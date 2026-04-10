@@ -1,0 +1,1921 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Web Dev – Complete Study Notes</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Sora:wght@300;400;600;700;800&display=swap');
+
+  :root {
+    --bg: #0d0f1a;
+    --surface: #141626;
+    --surface2: #1c1f35;
+    --border: #2a2f52;
+    --accent: #7c6dfa;
+    --accent2: #f7c948;
+    --accent3: #3ecf8e;
+    --accent4: #f87171;
+    --accent5: #38bdf8;
+    --accent6: #fb923c;
+    --text: #e2e4f0;
+    --muted: #8b90b8;
+    --code-bg: #0a0c18;
+    --sidebar-w: 270px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Sora', sans-serif;
+    font-size: 15px;
+    line-height: 1.75;
+    display: flex;
+  }
+
+  /* ===== SIDEBAR ===== */
+  #sidebar {
+    width: var(--sidebar-w);
+    min-width: var(--sidebar-w);
+    height: 100vh;
+    position: sticky;
+    top: 0;
+    overflow-y: auto;
+    background: #0b0d18;
+    border-right: 1px solid var(--border);
+    padding: 0 0 40px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+    flex-shrink: 0;
+  }
+  #sidebar::-webkit-scrollbar { width: 4px; }
+  #sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+  .sidebar-logo {
+    padding: 22px 20px 16px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 8px;
+    position: sticky;
+    top: 0;
+    background: #0b0d18;
+    z-index: 10;
+  }
+  .sidebar-logo span { font-size: 13px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; color: var(--accent); }
+  .sidebar-logo p { font-size: 10px; color: var(--muted); margin-top: 2px; }
+
+  .toc-group { margin-bottom: 4px; }
+  .toc-group-label {
+    font-size: 9px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--muted); padding: 10px 20px 4px; display: block;
+  }
+  .toc-group-label.ch0 { color: var(--accent6); }
+  .toc-group-label.ch0b { color: #a78bfa; }
+  .toc-group-label.ch1 { color: var(--accent); }
+  .toc-group-label.ch2 { color: var(--accent3); }
+  .toc-group-label.ch3 { color: var(--accent5); }
+  .toc-group-label.chq { color: var(--accent2); }
+
+  #sidebar a {
+    display: flex; align-items: center; gap: 8px; padding: 5px 20px;
+    color: var(--muted); text-decoration: none; font-size: 12.5px;
+    border-left: 2px solid transparent; transition: all 0.15s; line-height: 1.4;
+  }
+  #sidebar a:hover { color: var(--text); background: rgba(124,109,250,0.07); }
+  #sidebar a.active { color: #fff; border-left-color: var(--accent); background: rgba(124,109,250,0.1); }
+  #sidebar a .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--border); flex-shrink: 0; }
+  #sidebar a:hover .dot, #sidebar a.active .dot { background: var(--accent); }
+
+  /* ===== MAIN CONTENT ===== */
+  #main { flex: 1; min-width: 0; padding: 40px 24px 80px; max-width: 900px; }
+  .container { max-width: 860px; }
+
+  /* HEADERS */
+  header, .ch-header {
+    text-align: center; padding: 60px 0 50px;
+    border-bottom: 1px solid var(--border); margin-bottom: 50px;
+  }
+  .badge-orange { display: inline-block; background: var(--accent6); color: #fff; font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; padding: 4px 14px; border-radius: 20px; margin-bottom: 20px; }
+  .badge-purple { display: inline-block; background: #8b5cf6; color: #fff; font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; padding: 4px 14px; border-radius: 20px; margin-bottom: 20px; }
+  .badge { display: inline-block; background: var(--accent); color: #fff; font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; padding: 4px 14px; border-radius: 20px; margin-bottom: 20px; }
+  .badge-green { display: inline-block; background: var(--accent3); color: #0a1a0f; font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; padding: 4px 14px; border-radius: 20px; margin-bottom: 20px; }
+  .badge-blue { display: inline-block; background: var(--accent5); color: #051218; font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; padding: 4px 14px; border-radius: 20px; margin-bottom: 20px; }
+  .badge-yellow { display: inline-block; background: var(--accent2); color: #000; font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; padding: 4px 14px; border-radius: 20px; margin-bottom: 20px; }
+  header h1, .ch-header h1 { font-size: 2.8rem; font-weight: 800; letter-spacing: -1px; color: #fff; margin-bottom: 12px; }
+  header h1 span, .ch-header h1 span { color: var(--accent); }
+  .ch-header h1 span.g { color: var(--accent3); }
+  .ch-header h1 span.b { color: var(--accent5); }
+  .ch-header h1 span.o { color: var(--accent6); }
+  .ch-header h1 span.p { color: #a78bfa; }
+  header p, .ch-header p { color: var(--muted); font-size: 14px; }
+
+  /* SECTIONS */
+  section { margin-bottom: 52px; }
+  .section-header { display: flex; align-items: center; gap: 14px; margin-bottom: 24px; padding-bottom: 14px; border-bottom: 1px solid var(--border); }
+  .section-number { background: var(--accent); color: #fff; font-weight: 800; font-size: 13px; width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .section-number.green { background: var(--accent3); color: #0a1a0f; }
+  .section-number.blue  { background: var(--accent5); color: #051218; }
+  .section-number.orange { background: var(--accent6); color: #fff; }
+  .section-number.purple { background: #8b5cf6; color: #fff; }
+  section h2 { font-size: 1.35rem; font-weight: 700; color: #fff; }
+
+  /* CARDS */
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 20px 24px; margin-bottom: 16px; }
+  .card h3 { font-size: 13.5px; font-weight: 700; letter-spacing: 0.5px; color: var(--accent2); text-transform: uppercase; margin-bottom: 10px; }
+  .card p, .card li { color: var(--text); font-size: 14px; }
+  .card ul, .card ol { padding-left: 20px; }
+  .card ul li, .card ol li { margin-bottom: 5px; }
+  .card.highlight { border-color: var(--accent); background: linear-gradient(135deg, #141626, #1a1b30); }
+  .card.highlight-green { border-color: var(--accent3); background: linear-gradient(135deg, #141626, #0f2018); }
+  .card.highlight-blue { border-color: var(--accent5); background: linear-gradient(135deg, #141626, #0d1f2e); }
+  .card.highlight-orange { border-color: var(--accent6); background: linear-gradient(135deg, #141626, #2a1a0a); }
+  .card.highlight-purple { border-color: #8b5cf6; background: linear-gradient(135deg, #141626, #1a1228); }
+  .card.tip  { border-left: 3px solid var(--accent3); }
+  .card.warn { border-left: 3px solid var(--accent4); }
+  .card.info { border-left: 3px solid var(--accent5); }
+
+  /* CODE BLOCKS */
+  pre {
+    background: var(--code-bg); border: 1px solid var(--border); border-radius: 8px;
+    padding: 18px 20px; overflow-x: auto; margin: 12px 0;
+    font-family: 'JetBrains Mono', monospace; font-size: 13px; line-height: 1.7; color: #a5d6ff;
+  }
+  .kw  { color: #c792ea; }
+  .str { color: #c3e88d; }
+  .cmt { color: #546e7a; font-style: italic; }
+  .num { color: #f78c6c; }
+  .fn  { color: #82aaff; }
+  .var { color: #ffcb6b; }
+  .tag-html { color: #f87171; }
+  .attr { color: #f7c948; }
+
+  /* TWO COLUMN */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+  /* TABLE */
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; margin: 12px 0; }
+  th { background: var(--surface2); color: var(--accent); font-weight: 700; text-transform: uppercase; font-size: 11px; letter-spacing: 1px; padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border); }
+  td { padding: 9px 14px; border-bottom: 1px solid var(--border); color: var(--text); vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  td code, th code { font-family: 'JetBrains Mono', monospace; background: var(--code-bg); padding: 1px 6px; border-radius: 4px; font-size: 12px; }
+
+  /* TAG PILLS */
+  .tag { display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; margin: 2px; }
+  .tag.blue   { background: #1e2c60; color: #7c9dfa; }
+  .tag.green  { background: #0f3626; color: #3ecf8e; }
+  .tag.yellow { background: #2e2506; color: #f7c948; }
+  .tag.red    { background: #2e1010; color: #f87171; }
+  .tag.sky    { background: #0b2233; color: #38bdf8; }
+  .tag.orange { background: #2e1800; color: #fb923c; }
+
+  /* EXAMPLES SECTION */
+  .examples-header { padding: 28px 32px; border-radius: 12px 12px 0 0; margin-top: 60px; }
+  .examples-header.purple { background: linear-gradient(90deg, var(--accent) 0%, #5a4fcf 100%); }
+  .examples-header.green  { background: linear-gradient(90deg, #1a7a50 0%, #0f5c3a 100%); }
+  .examples-header.blue   { background: linear-gradient(90deg, #0e5a82 0%, #083d5e 100%); }
+  .examples-header.orange { background: linear-gradient(90deg, #c04a00 0%, #8a3000 100%); }
+  .examples-header.violet { background: linear-gradient(90deg, #6d28d9 0%, #4c1d95 100%); }
+  .examples-header h2 { color: #fff; font-size: 1.4rem; font-weight: 800; }
+  .examples-header p  { color: rgba(255,255,255,0.75); font-size: 13px; margin-top: 4px; }
+
+  .example-item { background: var(--surface); border: 1px solid var(--border); border-top: none; padding: 24px 28px; }
+  .example-item:last-child { border-radius: 0 0 12px 12px; }
+  .example-item h3 { font-size: 14px; font-weight: 700; color: var(--accent2); margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+  .example-item h3 .ex-num { background: var(--accent2); color: #000; font-size: 11px; font-weight: 800; padding: 2px 7px; border-radius: 4px; }
+  .output-label { font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--accent3); margin-top: 12px; margin-bottom: 4px; }
+  .output-box { background: #091c13; border: 1px solid #1a4030; border-radius: 6px; padding: 10px 14px; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--accent3); }
+
+  /* CHAPTER DIVIDERS */
+  .chapter-break { margin-top: 70px; border-top: 2px solid var(--border); padding-top: 60px; }
+  .ch-header { padding: 50px 0 40px; }
+
+  /* ============================================
+     QUIZ / MCQ STYLES
+     ============================================ */
+  .quiz-wrapper {
+    margin-top: 70px; border-top: 2px solid var(--border); padding-top: 60px;
+  }
+  .quiz-header {
+    text-align: center; padding: 40px 0 40px;
+    border-bottom: 1px solid var(--border); margin-bottom: 50px;
+  }
+  .quiz-header h1 { font-size: 2.4rem; font-weight: 800; color: #fff; margin-bottom: 10px; }
+  .quiz-header h1 span { color: var(--accent2); }
+  .quiz-header p { color: var(--muted); font-size: 14px; }
+
+  .quiz-section { margin-bottom: 50px; }
+  .quiz-section-title {
+    font-size: 1.1rem; font-weight: 800; color: var(--accent2);
+    text-transform: uppercase; letter-spacing: 1.5px;
+    padding: 10px 18px; background: rgba(247,201,72,0.08);
+    border: 1px solid rgba(247,201,72,0.2); border-radius: 8px;
+    margin-bottom: 20px; display: flex; align-items: center; gap: 10px;
+  }
+
+  .mcq-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 24px; margin-bottom: 18px;
+    transition: border-color 0.2s;
+  }
+  .mcq-card.answered-correct { border-color: var(--accent3); background: linear-gradient(135deg, #141626, #0f2018); }
+  .mcq-card.answered-wrong   { border-color: var(--accent4); background: linear-gradient(135deg, #141626, #1e0e0e); }
+
+  .mcq-q {
+    font-size: 14.5px; font-weight: 600; color: #fff;
+    margin-bottom: 16px; line-height: 1.6;
+  }
+  .mcq-q .q-num {
+    display: inline-flex; align-items: center; justify-content: center;
+    background: var(--accent2); color: #000; font-size: 11px; font-weight: 800;
+    width: 26px; height: 26px; border-radius: 6px; margin-right: 8px; flex-shrink: 0;
+  }
+
+  .mcq-options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .mcq-opt {
+    background: var(--surface2); border: 2px solid var(--border);
+    border-radius: 8px; padding: 10px 14px; cursor: pointer;
+    font-size: 13.5px; color: var(--text); transition: all 0.2s;
+    display: flex; align-items: flex-start; gap: 8px; text-align: left;
+  }
+  .mcq-opt:hover:not(.disabled) { border-color: var(--accent); color: #fff; background: rgba(124,109,250,0.1); }
+  .mcq-opt.correct { border-color: var(--accent3); background: rgba(62,207,142,0.12); color: var(--accent3); }
+  .mcq-opt.wrong   { border-color: var(--accent4); background: rgba(248,113,113,0.12); color: var(--accent4); }
+  .mcq-opt.disabled { cursor: default; }
+  .mcq-opt .opt-label { font-weight: 800; font-size: 12px; opacity: 0.7; flex-shrink: 0; margin-top: 1px; }
+
+  .mcq-feedback {
+    margin-top: 14px; padding: 10px 14px; border-radius: 8px; font-size: 13px;
+    display: none; line-height: 1.6;
+  }
+  .mcq-feedback.show { display: block; }
+  .mcq-feedback.correct { background: rgba(62,207,142,0.1); border: 1px solid rgba(62,207,142,0.3); color: var(--accent3); }
+  .mcq-feedback.wrong   { background: rgba(248,113,113,0.1); border: 1px solid rgba(248,113,113,0.3); color: var(--accent4); }
+
+  .quiz-progress {
+    display: flex; align-items: center; gap: 16px; margin-bottom: 30px;
+    padding: 14px 20px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+  }
+  .progress-bar-wrap { flex: 1; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
+  .progress-bar-fill { height: 100%; background: var(--accent3); border-radius: 3px; transition: width 0.4s; width: 0%; }
+  .progress-label { font-size: 12px; font-weight: 700; color: var(--muted); white-space: nowrap; }
+  .score-badge { background: var(--surface2); padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 800; color: var(--accent2); }
+
+  /* ============================================
+     FLASHCARD STYLES
+     ============================================ */
+  .flashcard-section { margin-bottom: 50px; }
+
+  .fc-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+    margin-top: 16px;
+  }
+
+  .flashcard {
+    perspective: 1000px;
+    height: 200px;
+    cursor: pointer;
+  }
+  .flashcard-inner {
+    position: relative; width: 100%; height: 100%;
+    transition: transform 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-style: preserve-3d;
+  }
+  .flashcard.flipped .flashcard-inner { transform: rotateY(180deg); }
+
+  .fc-front, .fc-back {
+    position: absolute; width: 100%; height: 100%;
+    backface-visibility: hidden; -webkit-backface-visibility: hidden;
+    border-radius: 12px; padding: 20px;
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    text-align: center;
+  }
+  .fc-front {
+    background: var(--surface); border: 2px solid var(--border);
+  }
+  .fc-back {
+    background: var(--surface2); border: 2px solid var(--accent);
+    transform: rotateY(180deg);
+  }
+  .fc-front:hover { border-color: var(--accent2); }
+
+  .fc-label {
+    font-size: 9px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 10px;
+  }
+  .fc-question {
+    font-size: 14px; font-weight: 600; color: #fff; line-height: 1.5;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .fc-hint { font-size: 11px; color: var(--muted); margin-top: 10px; }
+
+  .fc-back .fc-label { color: var(--accent); }
+  .fc-code {
+    font-family: 'JetBrains Mono', monospace; font-size: 12px;
+    color: #a5d6ff; line-height: 1.7; text-align: left; width: 100%;
+    background: var(--code-bg); padding: 10px 12px; border-radius: 6px;
+    overflow: auto; max-height: 140px;
+  }
+  .fc-text { font-size: 13px; color: var(--accent3); line-height: 1.6; }
+
+  .fc-nav {
+    display: flex; gap: 10px; align-items: center; margin-top: 16px;
+    justify-content: center;
+  }
+  .fc-btn {
+    background: var(--surface); border: 1px solid var(--border); color: var(--text);
+    padding: 8px 18px; border-radius: 8px; cursor: pointer; font-size: 13px;
+    font-family: 'Sora', sans-serif; font-weight: 600; transition: all 0.15s;
+  }
+  .fc-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .fc-btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .fc-btn.primary:hover { background: #6a5af0; }
+  .fc-counter { font-size: 13px; color: var(--muted); min-width: 70px; text-align: center; }
+
+  @media(max-width:900px){ #sidebar { display: none; } #main { padding: 24px 16px 60px; } }
+  @media(max-width:640px){ .two-col, .mcq-options { grid-template-columns: 1fr; } header h1, .ch-header h1 { font-size: 2rem; } }
+</style>
+</head>
+<body>
+
+<!-- ===== SIDEBAR TOC ===== -->
+<nav id="sidebar">
+  <div class="sidebar-logo">
+    <span>📚 Study Notes</span>
+    <p>HTML · CSS · JS · OOP · DOM · Quiz</p>
+  </div>
+
+  <!-- Chapter 0: HTML -->
+  <div class="toc-group">
+    <span class="toc-group-label ch0">⓪ HTML Fundamentals</span>
+    <a href="#html-intro"><span class="dot"></span>Introduction</a>
+    <a href="#html-structure"><span class="dot"></span>Page Structure</a>
+    <a href="#html-tables"><span class="dot"></span>Tables</a>
+    <a href="#html-media"><span class="dot"></span>Media Tags</a>
+    <a href="#html-forms"><span class="dot"></span>Forms &amp; Inputs</a>
+  </div>
+
+  <!-- Chapter 0b: CSS Fundamentals -->
+  <div class="toc-group">
+    <span class="toc-group-label ch0b">① CSS Fundamentals</span>
+    <a href="#css-intro"><span class="dot"></span>CSS Introduction</a>
+    <a href="#css-selectors"><span class="dot"></span>Selectors</a>
+    <a href="#css-text"><span class="dot"></span>Text Styles</a>
+    <a href="#css-boxmodel"><span class="dot"></span>Box Model</a>
+  </div>
+
+  <!-- Chapter 0c: CSS Responsive -->
+  <div class="toc-group">
+    <span class="toc-group-label" style="color:#34d399">② CSS Responsive</span>
+    <a href="#css-flexbox"><span class="dot"></span>Flexbox</a>
+    <a href="#css-grid"><span class="dot"></span>CSS Grid</a>
+    <a href="#css-media"><span class="dot"></span>Media Queries</a>
+    <a href="#css-patterns"><span class="dot"></span>Layout Patterns</a>
+  </div>
+
+  <!-- Chapter 1: JS Fundamentals -->
+  <div class="toc-group">
+    <span class="toc-group-label ch1">③ JS Fundamentals</span>
+    <a href="#intro"><span class="dot"></span>Introduction to JS</a>
+    <a href="#datatypes"><span class="dot"></span>Data Types</a>
+    <a href="#operators"><span class="dot"></span>Operators</a>
+    <a href="#conditionals"><span class="dot"></span>Conditionals</a>
+    <a href="#loops"><span class="dot"></span>Loops</a>
+    <a href="#functions"><span class="dot"></span>Functions &amp; Scope</a>
+    <a href="#arrays"><span class="dot"></span>Arrays</a>
+    <a href="#arrow"><span class="dot"></span>Arrow Functions</a>
+    <a href="#fp"><span class="dot"></span>Functional Programming</a>
+    <a href="#examples"><span class="dot"></span>📌 All Examples</a>
+  </div>
+
+  <!-- Chapter 2: OOP -->
+  <div class="toc-group">
+    <span class="toc-group-label ch2">④ OOP in JS</span>
+    <a href="#oop-intro" class="ch2"><span class="dot"></span>OOP Overview</a>
+    <a href="#obj-literal" class="ch2"><span class="dot"></span>Object Literal</a>
+    <a href="#obj-destructuring" class="ch2"><span class="dot"></span>Destructuring</a>
+    <a href="#class-oop" class="ch2"><span class="dot"></span>Class-Based OOP</a>
+    <a href="#class-inheritance" class="ch2"><span class="dot"></span>Inheritance</a>
+    <a href="#prototype-prop" class="ch2"><span class="dot"></span>Prototype Property</a>
+    <a href="#private-static" class="ch2"><span class="dot"></span>Private &amp; Static</a>
+    <a href="#prototypal" class="ch2"><span class="dot"></span>Prototypal Inheritance</a>
+    <a href="#modules" class="ch2"><span class="dot"></span>Modules &amp; NPM</a>
+    <a href="#oop-examples" class="ch2"><span class="dot"></span>📌 OOP Examples</a>
+  </div>
+
+  <!-- Chapter 3: Client-Side JS -->
+  <div class="toc-group">
+    <span class="toc-group-label ch3">⑤ Client-Side JS</span>
+    <a href="#cs-overview" class="ch3"><span class="dot"></span>Overview</a>
+    <a href="#cs-dom" class="ch3"><span class="dot"></span>DOM Model</a>
+    <a href="#cs-selecting" class="ch3"><span class="dot"></span>Selecting Elements</a>
+    <a href="#cs-manipulation" class="ch3"><span class="dot"></span>DOM Manipulation</a>
+    <a href="#cs-properties" class="ch3"><span class="dot"></span>Element Properties</a>
+    <a href="#cs-dataset" class="ch3"><span class="dot"></span>data-* &amp; dataset</a>
+    <a href="#cs-events" class="ch3"><span class="dot"></span>Event Handling</a>
+    <a href="#cs-fetch" class="ch3"><span class="dot"></span>Fetch &amp; Web API</a>
+    <a href="#cs-template" class="ch3"><span class="dot"></span>HTML Templates</a>
+    <a href="#cs-storage" class="ch3"><span class="dot"></span>localStorage</a>
+  </div>
+
+  <!-- Chapter 6: Web API -->
+  <div class="toc-group">
+    <span class="toc-group-label" style="color:#f87171">⑥ Web API</span>
+    <a href="#wa-overview"><span class="dot"></span>Overview</a>
+    <a href="#wa-http"><span class="dot"></span>HTTP &amp; URLs</a>
+    <a href="#wa-rest"><span class="dot"></span>REST Principles</a>
+    <a href="#wa-verbs"><span class="dot"></span>HTTP Verbs &amp; CRUD</a>
+    <a href="#wa-status"><span class="dot"></span>Status Codes</a>
+    <a href="#wa-nextjs"><span class="dot"></span>Next.js Routes</a>
+    <a href="#wa-dynamic"><span class="dot"></span>Dynamic Routes</a>
+    <a href="#wa-request"><span class="dot"></span>Request &amp; Response</a>
+  </div>
+</nav>
+
+<!-- ===== MAIN CONTENT ===== -->
+<div id="main">
+<div class="container">
+
+  <!-- ================================================================
+       CHAPTER 0 — HTML FUNDAMENTALS
+       ================================================================ -->
+  <header>
+    <div class="badge-orange">Chapter Study Notes</div>
+    <h1><span style="color:var(--accent6)">HTML</span> Fundamentals</h1>
+    <p>Page Structure · Semantic Tags · Tables · Media · Forms &amp; Input Types</p>
+  </header>
+
+  <section id="html-intro">
+    <div class="section-header">
+      <div class="section-number orange">1</div>
+      <h2>Introduction to HTML</h2>
+    </div>
+    <div class="card highlight-orange">
+      <h3>What is HTML?</h3>
+      <ul>
+        <li><strong>HyperText Markup Language</strong> — a text file containing markup tags</li>
+        <li>Describes the <strong>content &amp; logical structure</strong> of a web page</li>
+        <li>HTML = <strong>Content/Structure</strong> | CSS = <strong>Style/Presentation</strong> | JS = <strong>Behavior</strong></li>
+        <li>An HTML page can reference CSS, JavaScript, images, audio, and video</li>
+      </ul>
+    </div>
+    <div class="two-col">
+      <div class="card">
+        <h3>HTML Page Structure</h3>
+        <pre><span class="tag-html">&lt;!DOCTYPE html&gt;</span>
+<span class="tag-html">&lt;html&gt;</span>
+  <span class="tag-html">&lt;head&gt;</span>
+    <span class="tag-html">&lt;title&gt;</span>Page Title<span class="tag-html">&lt;/title&gt;</span>
+    <span class="tag-html">&lt;meta</span> <span class="attr">charset</span>=<span class="str">"UTF-8"</span><span class="tag-html">&gt;</span>
+    <span class="tag-html">&lt;link</span> <span class="attr">rel</span>=<span class="str">"stylesheet"</span> <span class="attr">href</span>=<span class="str">"style.css"</span><span class="tag-html">&gt;</span>
+    <span class="tag-html">&lt;script</span> <span class="attr">src</span>=<span class="str">"app.js"</span><span class="tag-html">&gt;&lt;/script&gt;</span>
+  <span class="tag-html">&lt;/head&gt;</span>
+  <span class="tag-html">&lt;body&gt;</span>
+    <span class="tag-html">&lt;h1&gt;</span>Heading<span class="tag-html">&lt;/h1&gt;</span>
+    <span class="tag-html">&lt;p&gt;</span>Paragraph<span class="tag-html">&lt;/p&gt;</span>
+  <span class="tag-html">&lt;/body&gt;</span>
+<span class="tag-html">&lt;/html&gt;</span></pre>
+      </div>
+      <div class="card">
+        <h3>What HTML Can Do</h3>
+        <ul>
+          <li>Define logical document structure</li>
+          <li>Collect user input via <strong>Forms</strong></li>
+          <li>Display tabular data using <strong>Tables</strong></li>
+          <li>Embed <strong>images, audio, video</strong></li>
+          <li>Draw graphics using <code>&lt;canvas&gt;</code></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="html-structure">
+    <div class="section-header">
+      <div class="section-number orange">2</div>
+      <h2>Semantic Page Structure</h2>
+    </div>
+    <div class="card highlight-orange">
+      <h3>Semantic Tags</h3>
+      <p>Use semantic tags to define the <strong>logical structure</strong> of the page in a meaningful way. Use CSS to arrange elements into the desired layout.</p>
+    </div>
+    <div class="card">
+      <h3>Semantic Tags Reference</h3>
+      <table>
+        <tr><th>Tag</th><th>Purpose</th></tr>
+        <tr><td><code>&lt;header&gt;</code></td><td>Introductory content, logo, nav links — typically at the top</td></tr>
+        <tr><td><code>&lt;nav&gt;</code></td><td>Primary navigation links (often inside header)</td></tr>
+        <tr><td><code>&lt;main&gt;</code></td><td>The main content of the page (unique per page)</td></tr>
+        <tr><td><code>&lt;section&gt;</code></td><td>Thematic grouping of content, like newspaper sections</td></tr>
+        <tr><td><code>&lt;article&gt;</code></td><td>Self-contained content that makes sense on its own (e.g., blog post)</td></tr>
+        <tr><td><code>&lt;aside&gt;</code></td><td>Sidebar content — can be removed without reducing main meaning</td></tr>
+        <tr><td><code>&lt;footer&gt;</code></td><td>Copyright, contact info, social links</td></tr>
+        <tr><td><code>&lt;div&gt;</code></td><td>Generic container — use when no semantic tag applies</td></tr>
+      </table>
+    </div>
+    <div class="card tip">
+      <h3>Article vs Section</h3>
+      <p><strong>&lt;article&gt;</strong> = self-contained post (makes sense when read alone). <strong>&lt;section&gt;</strong> = thematic grouping. Think newspaper: many articles inside each section. An article can contain sections (intro, body, summary).</p>
+    </div>
+  </section>
+
+  <section id="html-tables">
+    <div class="section-header">
+      <div class="section-number orange">3</div>
+      <h2>HTML Tables</h2>
+    </div>
+    <div class="card">
+      <h3>Table Structure</h3>
+      <p>Tables represent tabular data and are built with semantic sections.</p>
+      <pre><span class="tag-html">&lt;table&gt;</span>
+  <span class="tag-html">&lt;thead&gt;</span>
+    <span class="tag-html">&lt;tr&gt;&lt;th&gt;</span>Col 1<span class="tag-html">&lt;/th&gt;&lt;th&gt;</span>Col 2<span class="tag-html">&lt;/th&gt;&lt;/tr&gt;</span>
+  <span class="tag-html">&lt;/thead&gt;</span>
+  <span class="tag-html">&lt;tfoot&gt;</span>  <span class="cmt">&lt;!-- comes BEFORE tbody in code --&gt;</span>
+    <span class="tag-html">&lt;tr&gt;&lt;td&gt;</span>Footer 1<span class="tag-html">&lt;/td&gt;&lt;td&gt;</span>Footer 2<span class="tag-html">&lt;/td&gt;&lt;/tr&gt;</span>
+  <span class="tag-html">&lt;/tfoot&gt;</span>
+  <span class="tag-html">&lt;tbody&gt;</span>
+    <span class="tag-html">&lt;tr&gt;&lt;td&gt;</span>Cell 1.1<span class="tag-html">&lt;/td&gt;&lt;td&gt;</span>Cell 1.2<span class="tag-html">&lt;/td&gt;&lt;/tr&gt;</span>
+  <span class="tag-html">&lt;/tbody&gt;</span>
+<span class="tag-html">&lt;/table&gt;</span></pre>
+    </div>
+    <div class="card warn">
+      <h3>⚠️ Important: tfoot placement</h3>
+      <p>Even though <code>&lt;tfoot&gt;</code> appears <strong>before</strong> <code>&lt;tbody&gt;</code> in the HTML code, the browser renders the footer <strong>at the bottom</strong> of the table.</p>
+    </div>
+  </section>
+
+  <section id="html-media">
+    <div class="section-header">
+      <div class="section-number orange">4</div>
+      <h2>Media Tags</h2>
+    </div>
+    <div class="card highlight-orange">
+      <pre><span class="cmt">&lt;!-- Image --&gt;</span>
+<span class="tag-html">&lt;img</span> <span class="attr">src</span>=<span class="str">"cat.jpg"</span> <span class="attr">alt</span>=<span class="str">"A cat"</span><span class="tag-html">&gt;</span>
+
+<span class="cmt">&lt;!-- Video with controls --&gt;</span>
+<span class="tag-html">&lt;video</span> <span class="attr">controls</span> <span class="attr">width</span>=<span class="str">"360"</span> <span class="attr">height</span>=<span class="str">"240"</span>
+  <span class="attr">src</span>=<span class="str">"movie.mp4"</span><span class="tag-html">&gt;&lt;/video&gt;</span>
+
+<span class="cmt">&lt;!-- Audio with controls --&gt;</span>
+<span class="tag-html">&lt;audio</span> <span class="attr">controls</span> <span class="attr">src</span>=<span class="str">"audio.mp3"</span><span class="tag-html">&gt;&lt;/audio&gt;</span></pre>
+    </div>
+  </section>
+
+  <section id="html-forms">
+    <div class="section-header">
+      <div class="section-number orange">5</div>
+      <h2>Forms &amp; Input Types</h2>
+    </div>
+    <div class="card">
+      <h3>Form Basics</h3>
+      <p>Forms collect user input and submit it to a server. Each input has a <strong>name</strong> (for submission) and an <strong>id</strong> (for JS/CSS access).</p>
+    </div>
+    <div class="card highlight-orange">
+      <h3>Input Types</h3>
+      <table>
+        <tr><th>Type</th><th>Use Case</th></tr>
+        <tr><td><code>type="text"</code></td><td>Single-line text box</td></tr>
+        <tr><td><code>type="password"</code></td><td>Masked password field</td></tr>
+        <tr><td><code>type="email"</code></td><td>Email address — browser validates format</td></tr>
+        <tr><td><code>type="number"</code></td><td>Spinbox with min, max, step attributes</td></tr>
+        <tr><td><code>type="range"</code></td><td>Slider — exact number not shown to user</td></tr>
+        <tr><td><code>type="date"</code></td><td>Calendar date picker</td></tr>
+        <tr><td><code>type="tel"</code></td><td>Phone number — opens number pad on mobile</td></tr>
+        <tr><td><code>type="url"</code></td><td>URL — loosely validated</td></tr>
+        <tr><td><code>type="radio"</code></td><td>Grouped by name — select one from group</td></tr>
+        <tr><td><code>type="checkbox"</code></td><td>Multiple selections allowed</td></tr>
+        <tr><td><code>type="submit"</code></td><td>Submits the form to the server</td></tr>
+        <tr><td><code>type="hidden"</code></td><td>Hidden data passed on submit</td></tr>
+        <tr><td><code>&lt;textarea&gt;</code></td><td>Multi-line text area</td></tr>
+        <tr><td><code>&lt;select&gt;</code></td><td>Dropdown / multi-select list</td></tr>
+      </table>
+    </div>
+    <div class="two-col">
+      <div class="card">
+        <h3>Input Attributes</h3>
+        <ul>
+          <li><code>placeholder</code> — hint text (not a label replacement)</li>
+          <li><code>required</code> — browser validation before submit</li>
+          <li><code>autofocus</code> — auto-focuses first matching field</li>
+          <li><code>pattern="regex"</code> — validates against a regex</li>
+          <li><code>min</code>, <code>max</code>, <code>step</code> — for number/range</li>
+          <li><code>disabled</code> / <code>readonly</code> — restrict editing</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Form Organization</h3>
+        <ul>
+          <li><code>&lt;label for="id"&gt;</code> — associates text with input; clicking label focuses input</li>
+          <li><code>&lt;fieldset&gt;</code> — groups related inputs</li>
+          <li><code>&lt;datalist&gt;</code> — provides autocomplete suggestions for a text box</li>
+          <li><code>&lt;optgroup&gt;</code> — groups options in a select list</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================================================================
+       CHAPTER 0b — CSS FUNDAMENTALS
+       ================================================================ -->
+  <div class="chapter-break">
+    <div class="ch-header">
+      <div class="badge-purple">Chapter Study Notes</div>
+      <h1>CSS <span class="p">Fundamentals</span></h1>
+      <p>Syntax · Selectors · Specificity · Text Styles · Box Model · Borders</p>
+    </div>
+
+    <section id="css-intro">
+      <div class="section-header">
+        <div class="section-number purple">A</div>
+        <h2>CSS Introduction</h2>
+      </div>
+      <div class="card highlight-purple">
+        <h3>What is CSS?</h3>
+        <ul>
+          <li><strong>Cascading Style Sheets</strong> — controls presentation and layout of HTML</li>
+          <li>Separates <strong>content (HTML)</strong> from <strong>design (CSS)</strong></li>
+          <li>Flexible, cross-platform, standards-based (W3C)</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Three Ways to Include CSS</h3>
+        <table>
+          <tr><th>Method</th><th>How</th><th>Best For</th></tr>
+          <tr><td><strong>Inline</strong></td><td><code>&lt;p style="color:red"&gt;</code></td><td>Quick one-off overrides</td></tr>
+          <tr><td><strong>Embedded</strong></td><td><code>&lt;style&gt;</code> in <code>&lt;head&gt;</code></td><td>Single-page styles</td></tr>
+          <tr><td><strong>External</strong></td><td><code>&lt;link rel="stylesheet" href="style.css"&gt;</code></td><td>✅ Recommended — reusable, cached</td></tr>
+        </table>
+      </div>
+      <div class="two-col">
+        <div class="card warn">
+          <h3>The Cascade</h3>
+          <p>Last rule applied wins. Styles are applied in order found — later rules overwrite earlier ones in case of conflict. <strong>Inline styles win</strong> over all others.</p>
+        </div>
+        <div class="card info">
+          <h3>Inheritance</h3>
+          <p>Child elements inherit properties from their parent. A style on <code>body</code> (e.g., font) applies to all descendants unless overridden by a more specific rule.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="css-selectors">
+      <div class="section-header">
+        <div class="section-number purple">B</div>
+        <h2>CSS Selectors</h2>
+      </div>
+      <div class="card highlight-purple">
+        <h3>Selector Types</h3>
+        <table>
+          <tr><th>Selector</th><th>Example</th><th>Selects</th></tr>
+          <tr><td>Element</td><td><code>p { }</code></td><td>All <code>&lt;p&gt;</code> elements</td></tr>
+          <tr><td>Class</td><td><code>.btn { }</code></td><td>Elements with class="btn"</td></tr>
+          <tr><td>ID</td><td><code>#logo { }</code></td><td>Element with id="logo"</td></tr>
+          <tr><td>Universal</td><td><code>* { }</code></td><td>All elements (reset defaults)</td></tr>
+          <tr><td>Descendant</td><td><code>div p { }</code></td><td>All <code>&lt;p&gt;</code> inside any <code>&lt;div&gt;</code></td></tr>
+          <tr><td>Child</td><td><code>div &gt; p { }</code></td><td>Direct child <code>&lt;p&gt;</code> of <code>&lt;div&gt;</code></td></tr>
+          <tr><td>Attribute</td><td><code>a[href^="https"]</code></td><td>Links starting with https</td></tr>
+          <tr><td>Pseudo-class</td><td><code>a:hover { }</code></td><td>Link on mouse-over</td></tr>
+          <tr><td>Pseudo-element</td><td><code>p::before { }</code></td><td>Insert content before <code>&lt;p&gt;</code></td></tr>
+        </table>
+      </div>
+      <div class="card">
+        <h3>Specificity — More specific wins!</h3>
+        <p>When multiple rules target the same element: <strong>ID &gt; Class &gt; Element</strong>. Inline styles win over all. The <code>!important</code> rule overrides everything.</p>
+      </div>
+      <div class="card">
+        <h3>Structural Pseudo-classes</h3>
+        <pre><span class="kw">tr</span>:<span class="fn">first-child</span>  { } <span class="cmt">/* first table row */</span>
+<span class="kw">tr</span>:<span class="fn">last-child</span>   { } <span class="cmt">/* last table row */</span>
+<span class="kw">tr</span>:<span class="fn">nth-child</span>(<span class="num">2</span>) { } <span class="cmt">/* second table row */</span>
+<span class="kw">tr</span>:<span class="fn">nth-child</span>(odd)  { } <span class="cmt">/* every odd row — zebra stripes */</span>
+<span class="kw">tr</span>:<span class="fn">nth-child</span>(even) { } <span class="cmt">/* every even row */</span></pre>
+      </div>
+    </section>
+
+    <section id="css-text">
+      <div class="section-header">
+        <div class="section-number purple">C</div>
+        <h2>Text Styles &amp; Font Sizing</h2>
+      </div>
+      <div class="two-col">
+        <div class="card">
+          <h3>Key Text Properties</h3>
+          <ul>
+            <li><code>font-family</code> — typeface name (use stacks)</li>
+            <li><code>font-size</code> — size in px, em, rem, %</li>
+            <li><code>font-weight</code> — bold, normal, 400–900</li>
+            <li><code>font-style</code> — normal, italic</li>
+            <li><code>color</code> — text color</li>
+            <li><code>text-align</code> — left, right, center, justify</li>
+            <li><code>text-decoration</code> — none, underline, line-through</li>
+          </ul>
+        </div>
+        <div class="card info">
+          <h3>Relative Font Sizing</h3>
+          <ul>
+            <li><code>em</code> — relative to parent font-size</li>
+            <li><code>rem</code> — relative to root html font-size</li>
+            <li><code>%</code> — percentage of parent</li>
+            <li><strong>Preferred</strong> — scales across screen sizes &amp; user preferences</li>
+            <li>Set <code>body { font-size: 100%; }</code> as baseline</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="css-boxmodel">
+      <div class="section-header">
+        <div class="section-number purple">D</div>
+        <h2>Box Model, Margin, Border &amp; Padding</h2>
+      </div>
+      <div class="card highlight-purple">
+        <h3>The Box Model</h3>
+        <p>Every HTML element is a box with 4 layers from inside out: <strong>Content → Padding → Border → Margin</strong>.</p>
+      </div>
+      <div class="card">
+        <h3>Shorthand Margin &amp; Padding Rules</h3>
+        <pre><span class="cmt">/* 1 value: all 4 sides */</span>
+margin: <span class="num">0.8rem</span>;
+
+<span class="cmt">/* 2 values: top&bottom | left&right */</span>
+margin: <span class="num">10px</span> <span class="num">20px</span>;
+
+<span class="cmt">/* 4 values: top right bottom left (clockwise) */</span>
+margin: <span class="num">1px</span> <span class="num">3px</span> <span class="num">5px</span> <span class="num">7px</span>;
+
+<span class="cmt">/* Individual sides */</span>
+margin-top: <span class="num">10px</span>;  padding-left: <span class="num">1rem</span>;</pre>
+      </div>
+      <div class="card">
+        <h3>Borders</h3>
+        <pre><span class="cmt">/* shorthand: width | style | color */</span>
+border: <span class="num">2px</span> solid <span class="str">#3ecf8e</span>;
+border-radius: <span class="num">8px</span>;   <span class="cmt">/* rounds corners */</span>
+border-top: <span class="num">1px</span> dashed <span class="str">#ccc</span>; <span class="cmt">/* individual side */</span></pre>
+      </div>
+    </section>
+  </div><!-- end CSS Fundamentals -->
+
+  <!-- ================================================================
+       CHAPTER 0c — CSS RESPONSIVE DESIGN
+       ================================================================ -->
+  <div class="chapter-break">
+    <div class="ch-header">
+      <div class="badge-green">Chapter Study Notes</div>
+      <h1>CSS <span class="g">Responsive Design</span></h1>
+      <p>Flexbox · CSS Grid · Media Queries · Common Layout Patterns</p>
+    </div>
+
+    <section id="css-flexbox">
+      <div class="section-header">
+        <div class="section-number green">E</div>
+        <h2>Flexbox</h2>
+      </div>
+      <div class="card highlight-green">
+        <h3>What is Flexbox?</h3>
+        <p>A <strong>one-dimensional</strong> layout model for rows OR columns. Flex container stretches/shrinks items to fill space.</p>
+        <pre>.flex-container {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}</pre>
+      </div>
+      <div class="card">
+        <h3>Flex Container Properties</h3>
+        <table>
+          <tr><th>Property</th><th>Values / Effect</th></tr>
+          <tr><td><code>flex-direction</code></td><td><code>row</code> (default) | <code>column</code> — direction of items</td></tr>
+          <tr><td><code>flex-wrap</code></td><td><code>nowrap</code> (default) | <code>wrap</code> — allow multiple lines</td></tr>
+          <tr><td><code>justify-content</code></td><td>Aligns items along <strong>main axis</strong> (start, center, space-between, space-around)</td></tr>
+          <tr><td><code>align-items</code></td><td>Aligns items along <strong>cross axis</strong> (stretch default, center, flex-start)</td></tr>
+          <tr><td><code>align-content</code></td><td>Distributes space between wrapped lines</td></tr>
+          <tr><td><code>gap</code></td><td>Space between flex items</td></tr>
+        </table>
+      </div>
+      <div class="card">
+        <h3>Flex Item Properties</h3>
+        <table>
+          <tr><th>Property</th><th>Effect</th></tr>
+          <tr><td><code>flex-grow</code></td><td>How much item grows to fill space (0 = don't grow)</td></tr>
+          <tr><td><code>flex-shrink</code></td><td>How much item shrinks when space is limited</td></tr>
+          <tr><td><code>flex-basis</code></td><td>Default size before space is distributed</td></tr>
+          <tr><td><code>flex: grow shrink basis</code></td><td>Shorthand — e.g., <code>flex: 1 1 200px</code></td></tr>
+          <tr><td><code>order</code></td><td>Changes display order of item</td></tr>
+          <tr><td><code>align-self</code></td><td>Overrides <code>align-items</code> for a single item</td></tr>
+        </table>
+      </div>
+    </section>
+
+    <section id="css-grid">
+      <div class="section-header">
+        <div class="section-number green">F</div>
+        <h2>CSS Grid</h2>
+      </div>
+      <div class="card highlight-green">
+        <h3>What is CSS Grid?</h3>
+        <p>A <strong>two-dimensional</strong> layout system for both rows AND columns. Best for macro/page-level layouts.</p>
+        <pre>.container {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  grid-template-rows: auto 1fr auto;
+  gap: 1rem;
+}</pre>
+      </div>
+      <div class="card">
+        <h3>Grid Properties</h3>
+        <table>
+          <tr><th>Property</th><th>Effect</th></tr>
+          <tr><td><code>grid-template-columns</code></td><td>Define column sizes: px, %, fr, auto</td></tr>
+          <tr><td><code>grid-template-rows</code></td><td>Define row sizes</td></tr>
+          <tr><td><code>grid-gap / gap</code></td><td>Space between grid tracks (gutters)</td></tr>
+          <tr><td><code>grid-column: 2/4</code></td><td>Item spans from line 2 to line 4</td></tr>
+          <tr><td><code>grid-column: 1/-1</code></td><td>Spans all available columns</td></tr>
+          <tr><td><code>grid-area: header</code></td><td>Name the item for use in template-areas</td></tr>
+          <tr><td><code>grid-template-areas</code></td><td>Named placement — best for readable layouts</td></tr>
+        </table>
+      </div>
+      <div class="card">
+        <h3>Named Grid Areas — Best Practice</h3>
+        <pre>.container {
+  display: grid;
+  grid-template-areas:
+    "header header header"
+    "sidebar main  aside"
+    "footer footer footer";
+}
+header { grid-area: header; }
+main   { grid-area: main; }</pre>
+      </div>
+      <div class="card tip">
+        <h3>Grid vs Flexbox</h3>
+        <p><strong>Grid</strong> = 2D (rows + columns) → use for page-level macro layouts. <strong>Flexbox</strong> = 1D (row OR column) → use for component-level micro layouts like navbars and cards. In practice, <strong>combine both</strong>: Grid for page layout, Flexbox inside grid cells.</p>
+      </div>
+    </section>
+
+    <section id="css-media">
+      <div class="section-header">
+        <div class="section-number green">G</div>
+        <h2>Media Queries</h2>
+      </div>
+      <div class="card highlight-green">
+        <h3>Responsive Web Design (RWD)</h3>
+        <p>Use media queries to serve <strong>different layouts for different screen sizes</strong>. Use a <strong>mobile-first</strong> approach — start with single-column, then add columns as screen widens.</p>
+        <pre><span class="cmt">/* Apply 2-column grid only on screens > 700px */</span>
+@media screen and (min-width: <span class="num">700px</span>) {
+  .page {
+    display: grid;
+    grid-template-columns: <span class="num">2fr</span> <span class="num">1fr</span>;
+  }
+}</pre>
+      </div>
+      <div class="card">
+        <h3>Common Breakpoints</h3>
+        <table>
+          <tr><th>Device</th><th>Breakpoint</th></tr>
+          <tr><td>Mobile</td><td>&lt; 480px</td></tr>
+          <tr><td>Tablet</td><td>768px</td></tr>
+          <tr><td>Laptop</td><td>1024px</td></tr>
+          <tr><td>Desktop</td><td>1280px+</td></tr>
+        </table>
+      </div>
+    </section>
+
+    <section id="css-patterns">
+      <div class="section-header">
+        <div class="section-number green">H</div>
+        <h2>Common Layout Patterns</h2>
+      </div>
+      <div class="card">
+        <h3>Key Layout Patterns</h3>
+        <table>
+          <tr><th>Pattern</th><th>Technique</th></tr>
+          <tr><td><strong>Pancake Stack</strong> (Header-Main-Footer)</td><td><code>grid-template-rows: auto 1fr auto</code> — footer stays at bottom</td></tr>
+          <tr><td><strong>Sidebar Layout</strong></td><td><code>grid-template-columns: minmax(100px, 20%) 1fr</code></td></tr>
+          <tr><td><strong>Menu bar</strong></td><td><code>ul { display: flex; gap: 1rem; flex-wrap: wrap; }</code></td></tr>
+          <tr><td><strong>Deconstructed Pancake</strong></td><td><code>flex: 1 1 200px</code> — items wrap to next line at min-size</td></tr>
+          <tr><td><strong>Clamping Card</strong></td><td><code>width: clamp(23ch, 40%, 46ch)</code> — responsive with min/max</td></tr>
+          <tr><td><strong>Aspect Ratio Image</strong></td><td><code>aspect-ratio: 16/9</code> — maintains ratio while resizing</td></tr>
+        </table>
+      </div>
+    </section>
+
+  </div><!-- end CSS Responsive -->
+
+  <!-- ================================================================
+       CHAPTER 1 — JS FUNDAMENTALS
+       ================================================================ -->
+  <div class="chapter-break">
+    <div class="ch-header">
+      <div class="badge">Chapter Study Notes</div>
+      <h1><span>Java</span>Script</h1>
+      <p>Data Types · Operators · Control Flow · Functions · Arrays · Functional Programming</p>
+    </div>
+
+  <!-- 1. INTRODUCTION -->
+  <section id="intro">
+    <div class="section-header">
+      <div class="section-number">1</div>
+      <h2>Introduction to JavaScript</h2>
+    </div>
+    <div class="card">
+      <h3>What is JavaScript?</h3>
+      <ul>
+        <li><strong>Platform-independent</strong> scripting language — runs anywhere</li>
+        <li><strong>Lightweight but powerful</strong> interpreted language</li>
+        <li>Supports both <strong>functional</strong> and <strong>object-oriented</strong> programming</li>
+        <li>Current version: <strong>ES 2023 (ECMAScript 2023)</strong></li>
+        <li>Syntactically a <strong>C-family language</strong> (like Java / C#)</li>
+      </ul>
+    </div>
+    <div class="two-col">
+      <div class="card">
+        <h3>Where it runs</h3>
+        <ul>
+          <li><strong>Client-side</strong> – embedded in HTML, run by the browser</li>
+          <li><strong>Server-side</strong> – using Node.js</li>
+          <li><strong>Desktop apps</strong> – e.g. Electron.js</li>
+          <li><strong>Mobile apps</strong> – e.g. React Native</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>What JS Can Do</h3>
+        <ul>
+          <li>Handle client-side events (clicks, mouse-over)</li>
+          <li>Manipulate the DOM (read/add/edit/delete HTML elements)</li>
+          <li>Validate form input before server submission</li>
+          <li>Perform computations, sorting, animation</li>
+          <li>Async server calls <strong>(AJAX)</strong> without page reload</li>
+        </ul>
+      </div>
+    </div>
+    <div class="card tip">
+      <h3>Full Stack Note</h3>
+      <p>In a modern stack (MEAN/React/Next.js): <strong>JavaScript is the common language throughout the full stack</strong>, and <strong>JSON is the common data format</strong>.</p>
+    </div>
+  </section>
+
+  <!-- 2. DATA TYPES -->
+  <section id="datatypes">
+    <div class="section-header">
+      <div class="section-number">2</div>
+      <h2>Data Types in JavaScript</h2>
+    </div>
+    <div class="card highlight">
+      <h3>Declaring Variables</h3>
+      <ul>
+        <li>Use <code>const</code> by default — creates a block-scoped, read-only variable</li>
+        <li>Use <code>let</code> when the value needs to change (mutable variable)</li>
+        <li>Variable names are <strong>case-sensitive</strong></li>
+        <li>JS is <strong>loosely typed</strong> — the type comes from the assigned value</li>
+      </ul>
+      <pre><span class="kw">const</span> <span class="var">height</span> = <span class="num">110</span>;      <span class="cmt">// number</span>
+<span class="kw">let</span> <span class="var">count</span> = <span class="num">5</span>;
+<span class="var">count</span> = <span class="num">6</span>;            <span class="cmt">// OK — let is mutable</span></pre>
+    </div>
+    <div class="card">
+      <h3>The 7 Primitive Types</h3>
+      <table>
+        <tr><th>Type</th><th>Example</th><th>Notes</th></tr>
+        <tr><td><code>number</code></td><td><code>5, 3.14</code></td><td>Integer &amp; float same type</td></tr>
+        <tr><td><code>bigint</code></td><td><code>9007199254740991n</code></td><td>Very large integers</td></tr>
+        <tr><td><code>string</code></td><td><code>"hello", 'world'</code></td><td>Immutable, copied by value</td></tr>
+        <tr><td><code>boolean</code></td><td><code>true, false</code></td><td>–</td></tr>
+        <tr><td><code>undefined</code></td><td><code>let x;</code></td><td>Declared but not assigned</td></tr>
+        <tr><td><code>null</code></td><td><code>let x = null;</code></td><td>Intentional "no value"; typeof → <code>object</code></td></tr>
+        <tr><td><code>function</code></td><td><code>function f(){}</code></td><td>–</td></tr>
+      </table>
+      <p style="margin-top:10px; font-size:13px; color:var(--muted)">Everything else is an <strong>object</strong>. Use <code>typeof x</code> to check type at runtime.</p>
+    </div>
+    <div class="two-col">
+      <div class="card warn">
+        <h3>undefined vs. null</h3>
+        <ul>
+          <li><strong>undefined</strong> – declared but never assigned</li>
+          <li><strong>null</strong> – explicitly assigned to mean "no value"</li>
+          <li><code>typeof undefined</code> → <em>"undefined"</em></li>
+          <li><code>typeof null</code> → <em>"object"</em> (historical JS quirk)</li>
+        </ul>
+      </div>
+      <div class="card warn">
+        <h3>NaN (Not a Number)</h3>
+        <ul>
+          <li>Result of illegal/erroneous operations (e.g., <code>'A' * 2</code>)</li>
+          <li><strong>Toxic</strong>: any arithmetic with NaN → NaN</li>
+          <li><code>NaN === NaN</code> is <strong>false</strong></li>
+          <li>Use <code>isNaN(value)</code> to check</li>
+        </ul>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Template Literals (Interpolation)</h3>
+      <pre><span class="kw">const</span> <span class="var">person</span> = {fname: <span class="str">'Samir'</span>, lname: <span class="str">'Mujtahid'</span>};
+console.<span class="fn">log</span>(<span class="str">`Full name: ${person.fname} ${person.lname}`</span>);
+<span class="cmt">// Output: Full name: Samir Mujtahid</span></pre>
+    </div>
+    <div class="card tip">
+      <h3>False-like (Falsy) Values</h3>
+      <p>These always evaluate to <code>false</code> in a condition:</p>
+      <div style="margin-top:8px">
+        <span class="tag red">false</span><span class="tag red">0</span><span class="tag red">""</span><span class="tag red">null</span><span class="tag red">undefined</span><span class="tag red">NaN</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. OPERATORS -->
+  <section id="operators">
+    <div class="section-header">
+      <div class="section-number">3</div>
+      <h2>Operators in JavaScript</h2>
+    </div>
+    <div class="card highlight">
+      <h3>== vs === (IMPORTANT)</h3>
+      <ul>
+        <li><code>==</code> → <strong>Loose equality</strong>: performs type conversion before comparing</li>
+        <li><code>===</code> → <strong>Strict equality</strong>: NO type conversion — types must match too</li>
+      </ul>
+      <pre><span class="num">0</span> == <span class="str">""</span>    <span class="cmt">// true  (type coercion)</span>
+<span class="num">0</span> === <span class="str">""</span>   <span class="cmt">// false (different types)</span></pre>
+      <p style="font-size:13px; color:var(--accent4); margin-top:8px">⚠️ <strong>Prefer === in practice</strong></p>
+    </div>
+  </section>
+
+  <!-- 4. CONDITIONALS -->
+  <section id="conditionals">
+    <div class="section-header">
+      <div class="section-number">4</div>
+      <h2>Conditional Statements</h2>
+    </div>
+    <div class="two-col">
+      <div class="card">
+        <h3>if / else</h3>
+        <pre><span class="kw">if</span> (condition) {
+  <span class="cmt">// block A</span>
+} <span class="kw">else</span> {
+  <span class="cmt">// block B</span>
+}</pre>
+      </div>
+      <div class="card">
+        <h3>switch / case</h3>
+        <pre><span class="kw">switch</span> (value) {
+  <span class="kw">case</span> <span class="num">1</span>: ...; <span class="kw">break</span>;
+  <span class="kw">case</span> <span class="num">2</span>: ...; <span class="kw">break</span>;
+  <span class="kw">default</span>: ...; <span class="kw">break</span>;
+}</pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. LOOPS -->
+  <section id="loops">
+    <div class="section-header">
+      <div class="section-number">5</div>
+      <h2>Loops</h2>
+    </div>
+    <div class="card highlight">
+      <h3>for-of (Modern — Preferred)</h3>
+      <pre><span class="kw">const</span> <span class="var">nums</span> = [<span class="num">1</span>,<span class="num">2</span>,<span class="num">3</span>];
+<span class="kw">for</span> (<span class="kw">const</span> <span class="var">n</span> <span class="kw">of</span> <span class="var">nums</span>) { console.<span class="fn">log</span>(<span class="var">n</span>); }
+
+<span class="kw">for</span> (<span class="kw">const</span> [key, value] <span class="kw">of</span> Object.<span class="fn">entries</span>(obj)) {
+  console.<span class="fn">log</span>(<span class="str">`${key} = ${value}`</span>);
+}</pre>
+    </div>
+  </section>
+
+  <!-- 6. FUNCTIONS -->
+  <section id="functions">
+    <div class="section-header">
+      <div class="section-number">6</div>
+      <h2>Functions &amp; Scope</h2>
+    </div>
+    <div class="card">
+      <h3>Defining Functions — 3 Ways</h3>
+      <pre><span class="kw">function</span> <span class="fn">double</span>(number) { <span class="kw">return</span> number * <span class="num">2</span>; }
+<span class="kw">const</span> <span class="var">average</span> = <span class="kw">function</span>(a, b) { <span class="kw">return</span> (a + b) / <span class="num">2</span>; }
+<span class="kw">const</span> <span class="var">average</span> = (a, b) => (a + b) / <span class="num">2</span>;</pre>
+    </div>
+  </section>
+
+  <!-- 7. ARRAYS -->
+  <section id="arrays">
+    <div class="section-header">
+      <div class="section-number">7</div>
+      <h2>Arrays</h2>
+    </div>
+    <div class="card">
+      <h3>Array Methods — Add / Remove</h3>
+      <table>
+        <tr><th>Method</th><th>Action</th></tr>
+        <tr><td><code>array.push(el)</code></td><td>Add to tail</td></tr>
+        <tr><td><code>array.pop()</code></td><td>Remove &amp; return from tail</td></tr>
+        <tr><td><code>array.unshift(el)</code></td><td>Add to head</td></tr>
+        <tr><td><code>array.shift()</code></td><td>Remove &amp; return from head</td></tr>
+        <tr><td><code>array.splice(i, n)</code></td><td>Remove n items at index i</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <!-- 8. ARROW FUNCTIONS -->
+  <section id="arrow">
+    <div class="section-header">
+      <div class="section-number">8</div>
+      <h2>Arrow Functions (Lambda)</h2>
+    </div>
+    <div class="card">
+      <h3>Key Array Operations</h3>
+      <table>
+        <tr><th>Method</th><th>What it does</th></tr>
+        <tr><td><code>.forEach(fn)</code></td><td>Runs function on each element (no return)</td></tr>
+        <tr><td><code>.map(fn)</code></td><td>Transforms each element → new array</td></tr>
+        <tr><td><code>.filter(fn)</code></td><td>Keeps elements where condition is true</td></tr>
+        <tr><td><code>.find(fn)</code></td><td>Returns FIRST matching element</td></tr>
+        <tr><td><code>.reduce(fn)</code></td><td>Collapses array to a single value</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <!-- 9. FUNCTIONAL PROGRAMMING -->
+  <section id="fp">
+    <div class="section-header">
+      <div class="section-number">9</div>
+      <h2>Functional Programming (FP)</h2>
+    </div>
+    <div class="card highlight">
+      <h3>FP Key Features</h3>
+      <ul>
+        <li><strong>Pure functions</strong> — no side effects; same input → same output</li>
+        <li><strong>Immutability</strong> — don't modify input → fewer bugs</li>
+        <li><strong>Higher-order functions</strong> — take or return other functions</li>
+        <li><strong>Closures</strong> — inner function retains access to outer scope</li>
+        <li><strong>First-class functions</strong> — functions can be stored/passed/returned</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ===== CH1 EXAMPLES ===== -->
+  <div id="examples">
+    <div class="examples-header purple">
+      <h2>📌 All Examples from the Chapter (with Answers)</h2>
+      <p>Every code example presented in the slides — organized and answered</p>
+    </div>
+    <div class="example-item">
+      <h3><span class="ex-num">01</span> Declaring Variables</h3>
+      <pre><span class="kw">const</span> <span class="var">height</span> = <span class="num">110</span>;
+<span class="kw">let</span> <span class="var">mutableHeight</span> = <span class="num">110</span>;
+<span class="var">mutableHeight</span> = <span class="num">120</span>;
+<span class="cmt">// height = 120; ← ERROR</span></pre>
+      <div class="output-label">✓ Answer</div>
+      <div class="output-box">mutableHeight → 120 | height stays 110 (read-only)</div>
+    </div>
+    <div class="example-item">
+      <h3><span class="ex-num">02</span> undefined vs. null</h3>
+      <pre><span class="kw">let</span> <span class="var">testVar</span>;
+console.<span class="fn">log</span>(<span class="var">testVar</span>);         <span class="cmt">// ?</span>
+console.<span class="fn">log</span>(<span class="kw">typeof</span> <span class="var">testVar</span>);  <span class="cmt">// ?</span>
+<span class="var">testVar</span> = <span class="kw">null</span>;
+console.<span class="fn">log</span>(<span class="kw">typeof</span> <span class="var">testVar</span>);  <span class="cmt">// ?</span></pre>
+      <div class="output-label">✓ Output</div>
+      <div class="output-box">undefined | undefined | object</div>
+    </div>
+    <div class="example-item">
+      <h3><span class="ex-num">03</span> Comparison Operators</h3>
+      <pre>console.<span class="fn">log</span>(<span class="num">0</span> == <span class="str">""</span>);  <span class="cmt">// ?</span>
+console.<span class="fn">log</span>(<span class="num">0</span> === <span class="str">""</span>); <span class="cmt">// ?</span></pre>
+      <div class="output-label">✓ Output</div>
+      <div class="output-box">true (loose equality) | false (strict equality)</div>
+    </div>
+    <div class="example-item">
+      <h3><span class="ex-num">04</span> For Loop — Factorial</h3>
+      <pre><span class="kw">let</span> <span class="var">factorial</span> = <span class="num">1</span>;
+<span class="kw">for</span> (<span class="kw">let</span> <span class="var">i</span> = <span class="num">1</span>; <span class="var">i</span> &lt;= <span class="num">5</span>; <span class="var">i</span>++) { <span class="var">factorial</span> *= <span class="var">i</span>; }</pre>
+      <div class="output-label">✓ Answer</div>
+      <div class="output-box">factorial = 120</div>
+    </div>
+    <div class="example-item">
+      <h3><span class="ex-num">05</span> Array Methods</h3>
+      <pre><span class="kw">const</span> <span class="var">numbers</span> = [<span class="num">1</span>,<span class="num">2</span>,<span class="num">3</span>,<span class="num">4</span>,<span class="num">5</span>];
+<span class="var">numbers</span>.<span class="fn">pop</span>();
+<span class="var">numbers</span>.<span class="fn">unshift</span>(<span class="num">0</span>);
+console.<span class="fn">log</span>(<span class="var">numbers</span>.<span class="fn">join</span>(<span class="str">"|"</span>));</pre>
+      <div class="output-label">✓ Output</div>
+      <div class="output-box">0|1|2|3|4</div>
+    </div>
+    <div class="example-item">
+      <h3><span class="ex-num">06</span> map + reduce Pipeline</h3>
+      <pre><span class="kw">let</span> <span class="var">sum</span> = [<span class="num">1</span>,<span class="num">2</span>,<span class="num">3</span>].<span class="fn">map</span>(<span class="var">x</span> => <span class="var">x</span> * <span class="num">2</span>).<span class="fn">reduce</span>((s,<span class="var">x</span>) => s+<span class="var">x</span>);</pre>
+      <div class="output-label">✓ Answer</div>
+      <div class="output-box">map → [2,4,6] → reduce → sum = 12</div>
+    </div>
+    <div class="example-item">
+      <h3><span class="ex-num">07</span> Closure — Counter</h3>
+      <pre><span class="kw">function</span> <span class="fn">makeCounter</span>() {
+  <span class="kw">let</span> <span class="var">i</span> = <span class="num">0</span>;
+  <span class="kw">return</span> <span class="kw">function</span>() { <span class="kw">return</span> ++<span class="var">i</span>; }
+}
+<span class="kw">let</span> <span class="var">counter</span> = <span class="fn">makeCounter</span>();
+console.<span class="fn">log</span>(<span class="var">counter</span>(), <span class="var">counter</span>());</pre>
+      <div class="output-label">✓ Output</div>
+      <div class="output-box">1  2</div>
+    </div>
+  </div>
+
+  <!-- ================================================================
+       CHAPTER 2 — OOP
+       ================================================================ -->
+  <div class="chapter-break">
+    <div class="ch-header">
+      <div class="badge" style="background:var(--accent3); color:#0a1a0f;">Chapter Study Notes</div>
+      <h1><span class="g">OOP</span> Using JavaScript</h1>
+      <p>Object Literals · Classes · Prototypal Inheritance · Prototype Chain · Modules · NPM</p>
+    </div>
+
+    <section id="oop-intro">
+      <div class="section-header">
+        <div class="section-number green">A</div>
+        <h2>JavaScript OOP Overview</h2>
+      </div>
+      <div class="card highlight-green">
+        <h3>What is a JS Object?</h3>
+        <ul>
+          <li>A <strong>dynamic collection of properties</strong> — key-value pairs</li>
+          <li>Value can be <strong>data</strong> (any type) or a <strong>method</strong> (function)</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>3 Ways to Create an Object</h3>
+        <table>
+          <tr><th>Method</th><th>Example</th></tr>
+          <tr><td><strong>Object Literal</strong></td><td><code>const obj = { key: value }</code></td></tr>
+          <tr><td><strong>Class Instantiation</strong></td><td><code>new Person('Ali')</code></td></tr>
+          <tr><td><strong>Prototype-Based</strong></td><td><code>Object.create(proto)</code></td></tr>
+        </table>
+      </div>
+    </section>
+
+    <section id="obj-literal">
+      <div class="section-header">
+        <div class="section-number green">B</div>
+        <h2>Object Literal using JSON</h2>
+      </div>
+      <div class="card highlight-green">
+        <pre><span class="kw">const</span> <span class="var">person</span> = {
+  firstName: <span class="str">'Samir'</span>, lastName: <span class="str">'Saghir'</span>,
+  <span class="fn">getName</span>() { <span class="kw">return</span> <span class="str">`${this.firstName} ${this.lastName}`</span>; }
+};
+<span class="kw">const</span> <span class="var">json</span> = JSON.<span class="fn">stringify</span>(person); <span class="cmt">// methods excluded</span>
+<span class="kw">const</span> <span class="var">obj</span>  = JSON.<span class="fn">parse</span>(json);</pre>
+      </div>
+    </section>
+
+    <section id="obj-destructuring">
+      <div class="section-header">
+        <div class="section-number green">C</div>
+        <h2>Object Destructuring</h2>
+      </div>
+      <div class="card highlight-green">
+        <pre><span class="kw">const</span> { firstname, age, address: { city }, ...otherDetails } = student;
+<span class="cmt">// firstname = 'Ali' | age = 18 | city = 'Doha'</span></pre>
+      </div>
+    </section>
+
+    <section id="class-oop">
+      <div class="section-header">
+        <div class="section-number green">D</div>
+        <h2>Class-Based OOP</h2>
+      </div>
+      <div class="card highlight-green">
+        <pre><span class="kw">class</span> <span class="fn">Person</span> {
+  <span class="fn">constructor</span>(firstname, lastname) {
+    <span class="kw">this</span>.firstname = firstname;
+    <span class="kw">this</span>.lastname  = lastname;
+  }
+  <span class="kw">get</span> <span class="fn">fullname</span>() { <span class="kw">return</span> <span class="str">`${this.firstname} ${this.lastname}`</span>; }
+  <span class="kw">set</span> <span class="fn">fullname</span>(v) { [<span class="kw">this</span>.firstname, <span class="kw">this</span>.lastname] = v.<span class="fn">split</span>(<span class="str">" "</span>); }
+}</pre>
+      </div>
+    </section>
+
+    <section id="class-inheritance">
+      <div class="section-header">
+        <div class="section-number green">E</div>
+        <h2>Class-Based Inheritance</h2>
+      </div>
+      <div class="card highlight-green">
+        <pre><span class="kw">class</span> <span class="fn">Student</span> <span class="kw">extends</span> <span class="fn">Person</span> {
+  <span class="fn">constructor</span>(firstname, lastname, gpa) {
+    <span class="fn">super</span>(firstname, lastname);
+    <span class="kw">this</span>.gpa = gpa;
+  }
+  <span class="fn">greet</span>() { <span class="kw">return</span> <span class="str">`${super.greet()}. My gpa is ${this.gpa}`</span>; }
+}</pre>
+      </div>
+    </section>
+
+    <section id="prototype-prop">
+      <div class="section-header">
+        <div class="section-number green">F</div>
+        <h2>Prototype Property &amp; Private/Static</h2>
+      </div>
+      <div class="two-col">
+        <div class="card highlight-green">
+          <h3>Private Fields — <code>#</code></h3>
+          <pre><span class="kw">class</span> <span class="fn">User</span> {
+  #id = <span class="str">`...`</span>;
+  <span class="kw">get</span> <span class="fn">userId</span>() { <span class="kw">return this</span>.#id; }
+}</pre>
+        </div>
+        <div class="card">
+          <h3>Static Members</h3>
+          <pre><span class="kw">class</span> <span class="fn">Animal</span> {
+  <span class="kw">static</span> planet = <span class="str">"Earth"</span>;
+}
+Animal.planet; <span class="cmt">// "Earth"</span></pre>
+        </div>
+      </div>
+    </section>
+
+    <section id="private-static">
+      <div class="section-header">
+        <div class="section-number green">G</div>
+        <h2>Prototypal Inheritance</h2>
+      </div>
+      <div class="card highlight-green">
+        <pre><span class="kw">const</span> <span class="var">cat</span>   = { name: <span class="str">'cat'</span>, legs: <span class="num">4</span>, eyes: <span class="num">2</span> };
+<span class="kw">const</span> <span class="var">myCat</span> = { name: <span class="str">'Garfield'</span> };
+Object.<span class="fn">setPrototypeOf</span>(<span class="var">myCat</span>, <span class="var">cat</span>);
+<span class="cmt">// myCat inherits legs & eyes from cat</span></pre>
+      </div>
+    </section>
+
+    <section id="prototypal">
+      <div class="section-header">
+        <div class="section-number green">H</div>
+        <h2>Prototype Chain</h2>
+      </div>
+      <div class="card">
+        <table>
+          <tr><th>Object</th><th>Own Properties</th><th>__proto__ →</th></tr>
+          <tr><td><code>myCat</code></td><td>name, breed</td><td><code>cat</code></td></tr>
+          <tr><td><code>cat</code></td><td>name, legs, eyes</td><td><code>Object.prototype</code></td></tr>
+          <tr><td><code>Object.prototype</code></td><td>toString, hasOwnProperty…</td><td><code>null</code></td></tr>
+        </table>
+      </div>
+    </section>
+
+    <section id="proto-chain">
+      <div class="section-header">
+        <div class="section-number green">I</div>
+        <h2>Modules &amp; NPM</h2>
+      </div>
+      <div class="card">
+        <h3>Named vs Default Export</h3>
+        <table>
+          <tr><th></th><th>Named Export</th><th>Default Export</th></tr>
+          <tr><td>Count/file</td><td>Multiple</td><td>ONE only</td></tr>
+          <tr><td>Import</td><td><code>import { add } from './lib.js'</code></td><td><code>import calc from './calc.js'</code></td></tr>
+        </table>
+      </div>
+    </section>
+
+    <section id="modules">
+      <div class="section-header">
+        <div class="section-number green">J</div>
+        <h2>NPM Quick Reference</h2>
+      </div>
+      <div class="card tip">
+        <ul>
+          <li><code>npm init</code> — create package.json</li>
+          <li><code>npm install package-name</code> — install</li>
+          <li><code>npm install mocha -D</code> — dev dependency</li>
+          <li>Add <code>node_modules/</code> to <code>.gitignore</code></li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- OOP EXAMPLES -->
+    <div id="oop-examples">
+      <div class="examples-header green">
+        <h2>📌 OOP Examples from the Chapter</h2>
+        <p>Key code examples from the OOP slides</p>
+      </div>
+      <div class="example-item">
+        <h3><span class="ex-num">OOP-01</span> Class Inheritance — extends &amp; super</h3>
+        <pre><span class="kw">const</span> <span class="var">s</span> = <span class="kw">new</span> <span class="fn">Student</span>(<span class="str">"Ali"</span>, <span class="str">"Faleh"</span>, <span class="num">3.5</span>);
+<span class="var">s</span>.fullname = <span class="str">"Ahmed Saleh"</span>;
+console.<span class="fn">log</span>(<span class="var">s</span>.<span class="fn">greet</span>());</pre>
+        <div class="output-label">✓ Output</div>
+        <div class="output-box">Hello, my name is Ahmed Saleh. My gpa is 3.5</div>
+      </div>
+      <div class="example-item">
+        <h3><span class="ex-num">OOP-02</span> Prototype Chain — Property Lookup</h3>
+        <pre>console.<span class="fn">log</span>(<span class="var">myCat</span>.name);
+console.<span class="fn">log</span>(<span class="var">myCat</span>.legs);
+console.<span class="fn">log</span>(<span class="var">myCat</span>.<span class="fn">hasOwnProperty</span>(<span class="str">'eyes'</span>));</pre>
+        <div class="output-label">✓ Output</div>
+        <div class="output-box">"Garfield" (own) | 4 (inherited from cat) | false (eyes is in cat)</div>
+      </div>
+      <div class="example-item">
+        <h3><span class="ex-num">OOP-03</span> Spread to Clone an Object</h3>
+        <pre><span class="kw">const</span> <span class="var">movie2</span> = { ...<span class="var">movie1</span>, episode: <span class="num">8</span>, rating: <span class="num">5</span> };</pre>
+        <div class="output-label">✓ Output</div>
+        <div class="output-box">movie1.episode=7 (unchanged) | movie2.episode=8</div>
+      </div>
+    </div>
+  </div><!-- end chapter 2 -->
+
+  <!-- ================================================================
+       CHAPTER 3 — CLIENT-SIDE JS
+       ================================================================ -->
+  <div class="chapter-break">
+    <div class="ch-header">
+      <div class="badge-blue">Chapter Study Notes</div>
+      <h1>JS on the <span class="b">Client Side</span></h1>
+      <p>DOM Manipulation · Event Handling · Fetch API · HTML Templates · localStorage</p>
+    </div>
+
+    <section id="cs-overview">
+      <div class="section-header">
+        <div class="section-number blue">1</div>
+        <h2>Overview &amp; Where to Place JS Code</h2>
+      </div>
+      <div class="card highlight-blue">
+        <h3>What Can Client-Side JS Do?</h3>
+        <ul>
+          <li>React to user input — handle client-side events</li>
+          <li><strong>Manipulate the DOM</strong> — add, update, delete HTML elements</li>
+          <li>Apply <strong>CSS updates</strong> dynamically</li>
+          <li><strong>Validate form input</strong> before server submission</li>
+          <li>Perform asynchronous <strong>Web API calls (AJAX)</strong></li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="cs-dom">
+      <div class="section-header">
+        <div class="section-number blue">2</div>
+        <h2>Document Object Model (DOM)</h2>
+      </div>
+      <div class="card highlight-blue">
+        <h3>What is the DOM?</h3>
+        <ul>
+          <li><strong>Object-oriented representation</strong> of the HTML document</li>
+          <li>Allows: select · add/update/remove elements · apply styles · listen to events</li>
+          <li>Updates page objects <strong>without reloading</strong> the page</li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="cs-selecting">
+      <div class="section-header">
+        <div class="section-number blue">3</div>
+        <h2>Selecting HTML Elements</h2>
+      </div>
+      <div class="card highlight-blue">
+        <h3>Modern Way — querySelector</h3>
+        <pre>document.<span class="fn">querySelector</span>(<span class="str">"p"</span>)          <span class="cmt">// first &lt;p&gt;</span>
+document.<span class="fn">querySelector</span>(<span class="str">"#myId"</span>)     <span class="cmt">// by ID</span>
+document.<span class="fn">querySelector</span>(<span class="str">".myClass"</span>)  <span class="cmt">// by class</span>
+document.<span class="fn">querySelectorAll</span>(<span class="str">"p"</span>)     <span class="cmt">// NodeList of ALL &lt;p&gt;</span></pre>
+      </div>
+    </section>
+
+    <section id="cs-manipulation">
+      <div class="section-header">
+        <div class="section-number blue">4</div>
+        <h2>DOM Manipulation</h2>
+      </div>
+      <div class="card">
+        <h3>Commonly Used DOM Methods</h3>
+        <table>
+          <tr><th>Task</th><th>Code</th></tr>
+          <tr><td>Create element</td><td><code>document.createElement('div')</code></td></tr>
+          <tr><td>Add element</td><td><code>document.body.append(newDiv)</code></td></tr>
+          <tr><td>Remove element</td><td><code>el.remove()</code></td></tr>
+          <tr><td>Hide element</td><td><code>el.style.display = 'none'</code></td></tr>
+          <tr><td>Add CSS class</td><td><code>el.classList.add('alert')</code></td></tr>
+          <tr><td>Toggle CSS class</td><td><code>el.classList.toggle('active')</code></td></tr>
+        </table>
+      </div>
+    </section>
+
+    <section id="cs-properties">
+      <div class="section-header">
+        <div class="section-number blue">5</div>
+        <h2>Common Element Properties</h2>
+      </div>
+      <div class="card">
+        <table>
+          <tr><th>Property</th><th>Description</th></tr>
+          <tr><td><code>value</code></td><td>Get/set value of input elements</td></tr>
+          <tr><td><code>innerHTML</code></td><td>Get/set HTML content (parses tags)</td></tr>
+          <tr><td><code>innerText</code></td><td>Get/set plain text content</td></tr>
+          <tr><td><code>classList</code></td><td>CSS classes (add/remove/toggle)</td></tr>
+          <tr><td><code>style</code></td><td>Inline CSS access</td></tr>
+        </table>
+      </div>
+    </section>
+
+    <section id="cs-dataset">
+      <div class="section-header">
+        <div class="section-number blue">6</div>
+        <h2>data-* Attributes &amp; dataset</h2>
+      </div>
+      <div class="card highlight-blue">
+        <pre><span class="cmt">&lt;!-- HTML: data-user-name="johndoe" --&gt;</span>
+<span class="kw">const</span> <span class="var">el</span> = document.<span class="fn">querySelector</span>(<span class="str">'#user'</span>);
+<span class="var">el</span>.dataset.userName;           <span class="cmt">// "johndoe" (camelCase)</span>
+<span class="var">el</span>.dataset.dob = <span class="str">'1990-01-01'</span>; <span class="cmt">// set</span>
+<span class="kw">delete</span> <span class="var">el</span>.dataset.dob;         <span class="cmt">// delete</span></pre>
+      </div>
+    </section>
+
+    <section id="cs-events">
+      <div class="section-header">
+        <div class="section-number blue">7</div>
+        <h2>Event Handling</h2>
+      </div>
+      <div class="card highlight-blue">
+        <h3>addEventListener (Recommended)</h3>
+        <pre><span class="kw">const</span> <span class="var">btn</span> = document.<span class="fn">querySelector</span>(<span class="str">'#myBtn'</span>);
+<span class="var">btn</span>.<span class="fn">addEventListener</span>(<span class="str">'click'</span>, (e) => {
+  e.target.classList.<span class="fn">toggle</span>(<span class="str">'active'</span>);
+});
+<span class="var">form</span>.<span class="fn">addEventListener</span>(<span class="str">'submit'</span>, (e) => {
+  e.<span class="fn">preventDefault</span>(); <span class="cmt">// stop page reload</span>
+});</pre>
+      </div>
+    </section>
+
+    <section id="cs-fetch">
+      <div class="section-header">
+        <div class="section-number blue">8</div>
+        <h2>Fetch API &amp; Web API Calls</h2>
+      </div>
+      <div class="card highlight-blue">
+        <pre><span class="kw">async function</span> <span class="fn">getData</span>() {
+  <span class="kw">const</span> <span class="var">response</span> = <span class="kw">await</span> <span class="fn">fetch</span>(<span class="str">'https://api.example.com/data'</span>);
+  <span class="kw">const</span> <span class="var">data</span>     = <span class="kw">await</span> <span class="var">response</span>.<span class="fn">json</span>();
+  console.<span class="fn">log</span>(<span class="var">data</span>);
+}
+
+<span class="kw">async function</span> <span class="fn">postData</span>(payload) {
+  <span class="kw">const</span> <span class="var">res</span> = <span class="kw">await</span> <span class="fn">fetch</span>(<span class="str">'/api/items'</span>, {
+    method: <span class="str">'POST'</span>,
+    headers: { <span class="str">'Content-Type'</span>: <span class="str">'application/json'</span> },
+    body: JSON.<span class="fn">stringify</span>(payload)
+  });
+  <span class="kw">return</span> <span class="var">res</span>.<span class="fn">json</span>();
+}</pre>
+      </div>
+    </section>
+
+    <section id="cs-template">
+      <div class="section-header">
+        <div class="section-number blue">9</div>
+        <h2>HTML Templates to Generate UI</h2>
+      </div>
+      <div class="card highlight-blue">
+        <pre><span class="kw">function</span> <span class="fn">renderList</span>(items) {
+  <span class="kw">const</span> <span class="var">html</span> = items.<span class="fn">map</span>(item =>
+    <span class="str">`&lt;div class="card"&gt;&lt;h3&gt;${item.title}&lt;/h3&gt;&lt;/div&gt;`</span>
+  ).<span class="fn">join</span>(<span class="str">''</span>);
+  document.<span class="fn">querySelector</span>(<span class="str">'#container'</span>).innerHTML = <span class="var">html</span>;
+}</pre>
+      </div>
+    </section>
+
+    <section id="cs-storage">
+      <div class="section-header">
+        <div class="section-number blue">10</div>
+        <h2>localStorage</h2>
+      </div>
+      <div class="card highlight-blue">
+        <pre><span class="cmt">// Save object</span>
+localStorage.<span class="fn">setItem</span>(<span class="str">'user'</span>, JSON.<span class="fn">stringify</span>({ name: <span class="str">'Ali'</span> }));
+
+<span class="cmt">// Load</span>
+<span class="kw">const</span> <span class="var">obj</span> = JSON.<span class="fn">parse</span>(localStorage.<span class="fn">getItem</span>(<span class="str">'user'</span>));
+
+<span class="cmt">// Delete</span>
+localStorage.<span class="fn">removeItem</span>(<span class="str">'user'</span>);</pre>
+      </div>
+      <div class="card warn">
+        <h3>localStorage vs sessionStorage</h3>
+        <table>
+          <tr><th></th><th>localStorage</th><th>sessionStorage</th></tr>
+          <tr><td>Persists after tab close</td><td>✅ Yes</td><td>❌ No</td></tr>
+          <tr><td>Shared across tabs</td><td>✅ Same origin</td><td>❌ Per tab only</td></tr>
+        </table>
+      </div>
+    </section>
+
+  </div><!-- end chapter 3 -->
+
+
+  <!-- ================================================================
+       CHAPTER 6 — WEB API
+       ================================================================ -->
+  <div class="chapter-break">
+    <div class="ch-header">
+      <div class="badge" style="background:var(--accent4); color:#fff;">Chapter Study Notes</div>
+      <h1>Web <span style="color:var(--accent4)">API</span></h1>
+      <p>HTTP · REST · CRUD · Next.js Routes · Request &amp; Response</p>
+    </div>
+
+    <section id="wa-overview">
+      <div class="section-header">
+        <div class="section-number" style="background:var(--accent4)">1</div>
+        <h2>What is a Web API?</h2>
+      </div>
+      <div class="card" style="border-color:var(--accent4); background: linear-gradient(135deg, #141626, #2a1010);">
+        <h3>Definition</h3>
+        <ul>
+          <li><strong>Web API</strong> = Web-accessible Application Programming Interface (also known as REST Services)</li>
+          <li>A web service that accepts HTTP requests and returns <strong>structured data (JSON)</strong> instead of HTML</li>
+          <li>Programmatically accessible at a particular URL</li>
+          <li>Goal: <strong>interoperability</strong> between heterogeneous systems</li>
+          <li>Can be accessed by any client: browsers, mobile apps, IoT devices, other servers</li>
+        </ul>
+      </div>
+      <div class="card tip">
+        <h3>Full Stack Architecture</h3>
+        <p>Front-end (UI Components) ↔ <strong>Web API (JSON)</strong> ↔ Back-end App Logic ↔ Database. The Web API is the interface layer between client and server.</p>
+      </div>
+      <div class="card">
+        <h3>SPA Architecture</h3>
+        <ul>
+          <li>A <strong>Single Page Application (SPA)</strong> fits on a single web page</li>
+          <li>Page resources are retrieved at load time or <strong>loaded in response to user actions</strong></li>
+          <li>The page <strong>does not reload</strong> at any point — updates are handled by JS DOM manipulation</li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="wa-http">
+      <div class="section-header">
+        <div class="section-number" style="background:var(--accent4)">2</div>
+        <h2>HTTP &amp; URLs</h2>
+      </div>
+      <div class="card" style="border-color:var(--accent4)">
+        <h3>What is HTTP?</h3>
+        <ul>
+          <li><strong>HyperText Transfer Protocol</strong> — the message protocol of the Web</li>
+          <li>Uses a <strong>Request/Response</strong> interaction model</li>
+          <li>Client sends a request → Server sends a response</li>
+          <li>HTTP is an <strong>application protocol</strong>, not just a transport protocol</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>URL Structure</h3>
+        <pre><span class="cmt">// https://www.example.com:443/api/books?sort=title</span>
+<span class="cmt">// └─protocol─┘ └──host──┘ └port┘ └─path─┘ └─query─┘</span>
+
+Protocol  : http, https
+Host      : domain name or IP address
+Port      : e.g. 80 (http), 443 (https), 3000 (dev)
+Path      : /api/books — identifies the resource
+Query     : ?key=value — optional parameters after ?</pre>
+      </div>
+      <div class="two-col">
+        <div class="card">
+          <h3>HTTP Request Message</h3>
+          <ul>
+            <li><strong>Request line</strong> — method, resource URI, protocol version</li>
+            <li><strong>Headers</strong> — additional parameters (Content-Type, Authorization…)</li>
+            <li><strong>Body</strong> — optional data (e.g., form data, JSON payload)</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>HTTP Response Message</h3>
+          <ul>
+            <li><strong>Status line</strong> — protocol version, status code, phrase</li>
+            <li><strong>Headers</strong> — metadata (Content-Type, etc.)</li>
+            <li><strong>Body</strong> — the requested resource (HTML, JSON, image…)</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="wa-rest">
+      <div class="section-header">
+        <div class="section-number" style="background:var(--accent4)">3</div>
+        <h2>REST Principles</h2>
+      </div>
+      <div class="card" style="border-color:var(--accent4); background: linear-gradient(135deg, #141626, #2a1010);">
+        <h3>REST = Representational State Transfer</h3>
+        <ul>
+          <li><strong>Nouns (Resources)</strong> — identified by unique URIs: <code>http://example.com/employees/123</code></li>
+          <li><strong>Verbs (HTTP Methods)</strong> — GET, POST, PUT, PATCH, DELETE</li>
+          <li><strong>Representations</strong> — data format returned (usually JSON, sometimes XML)</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Naming Resources — Best Practices</h3>
+        <pre><span class="cmt">// Use plural nouns for collections</span>
+/api/books               <span class="cmt">// collection</span>
+/api/books/ISBN-0011     <span class="cmt">// specific resource</span>
+/api/books/ISBN-0011/authors  <span class="cmt">// sub-collection</span>
+
+/api/classes             <span class="cmt">// collection</span>
+/api/classes/cmps350     <span class="cmt">// specific class</span>
+/api/classes/cmps350/students <span class="cmt">// sub-collection</span></pre>
+        <p style="font-size:13px; color:var(--muted); margin-top:8px">Traversing the path from generic → specific = navigating the data hierarchy. Always use a dedicated <code>/api</code> prefix.</p>
+      </div>
+    </section>
+
+    <section id="wa-verbs">
+      <div class="section-header">
+        <div class="section-number" style="background:var(--accent4)">4</div>
+        <h2>HTTP Verbs &amp; CRUD</h2>
+      </div>
+      <div class="card">
+        <h3>CRUD Operations → HTTP Methods</h3>
+        <table>
+          <tr><th>Operation</th><th>HTTP Method</th><th>URL Example</th><th>Notes</th></tr>
+          <tr><td><strong>Create</strong></td><td><code>POST</code></td><td><code>POST /books</code></td><td>Server decides new resource URI; not repeatable</td></tr>
+          <tr><td><strong>Read All</strong></td><td><code>GET</code></td><td><code>GET /books</code></td><td>Retrieve collection</td></tr>
+          <tr><td><strong>Read One</strong></td><td><code>GET</code></td><td><code>GET /books/:id</code></td><td>Retrieve specific resource</td></tr>
+          <tr><td><strong>Replace</strong></td><td><code>PUT</code></td><td><code>PUT /books/:id</code></td><td>Replace entire resource; repeatable (idempotent)</td></tr>
+          <tr><td><strong>Update</strong></td><td><code>PATCH</code></td><td><code>PATCH /books/:id</code></td><td>Partial update of a resource</td></tr>
+          <tr><td><strong>Delete</strong></td><td><code>DELETE</code></td><td><code>DELETE /books/:id</code></td><td>Remove resource; no body needed</td></tr>
+        </table>
+      </div>
+      <div class="card tip">
+        <h3>POST vs PUT</h3>
+        <p><strong>POST</strong> = server decides the new resource URI (not repeatable). <strong>PUT</strong> = client decides the resource URI (repeatable/idempotent). PUT is typically used for full replacement/update.</p>
+      </div>
+    </section>
+
+    <section id="wa-status">
+      <div class="section-header">
+        <div class="section-number" style="background:var(--accent4)">5</div>
+        <h2>HTTP Response Status Codes</h2>
+      </div>
+      <div class="card">
+        <h3>Status Code Classes</h3>
+        <table>
+          <tr><th>Range</th><th>Meaning</th><th>Examples</th></tr>
+          <tr><td><code>2xx</code></td><td><strong>Success</strong></td><td>200 OK · 201 Created · 204 No Content</td></tr>
+          <tr><td><code>3xx</code></td><td><strong>Redirection</strong></td><td>301 Moved Permanently · 302 Found</td></tr>
+          <tr><td><code>4xx</code></td><td><strong>Client Error</strong></td><td>400 Bad Request · 401 Unauthorized · 403 Forbidden · 404 Not Found · 422 Unprocessable</td></tr>
+          <tr><td><code>5xx</code></td><td><strong>Server Error</strong></td><td>500 Internal Server Error · 503 Service Unavailable</td></tr>
+        </table>
+      </div>
+    </section>
+
+    <section id="wa-nextjs">
+      <div class="section-header">
+        <div class="section-number" style="background:var(--accent4)">6</div>
+        <h2>Web API using Next.js</h2>
+      </div>
+      <div class="card" style="border-color:var(--accent4); background: linear-gradient(135deg, #141626, #2a1010);">
+        <h3>Next.js Overview</h3>
+        <ul>
+          <li><strong>Next.js</strong> = React-based full-stack framework for server-rendered pages AND Web APIs</li>
+          <li>Uses a <strong>file-system based App Router</strong> — folder structure = URL routes</li>
+          <li>Create a project: <code>npx create-next-app@latest .</code></li>
+          <li>Run dev server: <code>npm run dev</code></li>
+        </ul>
+      </div>
+      <div class="two-col">
+        <div class="card">
+          <h3>API Routes — route.js</h3>
+          <ul>
+            <li>Add a <code>route.js</code> file inside <code>app/api/</code></li>
+            <li>Export async functions named by HTTP verb: <code>GET</code>, <code>POST</code>, <code>PUT</code>, <code>DELETE</code></li>
+            <li>Each subfolder with <code>route.js</code> = one API endpoint</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Route Handler Pattern</h3>
+          <pre><span class="cmt">// app/api/books/route.js</span>
+<span class="kw">export async function</span> <span class="fn">GET</span>(request) {
+  <span class="kw">return</span> <span class="kw">new</span> <span class="fn">Response</span>(
+    JSON.<span class="fn">stringify</span>(books),
+    { headers: { <span class="str">'Content-Type'</span>: <span class="str">'application/json'</span> } }
+  );
+}
+
+<span class="kw">export async function</span> <span class="fn">POST</span>(request) {
+  <span class="kw">const</span> <span class="var">body</span> = <span class="kw">await</span> request.<span class="fn">json</span>();
+  books.<span class="fn">push</span>(body);
+  <span class="kw">return</span> <span class="kw">new</span> <span class="fn">Response</span>(JSON.<span class="fn">stringify</span>(body), {status: <span class="num">201</span>});
+}</pre>
+        </div>
+      </div>
+    </section>
+
+    <section id="wa-dynamic">
+      <div class="section-header">
+        <div class="section-number" style="background:var(--accent4)">7</div>
+        <h2>Dynamic Routes &amp; Query Parameters</h2>
+      </div>
+      <div class="card">
+        <h3>Dynamic Route Segments — [folderName]</h3>
+        <pre><span class="cmt">// File: app/api/books/[id]/route.js</span>
+<span class="cmt">// URL: GET /api/books/42 → params.id = "42"</span>
+
+<span class="kw">export async function</span> <span class="fn">GET</span>(request, { params }) {
+  <span class="kw">const</span> <span class="var">book</span> = books.<span class="fn">find</span>(b => b.id === <span class="fn">Number</span>(params.id));
+  <span class="kw">if</span> (!book) <span class="kw">return new</span> <span class="fn">Response</span>(<span class="str">'Not found'</span>, {status: <span class="num">404</span>});
+  <span class="kw">return</span> <span class="kw">new</span> <span class="fn">Response</span>(JSON.<span class="fn">stringify</span>(book));
+}
+
+<span class="kw">export async function</span> <span class="fn">DELETE</span>(request, { params }) {
+  books = books.<span class="fn">filter</span>(b => b.id !== <span class="fn">Number</span>(params.id));
+  <span class="kw">return new</span> <span class="fn">Response</span>(<span class="kw">null</span>, {status: <span class="num">204</span>});
+}</pre>
+      </div>
+      <div class="two-col">
+        <div class="card">
+          <h3>Catch-all Routes — [...slug]</h3>
+          <ul>
+            <li><code>[...slug]</code> matches any number of path segments</li>
+            <li><code>app/blogs/[...filterBy]</code> matches: <code>/blogs/2023</code>, <code>/blogs/2023/3/10</code></li>
+            <li>Matched segments are available as an <strong>array</strong> in <code>params</code></li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Query Parameters</h3>
+          <pre><span class="cmt">// URL: /products?sortBy=price</span>
+<span class="kw">export async function</span> <span class="fn">GET</span>(request) {
+  <span class="kw">const</span> { searchParams } =
+    <span class="kw">new</span> <span class="fn">URL</span>(request.url);
+  <span class="kw">const</span> <span class="var">sortBy</span> = searchParams
+    .<span class="fn">get</span>(<span class="str">'sortBy'</span>); <span class="cmt">// "price"</span>
+}</pre>
+        </div>
+      </div>
+    </section>
+
+    <section id="wa-request">
+      <div class="section-header">
+        <div class="section-number" style="background:var(--accent4)">8</div>
+        <h2>Working with Request &amp; Response</h2>
+      </div>
+      <div class="card" style="border-color:var(--accent4)">
+        <h3>Reading the Request Body</h3>
+        <pre><span class="cmt">// JSON body (most common — fetch POST/PUT)</span>
+<span class="kw">const</span> <span class="var">data</span> = <span class="kw">await</span> request.<span class="fn">json</span>();
+
+<span class="cmt">// Plain text body</span>
+<span class="kw">const</span> <span class="var">text</span> = <span class="kw">await</span> request.<span class="fn">text</span>();
+
+<span class="cmt">// Form data (HTML form submission)</span>
+<span class="kw">const</span> <span class="var">form</span> = <span class="kw">await</span> request.<span class="fn">formData</span>();
+<span class="kw">const</span> <span class="var">obj</span>  = Object.<span class="fn">fromEntries</span>(form);</pre>
+      </div>
+      <div class="two-col">
+        <div class="card">
+          <h3>Client-side Fetch to Web API</h3>
+          <pre><span class="cmt">// GET</span>
+<span class="kw">const</span> <span class="var">res</span> = <span class="kw">await</span> <span class="fn">fetch</span>(<span class="str">'/api/books'</span>);
+<span class="kw">const</span> <span class="var">books</span> = <span class="kw">await</span> <span class="var">res</span>.<span class="fn">json</span>();
+
+<span class="cmt">// POST</span>
+<span class="kw">await</span> <span class="fn">fetch</span>(<span class="str">'/api/books'</span>, {
+  method: <span class="str">'POST'</span>,
+  headers: {<span class="str">'Content-Type'</span>: <span class="str">'application/json'</span>},
+  body: JSON.<span class="fn">stringify</span>(newBook)
+});</pre>
+        </div>
+        <div class="card">
+          <h3>Key Summary</h3>
+          <ul>
+            <li>Next.js routes: <code>app/api/[resource]/route.js</code></li>
+            <li>Export named functions: <code>GET</code>, <code>POST</code>, <code>PUT</code>, <code>DELETE</code></li>
+            <li>Dynamic segments: wrap folder in <code>[brackets]</code></li>
+            <li>Access params via 2nd argument: <code>{ params }</code></li>
+            <li>Read body: <code>await request.json()</code></li>
+            <li>Return response: <code>new Response(JSON.stringify(data))</code></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+  </div><!-- end chapter 6 Web API -->
+
+
+</div><!-- container -->
+</div><!-- main -->
+
+<script>
+// Sidebar active link
+const links = document.querySelectorAll('#sidebar a');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const id = entry.target.id;
+      links.forEach(l => l.classList.remove('active'));
+      const active = document.querySelector(`#sidebar a[href="#${id}"]`);
+      if (active) active.classList.add('active');
+    }
+  });
+}, { rootMargin: '-10% 0px -80% 0px' });
+document.querySelectorAll('section[id], div[id]').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>

@@ -1,0 +1,2191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MCQ Practice Bank – Web Dev</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Sora:wght@300;400;600;700;800&display=swap');
+  :root {
+    --bg:#0d0f1a;--surface:#141626;--surface2:#1c1f35;--border:#2a2f52;
+    --accent:#7c6dfa;--accent2:#f7c948;--accent3:#3ecf8e;--accent4:#f87171;
+    --accent5:#38bdf8;--accent6:#fb923c;--text:#e2e4f0;--muted:#8b90b8;
+    --code-bg:#0a0c18;--sidebar-w:240px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Sora',sans-serif;font-size:15px;line-height:1.75;}
+  .layout-wrap{display:flex;min-height:calc(100vh - 52px);}
+
+  /* SIDEBAR */
+  #sidebar{width:var(--sidebar-w);min-width:var(--sidebar-w);height:calc(100vh - 52px);position:sticky;top:52px;overflow-y:auto;background:#0b0d18;border-right:1px solid var(--border);padding:0 0 40px;scrollbar-width:thin;scrollbar-color:var(--border) transparent;flex-shrink:0;align-self:flex-start;}
+  #sidebar::-webkit-scrollbar{width:4px;}
+  #sidebar::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
+  .sidebar-logo{padding:22px 20px 16px;border-bottom:1px solid var(--border);margin-bottom:8px;position:sticky;top:0;background:#0b0d18;z-index:10;}
+  .sidebar-logo span{font-size:13px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--accent2);}
+  .sidebar-logo p{font-size:10px;color:var(--muted);margin-top:2px;}
+  .toc-group{margin-bottom:4px;}
+  .toc-group-label{font-size:9px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--muted);padding:10px 20px 4px;display:block;}
+  #sidebar a{display:flex;align-items:center;gap:8px;padding:5px 20px;color:var(--muted);text-decoration:none;font-size:12.5px;border-left:2px solid transparent;transition:all 0.15s;line-height:1.4;}
+  #sidebar a:hover{color:var(--text);background:rgba(124,109,250,.07);}
+  #sidebar a.active{color:#fff;border-left-color:var(--accent);background:rgba(124,109,250,.1);}
+  #sidebar a .dot{width:6px;height:6px;border-radius:50%;background:var(--border);flex-shrink:0;}
+  #sidebar a:hover .dot,#sidebar a.active .dot{background:var(--accent);}
+
+  /* MAIN */
+  #main{flex:1;min-width:0;padding:40px 28px 80px;max-width:1000px;}
+
+  /* PAGE TABS */
+  .tab-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:32px;padding-bottom:20px;border-bottom:1px solid var(--border);}
+  .tab-btn{padding:8px 20px;border-radius:30px;border:1px solid var(--border);background:var(--surface);color:var(--muted);cursor:pointer;font-family:'Sora',sans-serif;font-size:12px;font-weight:700;letter-spacing:.5px;transition:all .18s;}
+  .tab-btn:hover{border-color:var(--accent);color:var(--accent);}
+  .tab-btn.active{background:var(--accent);border-color:var(--accent);color:#fff;}
+  .tab-page{display:none;}
+  .tab-page.active{display:block;}
+
+  /* HEADERS */
+  .ch-header{text-align:center;padding:50px 0 40px;border-bottom:1px solid var(--border);margin-bottom:40px;}
+  .badge{display:inline-block;padding:4px 14px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:16px;color:#fff;}
+  .ch-header h1{font-size:2.4rem;font-weight:800;color:#fff;margin-bottom:8px;}
+  .ch-header p{color:var(--muted);font-size:14px;}
+
+  /* PROGRESS */
+  .quiz-progress{display:flex;align-items:center;gap:16px;margin-bottom:28px;padding:14px 20px;background:var(--surface);border:1px solid var(--border);border-radius:10px;}
+  .progress-bar-wrap{flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden;}
+  .progress-bar-fill{height:100%;background:var(--accent3);border-radius:3px;transition:width .4s;width:0%;}
+  .progress-label{font-size:12px;font-weight:700;color:var(--muted);white-space:nowrap;}
+  .score-badge{background:var(--surface2);padding:4px 12px;border-radius:20px;font-size:12px;font-weight:800;color:var(--accent2);}
+  .reset-btn{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:5px 14px;font-size:11px;color:var(--muted);cursor:pointer;font-family:'Sora',sans-serif;transition:all .15s;}
+  .reset-btn:hover{border-color:var(--accent4);color:var(--accent4);}
+
+  /* QUIZ SECTION */
+  .quiz-section-title{font-size:1.05rem;font-weight:800;color:var(--accent2);text-transform:uppercase;letter-spacing:1.5px;padding:10px 18px;background:rgba(247,201,72,.08);border:1px solid rgba(247,201,72,.2);border-radius:8px;margin:32px 0 18px;display:flex;align-items:center;gap:10px;}
+
+  /* MCQ CARD */
+  .mcq-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:24px;margin-bottom:18px;transition:border-color .2s;}
+  .mcq-card.answered-correct{border-color:var(--accent3);background:linear-gradient(135deg,#141626,#0f2018);}
+  .mcq-card.answered-wrong{border-color:var(--accent4);background:linear-gradient(135deg,#141626,#1e0e0e);}
+  .mcq-q{font-size:14.5px;font-weight:600;color:#fff;margin-bottom:16px;line-height:1.6;}
+  .mcq-q .q-num{display:inline-flex;align-items:center;justify-content:center;background:var(--accent2);color:#000;font-size:11px;font-weight:800;width:26px;height:26px;border-radius:6px;margin-right:8px;flex-shrink:0;}
+  .mcq-q code{font-family:'JetBrains Mono',monospace;background:var(--code-bg);padding:2px 7px;border-radius:4px;font-size:12px;color:#a5d6ff;}
+  .mcq-options{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .mcq-opt{background:var(--surface2);border:2px solid var(--border);border-radius:8px;padding:10px 14px;cursor:pointer;font-size:13.5px;color:var(--text);transition:all .2s;display:flex;align-items:flex-start;gap:8px;text-align:left;}
+  .mcq-opt:hover:not(.disabled){border-color:var(--accent);color:#fff;background:rgba(124,109,250,.1);}
+  .mcq-opt.correct{border-color:var(--accent3);background:rgba(62,207,142,.12);color:var(--accent3);}
+  .mcq-opt.wrong{border-color:var(--accent4);background:rgba(248,113,113,.12);color:var(--accent4);}
+  .mcq-opt.disabled{cursor:default;}
+  .mcq-opt .opt-label{font-weight:800;font-size:12px;opacity:.7;flex-shrink:0;margin-top:1px;}
+  .mcq-feedback{margin-top:14px;padding:10px 14px;border-radius:8px;font-size:13px;display:none;line-height:1.6;}
+  .mcq-feedback.show{display:block;}
+  .mcq-feedback.correct{background:rgba(62,207,142,.1);border:1px solid rgba(62,207,142,.3);color:var(--accent3);}
+  .mcq-feedback.wrong{background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.3);color:var(--accent4);}
+
+  /* FLASHCARD */
+  .fc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;margin-top:16px;}
+  .flashcard{perspective:1000px;height:210px;cursor:pointer;}
+  .flashcard-inner{position:relative;width:100%;height:100%;transition:transform .55s cubic-bezier(.4,0,.2,1);transform-style:preserve-3d;}
+  .flashcard.flipped .flashcard-inner{transform:rotateY(180deg);}
+  .fc-front,.fc-back{position:absolute;width:100%;height:100%;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:12px;padding:18px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;}
+  .fc-front{background:var(--surface);border:2px solid var(--border);}
+  .fc-back{background:var(--surface2);border:2px solid var(--accent);transform:rotateY(180deg);}
+  .fc-front:hover{border-color:var(--accent2);}
+  .fc-label{font-size:9px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;}
+  .fc-question{font-size:13.5px;font-weight:600;color:#fff;line-height:1.5;font-family:'JetBrains Mono',monospace;}
+  .fc-hint{font-size:11px;color:var(--muted);margin-top:8px;}
+  .fc-back .fc-label{color:var(--accent);}
+  .fc-code{font-family:'JetBrains Mono',monospace;font-size:11px;color:#a5d6ff;line-height:1.7;text-align:left;width:100%;background:var(--code-bg);padding:8px 10px;border-radius:6px;overflow:auto;max-height:150px;}
+  .fc-text{font-size:13px;color:var(--accent3);line-height:1.6;}
+  .fc-nav{display:flex;gap:10px;align-items:center;margin-top:14px;justify-content:center;}
+  .fc-btn{background:var(--surface);border:1px solid var(--border);color:var(--text);padding:7px 16px;border-radius:8px;cursor:pointer;font-size:12px;font-family:'Sora',sans-serif;font-weight:600;transition:all .15s;}
+  .fc-btn:hover{border-color:var(--accent);color:var(--accent);}
+  .fc-btn.primary{background:var(--accent);border-color:var(--accent);color:#fff;}
+  .fc-counter{font-size:12px;color:var(--muted);min-width:60px;text-align:center;}
+
+  @media(max-width:860px){#sidebar{display:none;}#main{padding:24px 16px 60px;width:100%;}}
+  @media(max-width:600px){.mcq-options{grid-template-columns:1fr;}.tab-btn{font-size:11px;padding:6px 14px;}}
+
+  /* PRACTICE QUESTION STYLES */
+  .prac-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:24px;margin-bottom:18px;}
+  .prac-q{font-size:14px;font-weight:600;color:#fff;margin-bottom:14px;line-height:1.6;}
+  .prac-q .q-num{display:inline-flex;align-items:center;justify-content:center;background:#a78bfa;color:#000;font-size:11px;font-weight:800;width:26px;height:26px;border-radius:6px;margin-right:8px;flex-shrink:0;}
+  .prac-code{background:var(--code-bg);border:1px solid var(--border);border-radius:8px;padding:14px 16px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#a5d6ff;line-height:1.7;white-space:pre;overflow-x:auto;margin:10px 0 14px;}
+  .prac-reveal-btn{font-family:'Sora',sans-serif;font-size:11px;font-weight:700;padding:7px 16px;border-radius:8px;border:1px solid #a78bfa;background:rgba(167,139,250,.08);color:#a78bfa;cursor:pointer;transition:all .2s;letter-spacing:.5px;}
+  .prac-reveal-btn:hover{background:rgba(167,139,250,.18);}
+  .prac-answer{margin-top:12px;padding:12px 16px;border-radius:8px;background:rgba(62,207,142,.08);border:1px solid rgba(62,207,142,.25);color:var(--accent3);font-size:13px;line-height:1.6;display:none;}
+  .prac-answer.show{display:block;}
+  .prac-answer code{font-family:'JetBrains Mono',monospace;background:var(--code-bg);padding:1px 5px;border-radius:3px;font-size:12px;color:#a5d6ff;}
+  .tf-options{display:flex;gap:10px;margin-top:10px;}
+  .tf-btn{padding:8px 22px;border-radius:8px;border:2px solid var(--border);background:var(--surface2);color:var(--text);cursor:pointer;font-family:'Sora',sans-serif;font-size:13px;font-weight:700;transition:all .2s;}
+  .tf-btn:hover:not(.disabled){border-color:var(--accent);color:var(--accent);}
+  .tf-btn.correct{border-color:var(--accent3);background:rgba(62,207,142,.12);color:var(--accent3);}
+  .tf-btn.wrong{border-color:var(--accent4);background:rgba(248,113,113,.12);color:var(--accent4);}
+  .tf-btn.disabled{cursor:default;}
+  .write-code-card{background:var(--surface);border:1px solid #a78bfa;border-radius:12px;padding:24px;margin-bottom:18px;}
+  .write-code-card .prac-q .q-num{background:#a78bfa;}
+</style>
+</head>
+<body>
+<style>
+.global-nav {
+  position: sticky;
+  top: 0;
+  z-index: 9999;
+  background: rgba(8,9,20,.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid #2a2f52;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  height: 52px;
+  gap: 12px;
+}
+.global-nav .nav-brand {
+  font-family: 'Space Mono', 'JetBrains Mono', monospace;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: #f7c948;
+  text-transform: uppercase;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.global-nav .nav-links {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+.global-nav .nav-links a {
+  font-family: 'Space Mono', 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  text-decoration: none;
+  padding: 6px 14px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  color: #8b90b8;
+  transition: all .18s;
+  white-space: nowrap;
+}
+.global-nav .nav-links a:hover {
+  color: #e2e4f0;
+  border-color: #2a2f52;
+  background: rgba(124,109,250,.1);
+}
+.global-nav .nav-links a.nav-notes.active  { color:#fb923c; border-color:#fb923c; background:rgba(251,146,60,.1); }
+.global-nav .nav-links a.nav-vault.active  { color:#60b8f0; border-color:#60b8f0; background:rgba(96,184,240,.1); }
+.global-nav .nav-links a.nav-mcq.active    { color:#3ecf8e; border-color:#3ecf8e; background:rgba(62,207,142,.1); }
+@media(max-width:480px){
+  .global-nav .nav-brand { display: none; }
+  .global-nav { justify-content: center; }
+  .global-nav .nav-links a { font-size: 10px; padding: 5px 10px; }
+}
+</style>
+<nav class="global-nav">
+  <span class="nav-brand">CMPS 350 · Web Dev</span>
+  <div class="nav-links">
+    <a href="Study_Notes_Complete.html" class="nav-notes">📚 Study Notes</a>
+    <a href="Keyword_Vault.html" class="nav-vault">⚡ Keyword Vault</a>
+    <a href="MCQ_Practice_Bank.html" class="nav-mcq active">🧠 MCQ Bank</a>
+  </div>
+</nav>
+
+<div class="layout-wrap">
+<!-- SIDEBAR -->
+<nav id="sidebar">
+  <div class="sidebar-logo">
+    <span>🧠 MCQ Bank</span>
+    <p>Web Dev · All Chapters</p>
+  </div>
+  <div class="toc-group">
+    <span class="toc-group-label" style="color:var(--accent6)">Chapters</span>
+    <a href="#" onclick="switchTab('html');return false;"><span class="dot"></span>① HTML</a>
+    <a href="#" onclick="switchTab('css');return false;"><span class="dot"></span>② CSS Fundamentals</a>
+    <a href="#" onclick="switchTab('cssresp');return false;"><span class="dot"></span>③ CSS Responsive</a>
+    <a href="#" onclick="switchTab('js');return false;"><span class="dot"></span>④ JavaScript</a>
+    <a href="#" onclick="switchTab('oop');return false;"><span class="dot"></span>⑤ OOP</a>
+    <a href="#" onclick="switchTab('dom');return false;"><span class="dot"></span>⑥ Client-Side JS</a>
+    <a href="#" onclick="switchTab('webapi');return false;"><span class="dot"></span>⑦ Web API</a>
+    <a href="#" onclick="switchTab('all');return false;"><span class="dot"></span>🎯 All Chapters</a>
+  </div>
+  <div class="toc-group">
+    <span class="toc-group-label" style="color:#a78bfa">Practice Sets</span>
+    <a href="#" onclick="switchTab('cssprac1');return false;"><span class="dot"></span>🎨 CSS Practice I</a>
+    <a href="#" onclick="switchTab('cssprac2');return false;"><span class="dot"></span>🎨 CSS Practice II</a>
+    <a href="#" onclick="switchTab('jsprac');return false;"><span class="dot"></span>⚡ JS Practice</a>
+  </div>
+  <div class="toc-group">
+    <span class="toc-group-label" style="color:var(--accent2)">Flashcards</span>
+    <a href="#" onclick="switchTab('fc');return false;"><span class="dot"></span>💡 Code Flashcards</a>
+  </div>
+</nav>
+
+<div id="main">
+
+<!-- TAB BAR -->
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="switchTab('html')">① HTML</button>
+  <button class="tab-btn" onclick="switchTab('css')">② CSS</button>
+  <button class="tab-btn" onclick="switchTab('cssresp')">③ Responsive</button>
+  <button class="tab-btn" onclick="switchTab('js')">④ JS</button>
+  <button class="tab-btn" onclick="switchTab('oop')">⑤ OOP</button>
+  <button class="tab-btn" onclick="switchTab('dom')">⑥ Client JS</button>
+  <button class="tab-btn" onclick="switchTab('webapi')">⑦ Web API</button>
+  <button class="tab-btn" onclick="switchTab('all')" style="border-color:var(--accent2);color:var(--accent2)">🎯 All</button>
+  <button class="tab-btn" onclick="switchTab('cssprac1')" style="border-color:#a78bfa;color:#a78bfa">🎨 CSS I</button>
+  <button class="tab-btn" onclick="switchTab('cssprac2')" style="border-color:#c084fc;color:#c084fc">🎨 CSS II</button>
+  <button class="tab-btn" onclick="switchTab('jsprac')" style="border-color:#60b8f0;color:#60b8f0">⚡ JS Practice</button>
+  <button class="tab-btn" onclick="switchTab('fc')" style="border-color:var(--accent3);color:var(--accent3)">💡 Flashcards</button>
+</div>
+
+<!-- ===================== HTML ===================== -->
+<div id="tab-html" class="tab-page active">
+  <div class="ch-header">
+    <div class="badge" style="background:var(--accent6)">Chapter Quiz</div>
+    <h1>⓪ HTML Fundamentals</h1>
+    <p>10 questions · Page Structure · Tables · Forms · Semantic Tags</p>
+  </div>
+  <div class="quiz-progress">
+    <span class="progress-label">Progress</span>
+    <div class="progress-bar-wrap"><div class="progress-bar-fill" id="pb-html"></div></div>
+    <span class="score-badge" id="sc-html">0 / 10</span>
+    <button class="reset-btn" onclick="resetQuiz('html')">↺ Reset</button>
+  </div>
+
+  <div class="quiz-section-title">🌐 HTML Structure &amp; Semantics</div>
+
+  <div class="mcq-card" id="html-q1">
+    <div class="mcq-q"><span class="q-num">1</span> Which tag defines the main content of a page and should appear only once?</div>
+    <div class="mcq-options">
+      <div class="mcq-opt" onclick="ans(this,false,'html-q1','&lt;body&gt; wraps everything, not just the main content.')"><span class="opt-label">A</span> &lt;body&gt;</div>
+      <div class="mcq-opt" onclick="ans(this,true,'html-q1','Correct! &lt;main&gt; marks the primary content unique to that page and should appear only once.')"><span class="opt-label">B</span> &lt;main&gt;</div>
+      <div class="mcq-opt" onclick="ans(this,false,'html-q1','&lt;section&gt; is a thematic grouping, not the unique main content.')"><span class="opt-label">C</span> &lt;section&gt;</div>
+      <div class="mcq-opt" onclick="ans(this,false,'html-q1','&lt;article&gt; is self-contained content, not the page main area.')"><span class="opt-label">D</span> &lt;article&gt;</div>
+    </div>
+    <div class="mcq-feedback" id="html-q1-fb"></div>
+  </div>
+
+  <div class="mcq-card" id="html-q2">
+    <div class="mcq-q"><span class="q-num">2</span> In an HTML table, <code>&lt;tfoot&gt;</code> must be written <em>before</em> <code>&lt;tbody&gt;</code> in the source code. How does the browser render it?</div>
+    <div class="mcq-options">
+      <div class="mcq-opt" onclick="ans(this,false,'html-q2','Incorrect — the browser renders tfoot at the bottom despite its position in code.')"><span class="opt-label">A</span> At the top of the table</div>
+      <div class="mcq-opt" onclick="ans(this,true,'html-q2','Correct! Despite appearing before &lt;tbody&gt; in source code, the browser renders &lt;tfoot&gt; at the bottom.')"><span class="opt-label">B</span> At the bottom of the table</div>
+      <div class="mcq-opt" onclick="ans(this,false,'html-q2','Incorrect.')"><span class="opt-label">C</span> In the middle of the table</div>
+      <div class="mcq-opt" onclick="ans(this,false,'html-q2','It renders in a fixed position — at the bottom.')"><span class="opt-label">D</span> Wherever it appears in the source</div>
+    </div>
+    <div class="mcq-feedback" id="html-q2-fb"></div>
+  </div>
+
+  <div class="mcq-card" id="html-q3">
+    <div class="mcq-q"><span class="q-num">3</span> Which input type opens a numeric keypad on mobile and loosely validates a phone number?</div>
+    <div class="mcq-options">
+      <div class="mcq-opt" onclick="ans(this,false,'html-q3','type=&quot;number&quot; opens a numeric keypad on mobile but validates as a general number, not specifically for phone numbers.')"><span class="opt-label">A</span> type="number"</div>
+      <div class="mcq-opt" onclick="ans(this,false,'html-q3','type=text has no phone-specific behaviour.')"><span class="opt-label">B</span> type="text"</div>
+      <div class="mcq-opt" onclick="ans(this,true,'html-q3','Correct! type=&quot;tel&quot; opens a numeric keypad on mobile and is designed for phone numbers.')"><span class="opt-label">C</span> type="tel"</div>
+      <div class="mcq-opt" onclick="ans(this,false,'html-q3','type=range is a slider, not for phone input.')"><span class="opt-label">D</span> type="range"</div>
+    </div>
+    <div class="mcq-feedback" id="html-q3-fb"></div>
+  </div>
+
+  <div class="mcq-card" id="html-q4">
+    <div class="mcq-q"><span class="q-num">4</span> What is the difference between <code>&lt;section&gt;</code> and <code>&lt;article&gt;</code>?</div>
+    <div class="mcq-options">
+      <div class="mcq-opt" onclick="ans(this,false,'html-q4','Both are semantic, not about styling.')"><span class="opt-label">A</span> &lt;section&gt; adds borders; &lt;article&gt; does not</div>
+      <div class="mcq-opt" onclick="ans(this,true,'html-q4','Correct! &lt;article&gt; = self-contained content; &lt;section&gt; = thematic grouping of content.')"><span class="opt-label">B</span> &lt;article&gt; is self-contained; &lt;section&gt; is a thematic grouping</div>
+      <div class="mcq-opt" onclick="ans(this,false,'html-q4','Both can appear inside &lt;main&gt;.')"><span class="opt-label">C</span> &lt;section&gt; is only inside &lt;main&gt;</div>
+      <div class="mcq-opt" onclick="ans(this,false,'html-q4','They have different semantic purposes.')"><span class="opt-label">D</span> They are interchangeable</div>
+    </div>
+    <div class="mcq-feedback" id="html-q4-fb"></div>
+  </div>
+
+  <div class="mcq-card" id="html-q5">
+    <div class="mcq-q"><span class="q-num">5</span> Which attribute makes a form field mandatory before submission?</div>
+    <div class="mcq-options">
+      <div class="mcq-opt" onclick="ans(this,false,'html-q5','placeholder is hint text only.')"><span class="opt-label">A</span> placeholder</div>
+      <div class="mcq-opt" onclick="ans(this,true,'html-q5','Correct! The required attribute triggers browser validation before the form is submitted.')"><span class="opt-label">B</span> required</div>
+      <div class="mcq-opt" onclick="ans(this,false,'html-q5','autofocus moves focus but does not validate.')"><span class="opt-label">C</span> autofocus</div>
+      <div class="mcq-opt" onclick="ans(this,false,'html-q5','disabled prevents input, not makes it required.')"><span class="opt-label">D</span> disabled</div>
+    </div>
+    <div class="mcq-feedback" id="html-q5-fb"></div>
+  </div>
+
+  <div class="mcq-card" id="html-q6">
+    <div class="mcq-q"><span class="q-num">6</span> Which element groups related form inputs together and can have a legend?</div>
+    <div class="mcq-options">
+      <div class="mcq-opt" onclick="ans(this,false,'html-q6','&lt;form&gt; wraps the whole form, not just a group.')"><span class="opt-label">A</span> &lt;form&gt;</div>
+      <div class="mcq-opt" onclick="ans(this,false,'html-q6','&lt;div&gt; is a generic container with no semantic meaning.')"><span class="opt-label">B</span> &lt;div&gt;</div>
+      <div class="mcq-opt" onclick="ans(this,true,'html-q6','Correct! &lt;fieldset&gt; groups related inputs and can have a &lt;legend&gt; caption.')"><span class="opt-label">C</span> &lt;fieldset&gt;</div>
+      <div class="mcq-opt" onclick="ans(this,false,'html-q6','&lt;section&gt; is for page sections, not form grouping.')"><span class="opt-label">D</span> &lt;section&gt;</div>
+    </div>
+    <div class="mcq-feedback" id="html-q6-fb"></div>
+  </div>
+
+  <div class="mcq-card" id="html-q7">
+    <div class="mcq-q"><span class="q-num">7</span> What does the <code>alt</code> attribute on an <code>&lt;img&gt;</code> tag provide?</div>
+    <div class="mcq-options">
+      <div class="mcq-opt" onclick="ans(this,false,'html-q7','alt does not change the image size.')"><span class="opt-label">A</span> Alternative image styling</div>
+      <div class="mcq-opt" onclick="ans(this,true,'html-q7','Correct! alt provides a text alternative for screen readers and displays when the image fails to load.')"><span class="opt-label">B</span> Descriptive text for accessibility and fallback display</div>
+      <div class="mcq-opt" onclick="ans(this,false,'html-q7','alt is not a tooltip — title attribute is for tooltips.')"><span class="opt-label">C</span> A tooltip shown on hover</div>
+      <div class="mcq-opt" onclick="ans(this,false,'html-q7','alt is not a caption — &lt;figcaption&gt; is for captions.')"><span class="opt-label">D</span> A visible caption below the image</div>
+    </div>
+    <div class="mcq-feedback" id="html-q7-fb"></div>
+  </div>
+
+  <div class="mcq-card" id="html-q8">
+    <div class="mcq-q"><span class="q-num">8</span> Which input type should you use when multiple selections are allowed from a list?</div>
+    <div class="mcq-options">
+      <div class="mcq-opt" onclick="ans(this,false,'html-q8','Radio buttons only allow one selection per group.')"><span class="opt-label">A</span> type="radio"</div>
+      <div class="mcq-opt" onclick="ans(this,true,'html-q8','Correct! Checkboxes allow multiple independent selections.')"><span class="opt-label">B</span> type="checkbox"</div>
+      <div class="mcq-opt" onclick="ans(this,false,'html-q8','type=select is not valid — use the &lt;select&gt; element.')"><span class="opt-label">C</span> type="select"</div>
+      <div class="mcq-opt" onclick="ans(this,false,'html-q8','type=text is a plain text box.')"><span class="opt-label">D</span> type="text"</div>
+    </div>
+    <div class="mcq-feedback" id="html-q8-fb"></div>
+  </div>
+
+  <div class="mcq-card" id="html-q9">
+    <div class="mcq-q"><span class="q-num">9</span> What is the role of the <code>&lt;aside&gt;</code> element?</div>
+    <div class="mcq-options">
+      <div class="mcq-opt" onclick="ans(this,false,'html-q9','&lt;nav&gt; is for navigation links.')"><span class="opt-label">A</span> Primary navigation links</div>
+      <div class="mcq-opt" onclick="ans(this,false,'html-q9','&lt;footer&gt; is for the page footer.')"><span class="opt-label">B</span> Page footer content</div>
+      <div class="mcq-opt" onclick="ans(this,true,'html-q9','Correct! &lt;aside&gt; is for sidebar content that is tangentially related — it can be removed without reducing the main meaning.')"><span class="opt-label">C</span> Sidebar/supplementary content tangentially related to main</div>
+      <div class="mcq-opt" onclick="ans(this,false,'html-q9','&lt;header&gt; holds introductory content.')"><span class="opt-label">D</span> Page header and logo area</div>
+    </div>
+    <div class="mcq-feedback" id="html-q9-fb"></div>
+  </div>
+
+  <div class="mcq-card" id="html-q10">
+    <div class="mcq-q"><span class="q-num">10</span> What HTML element provides autocomplete suggestions for a text input?</div>
+    <div class="mcq-options">
+      <div class="mcq-opt" onclick="ans(this,false,'html-q10','&lt;optgroup&gt; groups options inside a &lt;select&gt;.')"><span class="opt-label">A</span> &lt;optgroup&gt;</div>
+      <div class="mcq-opt" onclick="ans(this,false,'html-q10','&lt;select&gt; is a dropdown, not an autocomplete list.')"><span class="opt-label">B</span> &lt;select&gt;</div>
+      <div class="mcq-opt" onclick="ans(this,true,'html-q10','Correct! &lt;datalist&gt; linked to an input with list= provides a dropdown of autocomplete suggestions.')"><span class="opt-label">C</span> &lt;datalist&gt;</div>
+      <div class="mcq-opt" onclick="ans(this,false,'html-q10','&lt;option&gt; is used inside &lt;select&gt; or &lt;datalist&gt;, not standalone.')"><span class="opt-label">D</span> &lt;option&gt;</div>
+    </div>
+    <div class="mcq-feedback" id="html-q10-fb"></div>
+  </div>
+</div>
+
+<!-- ===================== CSS ===================== -->
+<div id="tab-css" class="tab-page">
+  <div class="ch-header">
+    <div class="badge" style="background:#8b5cf6">Chapter Quiz</div>
+    <h1>① CSS Fundamentals</h1>
+    <p>10 questions · Selectors · Specificity · Box Model · Text</p>
+  </div>
+  <div class="quiz-progress">
+    <span class="progress-label">Progress</span>
+    <div class="progress-bar-wrap"><div class="progress-bar-fill" id="pb-css"></div></div>
+    <span class="score-badge" id="sc-css">0 / 10</span>
+    <button class="reset-btn" onclick="resetQuiz('css')">↺ Reset</button>
+  </div>
+
+  <div class="quiz-section-title">🎨 CSS Selectors &amp; Specificity</div>
+
+  <div class="mcq-card" id="css-q1">
+    <div class="mcq-q"><span class="q-num">1</span> Which CSS selector has the highest specificity?</div>
+    <div class="mcq-options">
+      <div class="mcq-opt" onclick="ans(this,false,'css-q1','Element selectors have the lowest specificity.')"><span class="opt-label">A</span> Element selector <code>p { }</code></div>
+      <div class="mcq-opt" onclick="ans(this,false,'css-q1','Class selectors rank above elements but below IDs.')"><span class="opt-label">B</span> Class selector <code>.btn { }</code></div>
+      <div class="mcq-opt" onclick="ans(this,false,'css-q1','ID selectors are very specific, but inline styles win.')"><span class="opt-label">C</span> ID selector <code>#logo { }</code></div>
+      <div class="mcq-opt" onclick="ans(this,true,'css-q1','Correct! Inline > ID > Class > Element. Inline styles always win.')"><span class="opt-label">D</span> Inline style <code>style="..."</code></div>
+    </div>
+    <div class="mcq-feedback" id="css-q1-fb"></div>
+  </div>
+
+  <div class="mcq-card" id="css-q2">
+    <div class="mcq-q"><span class="q-num">2</span> What does the <code>em</code> unit in CSS refer to?</div>
+    <div class="mcq-options">
+      <div class="mcq-opt" onclick="ans(this,false,'css-q2','rem is relative to the root element, not em.')"><span class="opt-label">A</span> Font size of the root HTML element</div>
+      <div class="mcq-opt" onclick="ans(this,true,'css-q2','Correct! em is relative to the font-size of the parent element.')"><span class="opt-label">B</span> Font size of the parent element</div>
+      <div class="mcq-opt" onclick="ans(this,false,'css-q2','1px is an absolute unit.')"><span class="opt-label">C</span> One pixel</div>
+      <div class="mcq-opt" onclick="ans(this,false,'css-q2','vw = viewport width.')"><span class="opt-label">D</span> Viewport width</div>
+    </div>
+    <div class="mcq-feedback" id="css-q2-fb"></div>
+  </div>
+
+  <div class="mcq-card" id="css-q3">
+    <div class="mcq-q"><span class="q-num">3</span> What is the correct order of the CSS box model layers from inside to outside?</div>
+    <div class="mcq-options">
+      <div class="mcq-opt" onclick="ans(this,false,'css-q3','Incorrect order.')"><span class="opt-label">A</span> Margin → Border → Padding → Content</div>
+      <div class="mcq-opt" onclick="ans(this,true,'css-q3','Correct! Content → Padding → Border → Margin, from innermost to outermost.')"><span class="opt-label">B</span> Content → Padding → Border → Margin</div>
+      <div class="mcq-opt" onclick="ans(this,false,'css-q3','Incorrect order.')"><span class="opt-label">C</span> Content → Border → Padding → Margin</div>
+      <div class="mcq-opt" onclick="ans(this,false,'css-q3','Incorrect order.')"><span class="opt-label">D</span> Padding → Content → Border → Margin</div>
+    </div>
+    <div class="mcq-feedback" id="css-q3-fb"></div>
+  </div>
+
+  <div class="mcq-card" id="css-q4">
+    <div class="mcq-q"><span class="q-num">4</span> What does <code>margin: 10px 20px</code> set?</div>
+    <div class="mcq-options">
+      <div class="mcq-opt" onclick="ans(this,false,'css-q4','4 values sets top/right/bottom/left individually.')"><span class="opt-label">A</span> Top 10px, right 20px, bottom 10px, left 20px individually</div>
+      <div class="mcq-opt" onclick="ans(this,true,'css-q4','Correct! 2-value shorthand: first = top &amp; bottom, second = left &amp; right.')"><span class="opt-label">B</span> Top &amp; bottom 10px; left &amp; right 20px</div>
+      <div class="mcq-opt" onclick="ans(this,false,'css-q4','That would be margin: 20px for all sides.')"><span class="opt-label">C</span> All sides 20px</div>
+      <div class="mcq-opt" onclick="ans(this,false,'css-q4','Incorrect.')"><span class="opt-label">D</span> Top 20px, all others 10px</div>
+    </div>
+    <div class="mcq-feedback" id="css-q4-fb"></div>
+  </div>
+
+  <div class="mcq-card" id="css-q5">
+    <div class="mcq-q"><span class="q-num">5</span> Which CSS selector targets only <strong>direct children</strong> of a div?</div>
+    <div class="mcq-options">
+      <div class="mcq-opt" onclick="ans(this,false,'css-q5','div p selects ALL p elements anywhere inside a div.')"><span class="opt-label">A</span> <code>div p { }</code></div>
+      <div class="mcq-opt" onclick="ans(this,true,'css-q5','Correct! div > p targets only direct children, not nested ones.')"><span class="opt-label">B</span> <code>div &gt; p { }</code></div>
+      <div class="mcq-opt" onclick="ans(this,false,'css-q5','div + p selects the adjacent sibling after div.')"><span class="opt-label">C</span> <code>div + p { }</code></div>
+      <div class="mcq-opt" onclick="ans(this,false,'css-q5','div ~ p selects all siblings after div.')"><span class="opt-label">D</span> <code>div ~ p { }</code></div>
+    </div>
+    <div class="mcq-feedback" id="css-q5-fb"></div>
+  </div>
+
+  <div class="mcq-card" id="css-q6">
+    <div class="mcq-q"><span class="q-num">6</span> What does <code>tr:nth-child(odd)</code> select?</div>
+    <div class="mcq-options">
+      <div class="mcq-opt" onclick="ans(this,false,'css-q6','first-child only selects the very first.')"><span class="opt-label">A</span> Only the first table row</div>
+      <div class="mcq-opt" onclick="ans(this,false,'css-q6','It selects odd rows, not even.')"><span class="opt-label">B</span> Every even table row</div>
+      <div class="mcq-opt" onclick="ans(this,true,'css-q6','Correct! nth-child(odd) selects rows 1, 3, 5… — used for zebra striping.')"><span class="opt-label">C</span> Every odd table row (1, 3, 5…)</div>
+      <div class="mcq-opt" onclick="ans(this,false,'css-q6','It targets rows, not columns.')"><span class="opt-label">D</span> Every third column</div>
+    </div>
+    <div class="mcq-feedback" id="css-q6-fb"></div>
+  </div>
+
+  <div class="mcq-card" id="css-q7">
+    <div class="mcq-q"><span class="q-num">7</span> What is the recommended way to include CSS for a multi-page website?</div>
+    <div class="mcq-options">
+      <div class="mcq-opt" onclick="ans(this,false,'css-q7','Inline styles are hard to maintain and not reusable.')"><span class="opt-label">A</span> Inline styles on each element</div>
+      <div class="mcq-opt" onclick="ans(this,false,'css-q7','Embedded &lt;style&gt; is fine for single pages but not reusable.')"><span class="opt-label">B</span> &lt;style&gt; block in &lt;head&gt;</div>
+      <div class="mcq-opt" onclick="ans(this,true,'css-q7','Correct! External stylesheet linked with &lt;link&gt; is reusable across pages and can be cached by the browser.')"><span class="opt-label">C</span> External .css file linked with &lt;link rel="stylesheet"&gt;</div>
+      <div class="mcq-opt" onclick="ans(this,false,'css-q7','JavaScript can apply styles but it\'s not the primary method.')"><span class="opt-label">D</span> JavaScript to apply styles dynamically</div>
+    </div>
+    <div class="mcq-feedback" id="css-q7-fb"></div>
+  </div>
+
+  <div class="mcq-card" id="css-q8">
+    <div class="mcq-q"><span class="q-num">8</span> In CSS, what does "the cascade" mean?</div>
+    <div class="mcq-options">
+      <div class="mcq-opt" onclick="ans(this,false,'css-q8','The cascade is about rule priority, not animations.')"><span class="opt-label">A</span> CSS animations that flow downward</div>
+      <div class="mcq-opt" onclick="ans(this,true,'css-q8','Correct! The cascade means later rules overwrite earlier ones in case of conflict. Inline styles win over all.')"><span class="opt-label">B</span> Later rules overwrite earlier ones; inline styles win</div>
+      <div class="mcq-opt" onclick="ans(this,false,'css-q8','Child elements inherit from parents — that is inheritance, not cascade.')"><span class="opt-label">C</span> Child elements inherit styles from their parent</div>
+      <div class="mcq-opt" onclick="ans(this,false,'css-q8','Specificity is separate from the cascade concept.')"><span class="opt-label">D</span> ID selectors always override class selectors</div>
+    </div>
+    <div class="mcq-feedback" id="css-q8-fb"></div>
+  </div>
+
+  <div class="mcq-card" id="css-q9">
+    <div class="mcq-q"><span class="q-num">9</span> Which CSS property inserts content <em>before</em> an element without modifying the HTML?</div>
+    <div class="mcq-options">
+      <div class="mcq-opt" onclick="ans(this,false,'css-q9','content: is a property used with pseudo-elements, not alone.')"><span class="opt-label">A</span> <code>content: "→"</code></div>
+      <div class="mcq-opt" onclick="ans(this,false,'css-q9','::after inserts after the element.')"><span class="opt-label">B</span> <code>p::after { }</code></div>
+      <div class="mcq-opt" onclick="ans(this,true,'css-q9','Correct! p::before inserts generated content before the element using the content property.')"><span class="opt-label">C</span> <code>p::before { content: "→"; }</code></div>
+      <div class="mcq-opt" onclick="ans(this,false,'css-q9','prepend() is a JavaScript DOM method, not CSS.')"><span class="opt-label">D</span> <code>p.prepend("→")</code></div>
+    </div>
+    <div class="mcq-feedback" id="css-q9-fb"></div>
+  </div>
+
+  <div class="mcq-card" id="css-q10">
+    <div class="mcq-q"><span class="q-num">10</span> Which attribute selector targets links that <strong>start with</strong> "https"?</div>
+    <div class="mcq-options">
+      <div class="mcq-opt" onclick="ans(this,false,'css-q10','a[href=&quot;https&quot;] targets links with exactly that value.')"><span class="opt-label">A</span> <code>a[href="https"]</code></div>
+      <div class="mcq-opt" onclick="ans(this,true,'css-q10','Correct! The ^ operator matches attributes that START with the given value.')"><span class="opt-label">B</span> <code>a[href^="https"]</code></div>
+      <div class="mcq-opt" onclick="ans(this,false,'css-q10','The $ operator matches attributes that END with the value.')"><span class="opt-label">C</span> <code>a[href$="https"]</code></div>
+      <div class="mcq-opt" onclick="ans(this,false,'css-q10','The * operator matches attributes that CONTAIN the value.')"><span class="opt-label">D</span> <code>a[href*="https"]</code></div>
+    </div>
+    <div class="mcq-feedback" id="css-q10-fb"></div>
+  </div>
+</div>
+
+<!-- ===================== CSS RESPONSIVE ===================== -->
+<div id="tab-cssresp" class="tab-page">
+  <div class="ch-header">
+    <div class="badge" style="background:var(--accent3);color:#0a1a0f">Chapter Quiz</div>
+    <h1>② CSS Responsive Design</h1>
+    <p>10 questions · Flexbox · Grid · Media Queries · Layouts</p>
+  </div>
+  <div class="quiz-progress">
+    <span class="progress-label">Progress</span>
+    <div class="progress-bar-wrap"><div class="progress-bar-fill" id="pb-cssresp"></div></div>
+    <span class="score-badge" id="sc-cssresp">0 / 10</span>
+    <button class="reset-btn" onclick="resetQuiz('cssresp')">↺ Reset</button>
+  </div>
+
+  <div class="quiz-section-title">📐 Flexbox &amp; Grid</div>
+
+  <div class="mcq-card" id="cssresp-q1">
+    <div class="mcq-q"><span class="q-num">1</span> CSS Grid is described as a _____ layout system, while Flexbox is _____.</div>
+    <div class="mcq-options">
+      <div class="mcq-opt" onclick="ans(this,false,'cssresp-q1','It\'s the opposite.')"><span class="opt-label">A</span> one-dimensional; two-dimensional</div>
+      <div class="mcq-opt" onclick="ans(this,true,'cssresp-q1','Correct! Grid = 2D (rows + columns). Flexbox = 1D (row OR column).')"><span class="opt-label">B</span> two-dimensional; one-dimensional</div>
+      <div class="mcq-opt" onclick="ans(this,false,'cssresp-q1','Both can be used for layouts but have different dimensions.')"><span class="opt-label">C</span> both two-dimensional</div>
+      <div class="mcq-opt" onclick="ans(this,false,'cssresp-q1','Neither is &quot;fixed&quot;.')"><span class="opt-label">D</span> fixed; responsive</div>
+    </div>
+    <div class="mcq-feedback" id="cssresp-q1-fb"></div>
+  </div>
+
+  <div class="mcq-card" id="cssresp-q2">
+    <div class="mcq-q"><span class="q-num">2</span> What does <code>justify-content</code> control in Flexbox?</div>
+    <div class="mcq-options">
+      <div class="mcq-opt" onclick="ans(this,false,'cssresp-q2','align-items controls the cross-axis.')"><span class="opt-label">A</span> Alignment along the cross-axis</div>
+      <div class="mcq-opt" onclick="ans(this,true,'cssresp-q2','Correct! justify-content distributes items along the MAIN axis.')"><span class="opt-label">B</span> Distribution along the main axis</div>
+      <div class="mcq-opt" onclick="ans(this,false,'cssresp-q2','flex-direction controls direction.')"><span class="opt-label">C</span> Whether items go row or column</div>
+      <div class="mcq-opt" onclick="ans(this,false,'cssresp-q2','flex-wrap controls wrapping.')"><span class="opt-label">D</span> Whether items wrap onto multiple lines</div>
+    </div>
+    <div class="mcq-feedback" id="cssresp-q2-fb"></div>
+  </div>
+
+  <div class="mcq-card" id="cssresp-q3">
+    <div class="mcq-q"><span class="q-num">3</span> What CSS function provides a responsive width with an absolute minimum and maximum?</div>
+    <div class="mcq-options">
+      <div class="mcq-opt" onclick="ans(this,false,'cssresp-q3','minmax() is for Grid track sizing.')"><span class="opt-label">A</span> minmax()</div>
+      <div class="mcq-opt" onclick="ans(this,false,'cssresp-q3','calc() is for arithmetic.')"><span class="opt-label">B</span> calc()</div>
+      <div class="mcq-opt" onclick="ans(this,true,'cssresp-q3','Correct! clamp(min, preferred, max) constrains a value within a range, e.g., clamp(200px, 40%, 600px).')"><span class="opt-label">C</span> clamp()</div>
+      <div class="mcq-opt" onclick="ans(this,false,'cssresp-q3','max() returns the largest of given values.')"><span class="opt-label">D</span> max()</div>
+    </div>
+    <div class="mcq-feedback" id="cssresp-q3-fb"></div>
+  </div>
+
+  <div class="mcq-card" id="cssresp-q4">
+    <div class="mcq-q"><span class="q-num">4</span> Which Grid property allows you to name layout areas and assign items to them?</div>
+    <div class="mcq-options">
+      <div class="mcq-opt" onclick="ans(this,false,'cssresp-q4','grid-template-columns only defines column sizes.')"><span class="opt-label">A</span> grid-template-columns</div>
+      <div class="mcq-opt" onclick="ans(this,false,'cssresp-q4','grid-gap only controls spacing.')"><span class="opt-label">B</span> grid-gap</div>
+      <div class="mcq-opt" onclick="ans(this,true,'cssresp-q4','Correct! grid-template-areas lets you name regions and assign items using grid-area.')"><span class="opt-label">C</span> grid-template-areas</div>
+      <div class="mcq-opt" onclick="ans(this,false,'cssresp-q4','grid-column controls which columns an item spans.')"><span class="opt-label">D</span> grid-column</div>
+    </div>
+    <div class="mcq-feedback" id="cssresp-q4-fb"></div>
+  </div>
+
+  <div class="mcq-card" id="cssresp-q5">
+    <div class="mcq-q"><span class="q-num">5</span> What does the media query <code>@media screen and (min-width: 768px)</code> do?</div>
+    <div class="mcq-options">
+      <div class="mcq-opt" onclick="ans(this,false,'cssresp-q5','min-width means the styles apply ABOVE 768px, not below.')"><span class="opt-label">A</span> Applies styles only on screens narrower than 768px</div>
+      <div class="mcq-opt" onclick="ans(this,true,'cssresp-q5','Correct! min-width: 768px means styles apply when viewport is 768px or wider — standard tablet breakpoint.')"><span class="opt-label">B</span> Applies styles on screens 768px wide or wider</div>
+      <div class="mcq-opt" onclick="ans(this,false,'cssresp-q5','It applies to all screen sizes from 768px up.')"><span class="opt-label">C</span> Applies styles only on exactly 768px screens</div>
+      <div class="mcq-opt" onclick="ans(this,false,'cssresp-q5','max-width would be for max size limiting.')"><span class="opt-label">D</span> Applies styles on screens up to 768px maximum</div>
+    </div>
+    <div class="mcq-feedback" id="cssresp-q5-fb"></div>
+  </div>
+
+  <div class="mcq-card" id="cssresp-q6">
+    <div class="mcq-q"><span class="q-num">6</span> In the "Pancake Stack" layout, what does <code>grid-template-rows: auto 1fr auto</code> achieve?</div>
+    <div class="mcq-options">
+      <div class="mcq-opt" onclick="ans(this,false,'cssresp-q6','The header and footer grow to fill space, but that\'s wrong — 1fr does that.')"><span class="opt-label">A</span> Header and footer fill all available space</div>
+      <div class="mcq-opt" onclick="ans(this,true,'cssresp-q6','Correct! auto = header/footer shrink to content; 1fr = main fills all remaining space.')"><span class="opt-label">B</span> Header &amp; footer auto-size; main fills remaining space</div>
+      <div class="mcq-opt" onclick="ans(this,false,'cssresp-q6','The 3 rows don\'t share space equally — middle gets 1fr.')"><span class="opt-label">C</span> All three rows are equal height</div>
+      <div class="mcq-opt" onclick="ans(this,false,'cssresp-q6','All rows are shown — none are hidden.')"><span class="opt-label">D</span> Only the middle row is shown</div>
+    </div>
+    <div class="mcq-feedback" id="cssresp-q6-fb"></div>
+  </div>
+
+  <div class="mcq-card" id="cssresp-q7">
+    <div class="mcq-q"><span class="q-num">7</span> Which Flex item property controls how much an item grows to fill available space?</div>
+    <div class="mcq-options">
+      <div class="mcq-opt" onclick="ans(this,false,'cssresp-q7','flex-shrink controls shrinking, not growing.')"><span class="opt-label">A</span> flex-shrink</div>
+      <div class="mcq-opt" onclick="ans(this,true,'cssresp-q7','Correct! flex-grow: 1 means the item grows to fill available space; 0 means it does not grow.')"><span class="opt-label">B</span> flex-grow</div>
+      <div class="mcq-opt" onclick="ans(this,false,'cssresp-q7','flex-basis sets the default size before space distribution.')"><span class="opt-label">C</span> flex-basis</div>
+      <div class="mcq-opt" onclick="ans(this,false,'cssresp-q7','order changes the display order of an item.')"><span class="opt-label">D</span> order</div>
+    </div>
+    <div class="mcq-feedback" id="cssresp-q7-fb"></div>
+  </div>
+
+  <div class="mcq-card" id="cssresp-q8">
+    <div class="mcq-q"><span class="q-num">8</span> What does <code>grid-column: 1 / -1</code> mean?</div>
+    <div class="mcq-options">
+      <div class="mcq-opt" onclick="ans(this,false,'cssresp-q8','That would be grid-column: 1/2.')"><span class="opt-label">A</span> Item is placed in only the first column</div>
+      <div class="mcq-opt" onclick="ans(this,true,'cssresp-q8','Correct! 1/-1 means from the first line to the last line — spanning all columns.')"><span class="opt-label">B</span> Item spans from first to last column line (all columns)</div>
+      <div class="mcq-opt" onclick="ans(this,false,'cssresp-q8','Negative index -1 means the last line, not last two.')"><span class="opt-label">C</span> Item spans only the last two columns</div>
+      <div class="mcq-opt" onclick="ans(this,false,'cssresp-q8','It doesn\'t hide the item.')"><span class="opt-label">D</span> Item is hidden</div>
+    </div>
+    <div class="mcq-feedback" id="cssresp-q8-fb"></div>
+  </div>
+
+  <div class="mcq-card" id="cssresp-q9">
+    <div class="mcq-q"><span class="q-num">9</span> When should you use Flexbox over CSS Grid?</div>
+    <div class="mcq-options">
+      <div class="mcq-opt" onclick="ans(this,false,'cssresp-q9','Full page layouts are better suited to Grid.')"><span class="opt-label">A</span> Full page layout with header, sidebar, and footer</div>
+      <div class="mcq-opt" onclick="ans(this,true,'cssresp-q9','Correct! Flexbox excels at component-level 1D layouts like navbars and card rows.')"><span class="opt-label">B</span> Component-level layouts like navbars and card rows</div>
+      <div class="mcq-opt" onclick="ans(this,false,'cssresp-q9','Complex 2D placements are best handled by Grid.')"><span class="opt-label">C</span> Complex 2D item placements</div>
+      <div class="mcq-opt" onclick="ans(this,false,'cssresp-q9','Named areas feature is specific to Grid.')"><span class="opt-label">D</span> Layouts using named grid-template-areas</div>
+    </div>
+    <div class="mcq-feedback" id="cssresp-q9-fb"></div>
+  </div>
+
+  <div class="mcq-card" id="cssresp-q10">
+    <div class="mcq-q"><span class="q-num">10</span> Which approach is recommended for responsive design — mobile-first or desktop-first?</div>
+    <div class="mcq-options">
+      <div class="mcq-opt" onclick="ans(this,false,'cssresp-q10','Desktop-first uses max-width queries and is generally less recommended.')"><span class="opt-label">A</span> Desktop-first using max-width queries</div>
+      <div class="mcq-opt" onclick="ans(this,true,'cssresp-q10','Correct! Mobile-first starts with single-column and adds complexity with min-width media queries as screens get wider.')"><span class="opt-label">B</span> Mobile-first using min-width queries</div>
+      <div class="mcq-opt" onclick="ans(this,false,'cssresp-q10','A fixed-width approach is not responsive.')"><span class="opt-label">C</span> Fixed-width layouts for all screen sizes</div>
+      <div class="mcq-opt" onclick="ans(this,false,'cssresp-q10','Media queries apply regardless of the device used.')"><span class="opt-label">D</span> Media queries are only needed for tablet screens</div>
+    </div>
+    <div class="mcq-feedback" id="cssresp-q10-fb"></div>
+  </div>
+</div>
+
+<!-- ===================== JS ===================== -->
+<div id="tab-js" class="tab-page">
+  <div class="ch-header">
+    <div class="badge" style="background:var(--accent)">Chapter Quiz</div>
+    <h1>③ JavaScript Fundamentals</h1>
+    <p>10 questions · Data Types · Operators · Loops · Arrays · FP</p>
+  </div>
+  <div class="quiz-progress">
+    <span class="progress-label">Progress</span>
+    <div class="progress-bar-wrap"><div class="progress-bar-fill" id="pb-js"></div></div>
+    <span class="score-badge" id="sc-js">0 / 10</span>
+    <button class="reset-btn" onclick="resetQuiz('js')">↺ Reset</button>
+  </div>
+
+  <div class="quiz-section-title">⚡ JS Core Concepts</div>
+
+  <div class="mcq-card" id="js-q1">
+    <div class="mcq-q"><span class="q-num">1</span> What is the output of <code>typeof null</code> in JavaScript?</div>
+    <div class="mcq-options">
+      <div class="mcq-opt" onclick="ans(this,false,'js-q1','null is not reported as &quot;null&quot; by typeof.')"><span class="opt-label">A</span> "null"</div>
+      <div class="mcq-opt" onclick="ans(this,false,'js-q1','undefined is the result when a variable is declared but not assigned.')"><span class="opt-label">B</span> "undefined"</div>
+      <div class="mcq-opt" onclick="ans(this,true,'js-q1','Correct! typeof null returns &quot;object&quot; — this is a well-known historical JavaScript quirk.')"><span class="opt-label">C</span> "object"</div>
+      <div class="mcq-opt" onclick="ans(this,false,'js-q1','null is not a function.')"><span class="opt-label">D</span> "function"</div>
+    </div>
+    <div class="mcq-feedback" id="js-q1-fb"></div>
+  </div>
+
+  <div class="mcq-card" id="js-q2">
+    <div class="mcq-q"><span class="q-num">2</span> What does <code>0 == ""</code> evaluate to?</div>
+    <div class="mcq-options">
+      <div class="mcq-opt" onclick="ans(this,true,'js-q2','Correct! == (loose equality) does type coercion, making 0 == &quot;&quot; evaluate to true.')"><span class="opt-label">A</span> true</div>
+      <div class="mcq-opt" onclick="ans(this,false,'js-q2','0 === &quot;&quot; is false (strict equality). But == does type coercion so 0 == &quot;&quot; is true.')"><span class="opt-label">B</span> false</div>
+      <div class="mcq-opt" onclick="ans(this,false,'js-q2','No TypeError.')"><span class="opt-label">C</span> TypeError</div>
+      <div class="mcq-opt" onclick="ans(this,false,'js-q2','Returns a boolean, not NaN.')"><span class="opt-label">D</span> NaN</div>
+    </div>
+    <div class="mcq-feedback" id="js-q2-fb"></div>
+  </div>
+
+  <div class="mcq-card" id="js-q3">
+    <div class="mcq-q"><span class="q-num">3</span> Which of these values is NOT falsy in JavaScript?</div>
+    <div class="mcq-options">
+      <div class="mcq-opt" onclick="ans(this,false,'js-q3','0 is falsy.')"><span class="opt-label">A</span> 0</div>
+      <div class="mcq-opt" onclick="ans(this,false,'js-q3','Empty string &quot;&quot; is falsy.')"><span class="opt-label">B</span> ""</div>
+      <div class="mcq-opt" onclick="ans(this,true,'js-q3','Correct! &quot;0&quot; is a non-empty string and is therefore TRUTHY, even though the character is zero.')"><span class="opt-label">C</span> "0"</div>
+      <div class="mcq-opt" onclick="ans(this,false,'js-q3','null is falsy.')"><span class="opt-label">D</span> null</div>
+    </div>
+    <div class="mcq-feedback" id="js-q3-fb"></div>
+  </div>
+
+  <div class="mcq-card" id="js-q4">
+    <div class="mcq-q"><span class="q-num">4</span> What is the output of <code>[1,2,3].map(x => x * 2).reduce((s,x) => s+x)</code>?</div>
+    <div class="mcq-options">
+      <div class="mcq-opt" onclick="ans(this,false,'js-q4','map doubles first to [2,4,6], then reduce sums to 12.')"><span class="opt-label">A</span> 6</div>
+      <div class="mcq-opt" onclick="ans(this,true,'js-q4','Correct! map([1,2,3]) → [2,4,6], then reduce: 2+4+6 = 12.')"><span class="opt-label">B</span> 12</div>
+      <div class="mcq-opt" onclick="ans(this,false,'js-q4','That\'s not the correct calculation.')"><span class="opt-label">C</span> 36</div>
+      <div class="mcq-opt" onclick="ans(this,false,'js-q4','Both methods are valid, no error.')"><span class="opt-label">D</span> TypeError</div>
+    </div>
+    <div class="mcq-feedback" id="js-q4-fb"></div>
+  </div>
+
+  <div class="mcq-card" id="js-q5">
+    <div class="mcq-q"><span class="q-num">5</span> What does the rest operator (<code>...args</code>) do in a function definition?</div>
+    <div class="mcq-options">
+      <div class="mcq-opt" onclick="ans(this,false,'js-q5','Spreading copies array elements out. Rest collects arguments in.')"><span class="opt-label">A</span> Spreads an array into individual arguments</div>
+      <div class="mcq-opt" onclick="ans(this,true,'js-q5','Correct! The rest operator in a function collects all remaining arguments into an array.')"><span class="opt-label">B</span> Collects multiple arguments into an array</div>
+      <div class="mcq-opt" onclick="ans(this,false,'js-q5','Destructuring is different from rest.')"><span class="opt-label">C</span> Destructures an object into variables</div>
+      <div class="mcq-opt" onclick="ans(this,false,'js-q5','Spread merges arrays, rest collects function args.')"><span class="opt-label">D</span> Merges two arrays together</div>
+    </div>
+    <div class="mcq-feedback" id="js-q5-fb"></div>
+  </div>
+
+  <div class="mcq-card" id="js-q6">
+    <div class="mcq-q"><span class="q-num">6</span> Which array method returns a new array without modifying the original?</div>
+    <div class="mcq-options">
+      <div class="mcq-opt" onclick="ans(this,false,'js-q6','push() mutates the original array.')"><span class="opt-label">A</span> push()</div>
+      <div class="mcq-opt" onclick="ans(this,false,'js-q6','splice() mutates the original array.')"><span class="opt-label">B</span> splice()</div>
+      <div class="mcq-opt" onclick="ans(this,true,'js-q6','Correct! filter() always returns a new array of elements that pass the test — it never mutates the original.')"><span class="opt-label">C</span> filter()</div>
+      <div class="mcq-opt" onclick="ans(this,false,'js-q6','sort() sorts in place (mutates).')"><span class="opt-label">D</span> sort()</div>
+    </div>
+    <div class="mcq-feedback" id="js-q6-fb"></div>
+  </div>
+
+  <div class="mcq-card" id="js-q7">
+    <div class="mcq-q"><span class="q-num">7</span> What is a closure in JavaScript?</div>
+    <div class="mcq-options">
+      <div class="mcq-opt" onclick="ans(this,false,'js-q7','A function called once is an IIFE, not specifically a closure.')"><span class="opt-label">A</span> A function that can only be called once</div>
+      <div class="mcq-opt" onclick="ans(this,false,'js-q7','Arrow syntax is not the definition of a closure.')"><span class="opt-label">B</span> A function written with arrow syntax</div>
+      <div class="mcq-opt" onclick="ans(this,true,'js-q7','Correct! A closure is an inner function that retains access to its outer function\'s scope even after the outer function has returned.')"><span class="opt-label">C</span> An inner function that retains access to the outer function's scope</div>
+      <div class="mcq-opt" onclick="ans(this,false,'js-q7','No side effects = pure function, not a closure.')"><span class="opt-label">D</span> A function with no side effects</div>
+    </div>
+    <div class="mcq-feedback" id="js-q7-fb"></div>
+  </div>
+
+  <div class="mcq-card" id="js-q8">
+    <div class="mcq-q"><span class="q-num">8</span> Which variable declaration should you use by default?</div>
+    <div class="mcq-options">
+      <div class="mcq-opt" onclick="ans(this,false,'js-q8','var has function scope and hoisting issues — avoid it.')"><span class="opt-label">A</span> var</div>
+      <div class="mcq-opt" onclick="ans(this,false,'js-q8','let is for values that need to change, not for everything.')"><span class="opt-label">B</span> let</div>
+      <div class="mcq-opt" onclick="ans(this,true,'js-q8','Correct! Start with const by default. Only switch to let when the value genuinely needs to be reassigned.')"><span class="opt-label">C</span> const</div>
+      <div class="mcq-opt" onclick="ans(this,false,'js-q8','function is for declaring functions, not general variables.')"><span class="opt-label">D</span> function</div>
+    </div>
+    <div class="mcq-feedback" id="js-q8-fb"></div>
+  </div>
+
+  <div class="mcq-card" id="js-q9">
+    <div class="mcq-q"><span class="q-num">9</span> What does <code>.find(fn)</code> return on an array?</div>
+    <div class="mcq-options">
+      <div class="mcq-opt" onclick="ans(this,false,'js-q9','filter() returns all matching elements.')"><span class="opt-label">A</span> A new array of all matching elements</div>
+      <div class="mcq-opt" onclick="ans(this,true,'js-q9','Correct! .find() returns the FIRST element where the callback returns true, or undefined if none.')"><span class="opt-label">B</span> The first element where the callback returns true</div>
+      <div class="mcq-opt" onclick="ans(this,false,'js-q9','indexOf() returns the index, not find().')"><span class="opt-label">C</span> The index of the first matching element</div>
+      <div class="mcq-opt" onclick="ans(this,false,'js-q9','find() stops at the first match.')"><span class="opt-label">D</span> All elements as a new array</div>
+    </div>
+    <div class="mcq-feedback" id="js-q9-fb"></div>
+  </div>
+
+  <div class="mcq-card" id="js-q10">
+    <div class="mcq-q"><span class="q-num">10</span> In a modern stack, what is the role of JSON?</div>
+    <div class="mcq-options">
+      <div class="mcq-opt" onclick="ans(this,false,'js-q10','JSON is not a programming language.')"><span class="opt-label">A</span> A programming language</div>
+      <div class="mcq-opt" onclick="ans(this,false,'js-q10','JSON is a data format, not a database.')"><span class="opt-label">B</span> A database technology</div>
+      <div class="mcq-opt" onclick="ans(this,true,'js-q10','Correct! In a modern full-stack (MEAN/React/Next.js), JavaScript is the common language and JSON is the common data format throughout.')"><span class="opt-label">C</span> The common data format throughout the full stack</div>
+      <div class="mcq-opt" onclick="ans(this,false,'js-q10','JSON is not a framework.')"><span class="opt-label">D</span> A front-end framework</div>
+    </div>
+    <div class="mcq-feedback" id="js-q10-fb"></div>
+  </div>
+</div>
+
+<!-- ===================== OOP ===================== -->
+<div id="tab-oop" class="tab-page">
+  <div class="ch-header">
+    <div class="badge" style="background:var(--accent3);color:#0a1a0f">Chapter Quiz</div>
+    <h1>④ OOP in JavaScript</h1>
+    <p>10 questions · Classes · Inheritance · Prototypes · Modules</p>
+  </div>
+  <div class="quiz-progress">
+    <span class="progress-label">Progress</span>
+    <div class="progress-bar-wrap"><div class="progress-bar-fill" id="pb-oop"></div></div>
+    <span class="score-badge" id="sc-oop">0 / 10</span>
+    <button class="reset-btn" onclick="resetQuiz('oop')">↺ Reset</button>
+  </div>
+
+  <div class="quiz-section-title">🏛️ OOP Concepts</div>
+
+  <div class="mcq-card" id="oop-q1">
+    <div class="mcq-q"><span class="q-num">1</span> What keyword must a child class call in its constructor to invoke the parent constructor?</div>
+    <div class="mcq-options">
+      <div class="mcq-opt" onclick="ans(this,false,'oop-q1','parent() is not valid JavaScript.')"><span class="opt-label">A</span> parent()</div>
+      <div class="mcq-opt" onclick="ans(this,true,'oop-q1','Correct! super() calls the parent class constructor and must be called before using this in a child constructor.')"><span class="opt-label">B</span> super()</div>
+      <div class="mcq-opt" onclick="ans(this,false,'oop-q1','this() is not used to call parent constructors.')"><span class="opt-label">C</span> this()</div>
+      <div class="mcq-opt" onclick="ans(this,false,'oop-q1','base() is not a JS keyword.')"><span class="opt-label">D</span> base()</div>
+    </div>
+    <div class="mcq-feedback" id="oop-q1-fb"></div>
+  </div>
+
+  <div class="mcq-card" id="oop-q2">
+    <div class="mcq-q"><span class="q-num">2</span> Private class fields in JavaScript are denoted by which prefix?</div>
+    <div class="mcq-options">
+      <div class="mcq-opt" onclick="ans(this,false,'oop-q2','_ is a convention only — not truly private.')"><span class="opt-label">A</span> _ (underscore)</div>
+      <div class="mcq-opt" onclick="ans(this,false,'oop-q2','$ is not a privacy prefix.')"><span class="opt-label">B</span> $ (dollar sign)</div>
+      <div class="mcq-opt" onclick="ans(this,true,'oop-q2','Correct! # makes a field truly private. Accessing it outside the class causes a SyntaxError.')"><span class="opt-label">C</span> # (hash)</div>
+      <div class="mcq-opt" onclick="ans(this,false,'oop-q2','@ is used in decorators, not private fields.')"><span class="opt-label">D</span> @ (at sign)</div>
+    </div>
+    <div class="mcq-feedback" id="oop-q2-fb"></div>
+  </div>
+
+  <div class="mcq-card" id="oop-q3">
+    <div class="mcq-q"><span class="q-num">3</span> What does <code>JSON.stringify()</code> do with methods in an object?</div>
+    <div class="mcq-options">
+      <div class="mcq-opt" onclick="ans(this,false,'oop-q3','Methods cannot be represented in JSON.')"><span class="opt-label">A</span> Includes them as function strings</div>
+      <div class="mcq-opt" onclick="ans(this,false,'oop-q3','Methods don\'t throw errors, they are just omitted.')"><span class="opt-label">B</span> Throws a TypeError</div>
+      <div class="mcq-opt" onclick="ans(this,true,'oop-q3','Correct! JSON.stringify() only serializes data properties. Methods (functions) are silently excluded.')"><span class="opt-label">C</span> Excludes them from the output</div>
+      <div class="mcq-opt" onclick="ans(this,false,'oop-q3','They are excluded, not converted to null.')"><span class="opt-label">D</span> Converts them to null</div>
+    </div>
+    <div class="mcq-feedback" id="oop-q3-fb"></div>
+  </div>
+
+  <div class="mcq-card" id="oop-q4">
+    <div class="mcq-q"><span class="q-num">4</span> In a prototype chain, what is at the very end (top of the chain)?</div>
+    <div class="mcq-options">
+      <div class="mcq-opt" onclick="ans(this,false,'oop-q4','Object.prototype comes before null in the chain.')"><span class="opt-label">A</span> Object.prototype</div>
+      <div class="mcq-opt" onclick="ans(this,false,'oop-q4','undefined is a value, not the end of the chain.')"><span class="opt-label">B</span> undefined</div>
+      <div class="mcq-opt" onclick="ans(this,true,'oop-q4','Correct! The prototype chain ends at null. Object.prototype.__proto__ === null.')"><span class="opt-label">C</span> null</div>
+      <div class="mcq-opt" onclick="ans(this,false,'oop-q4','window is the global object, not the chain end.')"><span class="opt-label">D</span> window</div>
+    </div>
+    <div class="mcq-feedback" id="oop-q4-fb"></div>
+  </div>
+
+  <div class="mcq-card" id="oop-q5">
+    <div class="mcq-q"><span class="q-num">5</span> What does the <code>static</code> keyword mean in a JavaScript class?</div>
+    <div class="mcq-options">
+      <div class="mcq-opt" onclick="ans(this,false,'oop-q5','const/# makes a value unchangeable/private, not static.')"><span class="opt-label">A</span> The property cannot be changed</div>
+      <div class="mcq-opt" onclick="ans(this,false,'oop-q5','Private fields use # not static.')"><span class="opt-label">B</span> The property is only accessible inside the class</div>
+      <div class="mcq-opt" onclick="ans(this,true,'oop-q5','Correct! Static members belong to the CLASS itself, not instances. Access via ClassName.member.')"><span class="opt-label">C</span> The property belongs to the class, not individual instances</div>
+      <div class="mcq-opt" onclick="ans(this,false,'oop-q5','Static properties can be inherited by subclasses.')"><span class="opt-label">D</span> The property cannot be inherited</div>
+    </div>
+    <div class="mcq-feedback" id="oop-q5-fb"></div>
+  </div>
+
+  <div class="mcq-card" id="oop-q6">
+    <div class="mcq-q"><span class="q-num">6</span> In a named module export, which import is correct?</div>
+    <div class="mcq-options">
+      <div class="mcq-opt" onclick="ans(this,true,'oop-q6','Correct! Named exports are imported with curly braces using the exact exported name.')"><span class="opt-label">A</span> <code>import { add } from './lib.js'</code></div>
+      <div class="mcq-opt" onclick="ans(this,false,'oop-q6','import add from is the default export syntax.')"><span class="opt-label">B</span> <code>import add from './lib.js'</code></div>
+      <div class="mcq-opt" onclick="ans(this,false,'oop-q6','require() is Node.js CommonJS, not ES modules.')"><span class="opt-label">C</span> <code>const add = require('./lib.js')</code></div>
+      <div class="mcq-opt" onclick="ans(this,false,'oop-q6','include() is not valid ES module syntax.')"><span class="opt-label">D</span> <code>include { add } from './lib.js'</code></div>
+    </div>
+    <div class="mcq-feedback" id="oop-q6-fb"></div>
+  </div>
+
+  <div class="mcq-card" id="oop-q7">
+    <div class="mcq-q"><span class="q-num">7</span> What does <code>Object.setPrototypeOf(myCat, cat)</code> do?</div>
+    <div class="mcq-options">
+      <div class="mcq-opt" onclick="ans(this,false,'oop-q7','It changes the prototype, not copies properties.')"><span class="opt-label">A</span> Copies all properties from cat to myCat</div>
+      <div class="mcq-opt" onclick="ans(this,true,'oop-q7','Correct! It sets cat as the prototype of myCat, so myCat inherits cat\'s properties through the prototype chain.')"><span class="opt-label">B</span> Makes cat the prototype of myCat, enabling prototype inheritance</div>
+      <div class="mcq-opt" onclick="ans(this,false,'oop-q7','It doesn\'t merge — it establishes a prototype link.')"><span class="opt-label">C</span> Merges cat into myCat as a flat object</div>
+      <div class="mcq-opt" onclick="ans(this,false,'oop-q7','It establishes a prototype chain, not just a new property.')"><span class="opt-label">D</span> Adds a property named "prototype" to myCat</div>
+    </div>
+    <div class="mcq-feedback" id="oop-q7-fb"></div>
+  </div>
+
+  <div class="mcq-card" id="oop-q8">
+    <div class="mcq-q"><span class="q-num">8</span> How many default exports can a JavaScript module have?</div>
+    <div class="mcq-options">
+      <div class="mcq-opt" onclick="ans(this,true,'oop-q8','Correct! A module can have only ONE default export but multiple named exports.')"><span class="opt-label">A</span> Only one</div>
+      <div class="mcq-opt" onclick="ans(this,false,'oop-q8','Multiple default exports would cause a syntax error.')"><span class="opt-label">B</span> Up to three</div>
+      <div class="mcq-opt" onclick="ans(this,false,'oop-q8','Unlimited applies to named exports, not default.')"><span class="opt-label">C</span> Unlimited</div>
+      <div class="mcq-opt" onclick="ans(this,false,'oop-q8','Modules can have default exports.')"><span class="opt-label">D</span> None — only named exports are allowed</div>
+    </div>
+    <div class="mcq-feedback" id="oop-q8-fb"></div>
+  </div>
+
+  <div class="mcq-card" id="oop-q9">
+    <div class="mcq-q"><span class="q-num">9</span> Which of the following is a feature of Functional Programming?</div>
+    <div class="mcq-options">
+      <div class="mcq-opt" onclick="ans(this,false,'oop-q9','Shared mutable state causes bugs and is an anti-pattern in FP.')"><span class="opt-label">A</span> Shared mutable state</div>
+      <div class="mcq-opt" onclick="ans(this,false,'oop-q9','Modifying input is a side effect — FP avoids this.')"><span class="opt-label">B</span> Modifying input parameters</div>
+      <div class="mcq-opt" onclick="ans(this,true,'oop-q9','Correct! Pure functions have no side effects and always produce the same output for the same input — a core FP principle.')"><span class="opt-label">C</span> Pure functions with no side effects</div>
+      <div class="mcq-opt" onclick="ans(this,false,'oop-q9','Class hierarchies are an OOP concept, not FP.')"><span class="opt-label">D</span> Deep class hierarchies</div>
+    </div>
+    <div class="mcq-feedback" id="oop-q9-fb"></div>
+  </div>
+
+  <div class="mcq-card" id="oop-q10">
+    <div class="mcq-q"><span class="q-num">10</span> What does <code>const movie2 = { ...movie1, episode: 8 }</code> do?</div>
+    <div class="mcq-options">
+      <div class="mcq-opt" onclick="ans(this,false,'oop-q10','movie1 is not modified — spread creates a new object.')"><span class="opt-label">A</span> Modifies movie1 by adding episode: 8</div>
+      <div class="mcq-opt" onclick="ans(this,true,'oop-q10','Correct! Spread (...movie1) copies all properties into a new object, then episode: 8 overrides or adds that property.')"><span class="opt-label">B</span> Creates a new object with all movie1 properties plus episode: 8</div>
+      <div class="mcq-opt" onclick="ans(this,false,'oop-q10','Both movie1 and movie2 are objects, not arrays.')"><span class="opt-label">C</span> Appends movie1 array to movie2</div>
+      <div class="mcq-opt" onclick="ans(this,false,'oop-q10','Spread works fine here.')"><span class="opt-label">D</span> Throws a TypeError</div>
+    </div>
+    <div class="mcq-feedback" id="oop-q10-fb"></div>
+  </div>
+</div>
+
+<!-- ===================== CLIENT-SIDE JS ===================== -->
+<div id="tab-dom" class="tab-page">
+  <div class="ch-header">
+    <div class="badge" style="background:var(--accent5);color:#051218">Chapter Quiz</div>
+    <h1>⑤ Client-Side JavaScript</h1>
+    <p>10 questions · DOM · Events · Fetch · localStorage</p>
+  </div>
+  <div class="quiz-progress">
+    <span class="progress-label">Progress</span>
+    <div class="progress-bar-wrap"><div class="progress-bar-fill" id="pb-dom"></div></div>
+    <span class="score-badge" id="sc-dom">0 / 10</span>
+    <button class="reset-btn" onclick="resetQuiz('dom')">↺ Reset</button>
+  </div>
+
+  <div class="quiz-section-title">🌍 DOM &amp; Events</div>
+
+  <div class="mcq-card" id="dom-q1">
+    <div class="mcq-q"><span class="q-num">1</span> What does <code>document.querySelector(".myClass")</code> return?</div>
+    <div class="mcq-options">
+      <div class="mcq-opt" onclick="ans(this,true,'dom-q1','Correct! querySelector returns only the FIRST matching element.')"><span class="opt-label">A</span> The first element with class "myClass"</div>
+      <div class="mcq-opt" onclick="ans(this,false,'dom-q1','querySelectorAll returns all matches as a NodeList.')"><span class="opt-label">B</span> All elements with class "myClass" as an array</div>
+      <div class="mcq-opt" onclick="ans(this,false,'dom-q1','querySelector works fine with class selectors.')"><span class="opt-label">C</span> An error — use getElementById for classes</div>
+      <div class="mcq-opt" onclick="ans(this,false,'dom-q1','querySelector returns a single element, not a NodeList.')"><span class="opt-label">D</span> A NodeList of matching elements</div>
+    </div>
+    <div class="mcq-feedback" id="dom-q1-fb"></div>
+  </div>
+
+  <div class="mcq-card" id="dom-q2">
+    <div class="mcq-q"><span class="q-num">2</span> Which method prevents a form from reloading the page on submit?</div>
+    <div class="mcq-options">
+      <div class="mcq-opt" onclick="ans(this,false,'dom-q2','stopPropagation stops event bubbling, not default form behavior.')"><span class="opt-label">A</span> event.stopPropagation()</div>
+      <div class="mcq-opt" onclick="ans(this,true,'dom-q2','Correct! event.preventDefault() stops the browser\'s default behavior — for forms, that means preventing the page reload.')"><span class="opt-label">B</span> event.preventDefault()</div>
+      <div class="mcq-opt" onclick="ans(this,false,'dom-q2','event.cancel() is not a standard DOM method.')"><span class="opt-label">C</span> event.cancel()</div>
+      <div class="mcq-opt" onclick="ans(this,false,'dom-q2','return false only works in inline handlers, not addEventListener.')"><span class="opt-label">D</span> return false</div>
+    </div>
+    <div class="mcq-feedback" id="dom-q2-fb"></div>
+  </div>
+
+  <div class="mcq-card" id="dom-q3">
+    <div class="mcq-q"><span class="q-num">3</span> What is the correct way to store an object in localStorage?</div>
+    <div class="mcq-options">
+      <div class="mcq-opt" onclick="ans(this,false,'dom-q3','localStorage stores strings only — objects become &quot;[object Object]&quot;.')"><span class="opt-label">A</span> localStorage.setItem('key', {name: 'Ali'})</div>
+      <div class="mcq-opt" onclick="ans(this,true,'dom-q3','Correct! Serialize with JSON.stringify() before storing and JSON.parse() when reading back.')"><span class="opt-label">B</span> localStorage.setItem('key', JSON.stringify({name: 'Ali'}))</div>
+      <div class="mcq-opt" onclick="ans(this,false,'dom-q3','localStorage.store() does not exist.')"><span class="opt-label">C</span> localStorage.store('key', {name: 'Ali'})</div>
+      <div class="mcq-opt" onclick="ans(this,false,'dom-q3','localStorage.save() does not exist.')"><span class="opt-label">D</span> localStorage.save('key', JSON.stringify({name: 'Ali'}))</div>
+    </div>
+    <div class="mcq-feedback" id="dom-q3-fb"></div>
+  </div>
+
+  <div class="mcq-card" id="dom-q4">
+    <div class="mcq-q"><span class="q-num">4</span> The HTML attribute <code>data-user-name="johndoe"</code> — how is it accessed in JS?</div>
+    <div class="mcq-options">
+      <div class="mcq-opt" onclick="ans(this,false,'dom-q4','dataset uses camelCase, not kebab-case.')"><span class="opt-label">A</span> el.dataset['user-name']</div>
+      <div class="mcq-opt" onclick="ans(this,true,'dom-q4','Correct! data-user-name becomes dataset.userName (hyphen → camelCase).')"><span class="opt-label">B</span> el.dataset.userName</div>
+      <div class="mcq-opt" onclick="ans(this,false,'dom-q4','el.data is not a standard DOM property.')"><span class="opt-label">C</span> el.data.userName</div>
+      <div class="mcq-opt" onclick="ans(this,false,'dom-q4','getAttribute works but dataset is the modern approach.')"><span class="opt-label">D</span> el.getAttribute('userName')</div>
+    </div>
+    <div class="mcq-feedback" id="dom-q4-fb"></div>
+  </div>
+
+  <div class="mcq-card" id="dom-q5">
+    <div class="mcq-q"><span class="q-num">5</span> What does <code>response.json()</code> return from the Fetch API?</div>
+    <div class="mcq-options">
+      <div class="mcq-opt" onclick="ans(this,false,'dom-q5','It does not return a plain string.')"><span class="opt-label">A</span> A JSON string</div>
+      <div class="mcq-opt" onclick="ans(this,false,'dom-q5','It is asynchronous — it returns a Promise.')"><span class="opt-label">B</span> A JavaScript object (synchronously)</div>
+      <div class="mcq-opt" onclick="ans(this,true,'dom-q5','Correct! response.json() returns a Promise that resolves to a JS object parsed from the JSON response body.')"><span class="opt-label">C</span> A Promise that resolves to a JavaScript object</div>
+      <div class="mcq-opt" onclick="ans(this,false,'dom-q5','It resolves to a JS object, not always an array.')"><span class="opt-label">D</span> An array of JSON data</div>
+    </div>
+    <div class="mcq-feedback" id="dom-q5-fb"></div>
+  </div>
+
+  <div class="mcq-card" id="dom-q6">
+    <div class="mcq-q"><span class="q-num">6</span> What is the difference between <code>innerHTML</code> and <code>innerText</code>?</div>
+    <div class="mcq-options">
+      <div class="mcq-opt" onclick="ans(this,false,'dom-q6','It\'s the opposite.')"><span class="opt-label">A</span> innerHTML returns text; innerText returns HTML</div>
+      <div class="mcq-opt" onclick="ans(this,true,'dom-q6','Correct! innerHTML parses and includes HTML tags. innerText returns only the visible plain text.')"><span class="opt-label">B</span> innerHTML parses HTML tags; innerText returns plain text</div>
+      <div class="mcq-opt" onclick="ans(this,false,'dom-q6','They have different behaviours.')"><span class="opt-label">C</span> They are identical</div>
+      <div class="mcq-opt" onclick="ans(this,false,'dom-q6','Both work on any element.')"><span class="opt-label">D</span> innerHTML only works on &lt;div&gt;</div>
+    </div>
+    <div class="mcq-feedback" id="dom-q6-fb"></div>
+  </div>
+
+  <div class="mcq-card" id="dom-q7">
+    <div class="mcq-q"><span class="q-num">7</span> Which localStorage method persists data even after the browser tab is closed?</div>
+    <div class="mcq-options">
+      <div class="mcq-opt" onclick="ans(this,true,'dom-q7','Correct! localStorage persists data across sessions. sessionStorage is cleared when the tab closes.')"><span class="opt-label">A</span> localStorage.setItem()</div>
+      <div class="mcq-opt" onclick="ans(this,false,'dom-q7','sessionStorage is cleared when the tab closes.')"><span class="opt-label">B</span> sessionStorage.setItem()</div>
+      <div class="mcq-opt" onclick="ans(this,false,'dom-q7','cookieStorage is not a standard API.')"><span class="opt-label">C</span> cookieStorage.setItem()</div>
+      <div class="mcq-opt" onclick="ans(this,false,'dom-q7','memoryStorage is not a standard API.')"><span class="opt-label">D</span> memoryStorage.setItem()</div>
+    </div>
+    <div class="mcq-feedback" id="dom-q7-fb"></div>
+  </div>
+
+  <div class="mcq-card" id="dom-q8">
+    <div class="mcq-q"><span class="q-num">8</span> How do you add the CSS class "active" to an element using <code>classList</code>?</div>
+    <div class="mcq-options">
+      <div class="mcq-opt" onclick="ans(this,false,'dom-q8','That assignment replaces all existing classes.')"><span class="opt-label">A</span> el.className = "active"</div>
+      <div class="mcq-opt" onclick="ans(this,false,'dom-q8','push() is an array method, not classList.')"><span class="opt-label">B</span> el.classList.push("active")</div>
+      <div class="mcq-opt" onclick="ans(this,true,'dom-q8','Correct! classList.add() appends the class while keeping existing ones.')"><span class="opt-label">C</span> el.classList.add("active")</div>
+      <div class="mcq-opt" onclick="ans(this,false,'dom-q8','setAttribute sets an attribute, not the modern classList approach.')"><span class="opt-label">D</span> el.setAttribute("active")</div>
+    </div>
+    <div class="mcq-feedback" id="dom-q8-fb"></div>
+  </div>
+
+  <div class="mcq-card" id="dom-q9">
+    <div class="mcq-q"><span class="q-num">9</span> When using the Fetch API to POST data, which three things must be in the options object?</div>
+    <div class="mcq-options">
+      <div class="mcq-opt" onclick="ans(this,false,'dom-q9','url is the first argument to fetch(), not in options.')"><span class="opt-label">A</span> url, method, body</div>
+      <div class="mcq-opt" onclick="ans(this,true,'dom-q9','Correct! method (POST), headers (Content-Type: application/json), and body (JSON.stringify(data)) always go together.')"><span class="opt-label">B</span> method, headers, body</div>
+      <div class="mcq-opt" onclick="ans(this,false,'dom-q9','auth is not a standard fetch option.')"><span class="opt-label">C</span> method, auth, body</div>
+      <div class="mcq-opt" onclick="ans(this,false,'dom-q9','type is not a standard fetch option.')"><span class="opt-label">D</span> type, headers, data</div>
+    </div>
+    <div class="mcq-feedback" id="dom-q9-fb"></div>
+  </div>
+
+  <div class="mcq-card" id="dom-q10">
+    <div class="mcq-q"><span class="q-num">10</span> What does <code>el.classList.toggle('active')</code> do?</div>
+    <div class="mcq-options">
+      <div class="mcq-opt" onclick="ans(this,false,'dom-q10','add() always adds, it doesn\'t toggle.')"><span class="opt-label">A</span> Always adds the class "active"</div>
+      <div class="mcq-opt" onclick="ans(this,false,'dom-q10','remove() always removes, it doesn\'t toggle.')"><span class="opt-label">B</span> Always removes the class "active"</div>
+      <div class="mcq-opt" onclick="ans(this,true,'dom-q10','Correct! toggle() adds the class if absent, removes it if present — perfect for on/off UI states.')"><span class="opt-label">C</span> Adds class if absent, removes it if present</div>
+      <div class="mcq-opt" onclick="ans(this,false,'dom-q10','toggle does not check for other classes.')"><span class="opt-label">D</span> Removes all other classes and keeps only "active"</div>
+    </div>
+    <div class="mcq-feedback" id="dom-q10-fb"></div>
+  </div>
+</div>
+
+<!-- ===================== WEB API ===================== -->
+<div id="tab-webapi" class="tab-page">
+  <div class="ch-header">
+    <div class="badge" style="background:var(--accent4)">Chapter Quiz</div>
+    <h1>⑥ Web API</h1>
+    <p>10 questions · HTTP · REST · CRUD · Next.js · Status Codes</p>
+  </div>
+  <div class="quiz-progress">
+    <span class="progress-label">Progress</span>
+    <div class="progress-bar-wrap"><div class="progress-bar-fill" id="pb-webapi"></div></div>
+    <span class="score-badge" id="sc-webapi">0 / 10</span>
+    <button class="reset-btn" onclick="resetQuiz('webapi')">↺ Reset</button>
+  </div>
+
+  <div class="quiz-section-title">🌐 HTTP &amp; REST</div>
+
+  <div class="mcq-card" id="webapi-q1">
+    <div class="mcq-q"><span class="q-num">1</span> What is a Web API?</div>
+    <div class="mcq-options">
+      <div class="mcq-opt" onclick="ans(this,false,'webapi-q1','Web APIs return data, not visually rendered HTML pages.')"><span class="opt-label">A</span> A web page that returns HTML</div>
+      <div class="mcq-opt" onclick="ans(this,true,'webapi-q1','Correct! A Web API accepts HTTP requests and returns structured data (JSON) — like a web page but for programs.')"><span class="opt-label">B</span> A web service that accepts HTTP requests and returns JSON</div>
+      <div class="mcq-opt" onclick="ans(this,false,'webapi-q1','A database is a storage layer, not a Web API.')"><span class="opt-label">C</span> A database that stores JSON files</div>
+      <div class="mcq-opt" onclick="ans(this,false,'webapi-q1','A Web API can be consumed by any client, not just browsers.')"><span class="opt-label">D</span> A browser plugin for accessing data</div>
+    </div>
+    <div class="mcq-feedback" id="webapi-q1-fb"></div>
+  </div>
+
+  <div class="mcq-card" id="webapi-q2">
+    <div class="mcq-q"><span class="q-num">2</span> In REST, what are the three main concepts?</div>
+    <div class="mcq-options">
+      <div class="mcq-opt" onclick="ans(this,false,'webapi-q2','HTML is not a REST concept.')"><span class="opt-label">A</span> HTML, CSS, JavaScript</div>
+      <div class="mcq-opt" onclick="ans(this,true,'webapi-q2','Correct! REST = Nouns (Resources via URIs) + Verbs (HTTP Methods) + Representations (JSON/XML).')"><span class="opt-label">B</span> Nouns (Resources), Verbs (HTTP Methods), Representations</div>
+      <div class="mcq-opt" onclick="ans(this,false,'webapi-q2','These are database concepts, not REST.')"><span class="opt-label">C</span> Tables, Columns, Rows</div>
+      <div class="mcq-opt" onclick="ans(this,false,'webapi-q2','Request, Response and Header describe HTTP messages, not the REST design concepts.')"><span class="opt-label">D</span> Request, Response, Header</div>
+    </div>
+    <div class="mcq-feedback" id="webapi-q2-fb"></div>
+  </div>
+
+  <div class="mcq-card" id="webapi-q3">
+    <div class="mcq-q"><span class="q-num">3</span> Which HTTP method should be used to CREATE a new book where the server decides the URI?</div>
+    <div class="mcq-options">
+      <div class="mcq-opt" onclick="ans(this,false,'webapi-q3','GET retrieves resources.')"><span class="opt-label">A</span> GET</div>
+      <div class="mcq-opt" onclick="ans(this,true,'webapi-q3','Correct! POST is used for creation when the server assigns the URI. It is not repeatable (not idempotent).')"><span class="opt-label">B</span> POST</div>
+      <div class="mcq-opt" onclick="ans(this,false,'webapi-q3','PUT is for replacement/update and is idempotent.')"><span class="opt-label">C</span> PUT</div>
+      <div class="mcq-opt" onclick="ans(this,false,'webapi-q3','DELETE removes resources.')"><span class="opt-label">D</span> DELETE</div>
+    </div>
+    <div class="mcq-feedback" id="webapi-q3-fb"></div>
+  </div>
+
+  <div class="mcq-card" id="webapi-q4">
+    <div class="mcq-q"><span class="q-num">4</span> What HTTP status code indicates the resource was not found?</div>
+    <div class="mcq-options">
+      <div class="mcq-opt" onclick="ans(this,false,'webapi-q4','200 means OK — success.')"><span class="opt-label">A</span> 200</div>
+      <div class="mcq-opt" onclick="ans(this,false,'webapi-q4','500 is an internal server error.')"><span class="opt-label">B</span> 500</div>
+      <div class="mcq-opt" onclick="ans(this,true,'webapi-q4','Correct! 404 Not Found — the resource at the given URL does not exist.')"><span class="opt-label">C</span> 404</div>
+      <div class="mcq-opt" onclick="ans(this,false,'webapi-q4','201 means the resource was created successfully.')"><span class="opt-label">D</span> 201</div>
+    </div>
+    <div class="mcq-feedback" id="webapi-q4-fb"></div>
+  </div>
+
+  <div class="mcq-card" id="webapi-q5">
+    <div class="mcq-q"><span class="q-num">5</span> In Next.js, how do you create an API endpoint at <code>/api/books</code>?</div>
+    <div class="mcq-options">
+      <div class="mcq-opt" onclick="ans(this,false,'webapi-q5','page.js creates a web page, not an API route.')"><span class="opt-label">A</span> Create app/api/books/page.js</div>
+      <div class="mcq-opt" onclick="ans(this,true,'webapi-q5','Correct! route.js inside app/api/books/ creates a Web API endpoint accessible at /api/books.')"><span class="opt-label">B</span> Create app/api/books/route.js</div>
+      <div class="mcq-opt" onclick="ans(this,false,'webapi-q5','api.js is not a Next.js convention.')"><span class="opt-label">C</span> Create app/books/api.js</div>
+      <div class="mcq-opt" onclick="ans(this,false,'webapi-q5','controller.js is not the Next.js App Router convention.')"><span class="opt-label">D</span> Create app/controller/books.js</div>
+    </div>
+    <div class="mcq-feedback" id="webapi-q5-fb"></div>
+  </div>
+
+  <div class="mcq-card" id="webapi-q6">
+    <div class="mcq-q"><span class="q-num">6</span> How do you create a dynamic route for <code>/api/books/[id]</code> in Next.js?</div>
+    <div class="mcq-options">
+      <div class="mcq-opt" onclick="ans(this,false,'webapi-q6','Using :id is Express.js syntax, not Next.js App Router.')"><span class="opt-label">A</span> app/api/books/:id/route.js</div>
+      <div class="mcq-opt" onclick="ans(this,true,'webapi-q6','Correct! Wrapping a folder name in [brackets] creates a dynamic route segment.')"><span class="opt-label">B</span> app/api/books/[id]/route.js</div>
+      <div class="mcq-opt" onclick="ans(this,false,'webapi-q6','Curly braces are not the Next.js convention.')"><span class="opt-label">C</span> app/api/books/{id}/route.js</div>
+      <div class="mcq-opt" onclick="ans(this,false,'webapi-q6','Asterisk has a different meaning.')"><span class="opt-label">D</span> app/api/books/*/route.js</div>
+    </div>
+    <div class="mcq-feedback" id="webapi-q6-fb"></div>
+  </div>
+
+  <div class="mcq-card" id="webapi-q7">
+    <div class="mcq-q"><span class="q-num">7</span> How do you read a JSON request body in a Next.js route handler?</div>
+    <div class="mcq-options">
+      <div class="mcq-opt" onclick="ans(this,false,'webapi-q7','req.body is Express.js syntax, not Next.js App Router.')"><span class="opt-label">A</span> req.body</div>
+      <div class="mcq-opt" onclick="ans(this,true,'webapi-q7','Correct! In Next.js App Router, await request.json() reads and parses the JSON request body.')"><span class="opt-label">B</span> await request.json()</div>
+      <div class="mcq-opt" onclick="ans(this,false,'webapi-q7','JSON.parse(request) is not valid — request is not a string.')"><span class="opt-label">C</span> JSON.parse(request)</div>
+      <div class="mcq-opt" onclick="ans(this,false,'webapi-q7','request.data() is not a valid Next.js API.')"><span class="opt-label">D</span> request.data()</div>
+    </div>
+    <div class="mcq-feedback" id="webapi-q7-fb"></div>
+  </div>
+
+  <div class="mcq-card" id="webapi-q8">
+    <div class="mcq-q"><span class="q-num">8</span> Which status code range indicates a CLIENT error?</div>
+    <div class="mcq-options">
+      <div class="mcq-opt" onclick="ans(this,false,'webapi-q8','2xx = success.')"><span class="opt-label">A</span> 2xx</div>
+      <div class="mcq-opt" onclick="ans(this,false,'webapi-q8','3xx = redirection.')"><span class="opt-label">B</span> 3xx</div>
+      <div class="mcq-opt" onclick="ans(this,true,'webapi-q8','Correct! 4xx = client errors (e.g., 400 Bad Request, 401 Unauthorized, 404 Not Found).')"><span class="opt-label">C</span> 4xx</div>
+      <div class="mcq-opt" onclick="ans(this,false,'webapi-q8','5xx = server errors.')"><span class="opt-label">D</span> 5xx</div>
+    </div>
+    <div class="mcq-feedback" id="webapi-q8-fb"></div>
+  </div>
+
+  <div class="mcq-card" id="webapi-q9">
+    <div class="mcq-q"><span class="q-num">9</span> What is a Single Page Application (SPA)?</div>
+    <div class="mcq-options">
+      <div class="mcq-opt" onclick="ans(this,false,'webapi-q9','A SPA does not reload the page for each update.')"><span class="opt-label">A</span> A website that reloads the full page on every user action</div>
+      <div class="mcq-opt" onclick="ans(this,false,'webapi-q9','SPAs are dynamic, not static.')"><span class="opt-label">B</span> A static web page with no JavaScript</div>
+      <div class="mcq-opt" onclick="ans(this,true,'webapi-q9','Correct! A SPA fits on one HTML page. Resources load dynamically in response to user actions without full page reloads.')"><span class="opt-label">C</span> A web app where content loads dynamically without full page reloads</div>
+      <div class="mcq-opt" onclick="ans(this,false,'webapi-q9','SPAs can have multiple views — they just don\'t reload the page.')"><span class="opt-label">D</span> A website with exactly one view/screen</div>
+    </div>
+    <div class="mcq-feedback" id="webapi-q9-fb"></div>
+  </div>
+
+  <div class="mcq-card" id="webapi-q10">
+    <div class="mcq-q"><span class="q-num">10</span> What does <code>[...slug]</code> in a Next.js folder name create?</div>
+    <div class="mcq-options">
+      <div class="mcq-opt" onclick="ans(this,false,'webapi-q10','A basic dynamic route uses [slug] without the ellipsis.')"><span class="opt-label">A</span> A basic dynamic route matching one segment</div>
+      <div class="mcq-opt" onclick="ans(this,true,'webapi-q10','Correct! [...slug] is a catch-all route that matches any number of path segments after the base path.')"><span class="opt-label">B</span> A catch-all route matching any number of path segments</div>
+      <div class="mcq-opt" onclick="ans(this,false,'webapi-q10','Optional catch-all uses double brackets: [[...slug]].')"><span class="opt-label">C</span> An optional route that matches only if the segment exists</div>
+      <div class="mcq-opt" onclick="ans(this,false,'webapi-q10','Static routes use plain folder names.')"><span class="opt-label">D</span> A static route segment</div>
+    </div>
+    <div class="mcq-feedback" id="webapi-q10-fb"></div>
+  </div>
+</div>
+
+<!-- ===================== ALL CHAPTERS ===================== -->
+<div id="tab-all" class="tab-page">
+  <div class="ch-header">
+    <div class="badge" style="background:var(--accent2);color:#000">Mixed Challenge</div>
+    <h1>🎯 All Chapters</h1>
+    <p>30 questions spanning every chapter — full exam preparation</p>
+  </div>
+  <div class="quiz-progress">
+    <span class="progress-label">Progress</span>
+    <div class="progress-bar-wrap"><div class="progress-bar-fill" id="pb-all"></div></div>
+    <span class="score-badge" id="sc-all">0 / 30</span>
+    <button class="reset-btn" onclick="resetQuiz('all')">↺ Reset</button>
+  </div>
+  <div id="all-quiz-container"><!-- generated by JS --></div>
+</div>
+
+<!-- ===================== FLASHCARDS ===================== -->
+<div id="tab-fc" class="tab-page">
+  <div class="ch-header">
+    <div class="badge" style="background:var(--accent2);color:#000">Code Practice</div>
+    <h1>💡 Code Flashcards</h1>
+    <p>Click a card to reveal · Navigate with arrows · Practice writing code from memory</p>
+  </div>
+
+  <div class="quiz-section-title">🌐 HTML</div>
+  <div id="fc-grid-html"></div>
+  <div class="fc-nav"><button class="fc-btn" onclick="fcNav('html',-1)">← Prev</button><span class="fc-counter" id="fc-counter-html">1/5</span><button class="fc-btn" onclick="fcNav('html',1)">Next →</button><button class="fc-btn primary" onclick="fcFlip('html')">Flip</button></div>
+
+  <div class="quiz-section-title" style="margin-top:32px">🎨 CSS</div>
+  <div id="fc-grid-css"></div>
+  <div class="fc-nav"><button class="fc-btn" onclick="fcNav('css',-1)">← Prev</button><span class="fc-counter" id="fc-counter-css">1/6</span><button class="fc-btn" onclick="fcNav('css',1)">Next →</button><button class="fc-btn primary" onclick="fcFlip('css')">Flip</button></div>
+
+  <div class="quiz-section-title" style="margin-top:32px">⚡ JavaScript &amp; OOP</div>
+  <div id="fc-grid-js"></div>
+  <div class="fc-nav"><button class="fc-btn" onclick="fcNav('js',-1)">← Prev</button><span class="fc-counter" id="fc-counter-js">1/8</span><button class="fc-btn" onclick="fcNav('js',1)">Next →</button><button class="fc-btn primary" onclick="fcFlip('js')">Flip</button></div>
+
+  <div class="quiz-section-title" style="margin-top:32px">🌐 Web API</div>
+  <div id="fc-grid-webapi"></div>
+  <div class="fc-nav"><button class="fc-btn" onclick="fcNav('webapi',-1)">← Prev</button><span class="fc-counter" id="fc-counter-webapi">1/5</span><button class="fc-btn" onclick="fcNav('webapi',1)">Next →</button><button class="fc-btn primary" onclick="fcFlip('webapi')">Flip</button></div>
+</div>
+
+<!-- ===================== CSS PRACTICE I ===================== -->
+<div id="tab-cssprac1" class="tab-page">
+  <div class="ch-header">
+    <div class="badge" style="background:#a78bfa">Practice Questions</div>
+    <h1>🎨 CSS Practice I</h1>
+    <p>32 questions · Selectors · Specificity · Flexbox · Grid · Media Queries</p>
+  </div>
+
+  <div class="quiz-section-title">🎯 Selectors & Specificity</div>
+
+  <div class="prac-card" id="cp1-q1">
+    <div class="prac-q"><span class="q-num">1</span> Which &lt;p&gt; element turns green?</div>
+    <div class="prac-code">&lt;div class="box"&gt;
+  &lt;p&gt;Katmer&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;Kunafa&lt;/p&gt;
+
+.box p { color: green; }</div>
+    <button class="prac-reveal-btn" onclick="revealAnswer('cp1-q1')">Show Answer</button>
+    <div class="prac-answer" id="cp1-q1-ans">✅ <strong>Katmer</strong> — <code>.box p</code> is a descendant selector: it targets any &lt;p&gt; inside an element with class <code>box</code>. "Kunafa" is outside .box, so it is not selected.</div>
+  </div>
+
+  <div class="prac-card" id="cp1-q2">
+    <div class="prac-q"><span class="q-num">2</span> Which elements become underlined?</div>
+    <div class="prac-code">&lt;ul class="menu"&gt;
+  &lt;li&gt;Iskender&lt;/li&gt;
+  &lt;li&gt;&lt;span&gt;Baklava&lt;/span&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+.menu > li { text-decoration: underline; }</div>
+    <button class="prac-reveal-btn" onclick="revealAnswer('cp1-q2')">Show Answer</button>
+    <div class="prac-answer" id="cp1-q2-ans">✅ <strong>Both &lt;li&gt; elements</strong> (Iskender and the li wrapping Baklava) — <code>&gt;</code> is the direct child combinator. Both &lt;li&gt;s are direct children of .menu. The &lt;span&gt; itself is not underlined by this rule (though it inherits the underline from the parent li).</div>
+  </div>
+
+  <div class="prac-card" id="cp1-q3">
+    <div class="prac-q"><span class="q-num">3</span> Which elements are red?</div>
+    <div class="prac-code">&lt;h1&gt;Doha&lt;/h1&gt;
+&lt;h2&gt;Istanbul&lt;/h2&gt;
+&lt;p&gt;Hello&lt;/p&gt;
+
+h1, p { color: red; }</div>
+    <button class="prac-reveal-btn" onclick="revealAnswer('cp1-q3')">Show Answer</button>
+    <div class="prac-answer" id="cp1-q3-ans">✅ <strong>Doha (h1) and Hello (p)</strong> — the comma groups selectors. Istanbul (h2) is not in the selector list, so it is unaffected.</div>
+  </div>
+
+  <div class="prac-card" id="cp1-q4">
+    <div class="prac-q"><span class="q-num">4</span> What happens when the mouse pointer is placed over the link?</div>
+    <div class="prac-code">&lt;a class="link" href="#"&gt;Corniche Walk&lt;/a&gt;
+
+.link { color: black; }
+.link:hover { color: orange; }</div>
+    <button class="prac-reveal-btn" onclick="revealAnswer('cp1-q4')">Show Answer</button>
+    <div class="prac-answer" id="cp1-q4-ans">✅ The text color changes from <strong>black → orange</strong> when hovered. <code>:hover</code> is a pseudo-class that applies only when the mouse is over the element.</div>
+  </div>
+
+  <div class="prac-card" id="cp1-q5">
+    <div class="prac-q"><span class="q-num">5</span> What is the final text color?</div>
+    <div class="prac-code">&lt;p id="x" class="y"&gt;Qatar&lt;/p&gt;
+
+p  { color: blue; }
+.y { color: green; }
+#x { color: red; }</div>
+    <button class="prac-reveal-btn" onclick="revealAnswer('cp1-q5')">Show Answer</button>
+    <div class="prac-answer" id="cp1-q5-ans">✅ <strong>Red</strong> — Specificity wins: ID (#x) = 100 points &gt; Class (.y) = 10 points &gt; Element (p) = 1 point. The ID rule has the highest specificity, so it wins regardless of order.</div>
+  </div>
+
+  <div class="prac-card" id="cp1-q6">
+    <div class="prac-q"><span class="q-num">6</span> If the screen width is 500px, what is the font size?</div>
+    <div class="prac-code">&lt;div class="card"&gt;Al Bayt Stadium&lt;/div&gt;
+
+.card { font-size: 16px; }
+@media (max-width: 600px) {
+  .card { font-size: 12px; }
+}</div>
+    <button class="prac-reveal-btn" onclick="revealAnswer('cp1-q6')">Show Answer</button>
+    <div class="prac-answer" id="cp1-q6-ans">✅ <strong>12px</strong> — 500px is less than 600px, so the media query condition <code>max-width: 600px</code> is true and the override applies.</div>
+  </div>
+
+  <div class="prac-card" id="cp1-q7">
+    <div class="prac-q"><span class="q-num">7</span> Will A, B, and C appear in a row or stacked vertically?</div>
+    <div class="prac-code">&lt;div class="row"&gt;
+  &lt;div&gt;A&lt;/div&gt;&lt;div&gt;B&lt;/div&gt;&lt;div&gt;C&lt;/div&gt;
+&lt;/div&gt;
+
+.row { display: flex; }</div>
+    <button class="prac-reveal-btn" onclick="revealAnswer('cp1-q7')">Show Answer</button>
+    <div class="prac-answer" id="cp1-q7-ans">✅ <strong>In a row (side by side)</strong> — <code>display: flex</code> sets <code>flex-direction: row</code> by default, placing all child divs horizontally.</div>
+  </div>
+
+  <div class="prac-card" id="cp1-q8">
+    <div class="prac-q"><span class="q-num">8</span> Which list items become purple?</div>
+    <div class="prac-code">&lt;ul&gt;
+  &lt;li&gt;Tea&lt;/li&gt;
+  &lt;li&gt;Coffee&lt;/li&gt;
+  &lt;li&gt;Karak&lt;/li&gt;
+  &lt;li&gt;Turkish Coffee&lt;/li&gt;
+&lt;/ul&gt;
+
+li:nth-child(2n) { color: purple; }</div>
+    <button class="prac-reveal-btn" onclick="revealAnswer('cp1-q8')">Show Answer</button>
+    <div class="prac-answer" id="cp1-q8-ans">✅ <strong>Coffee (2nd) and Turkish Coffee (4th)</strong> — <code>nth-child(2n)</code> selects every even child (n=1→2, n=2→4…). Same as <code>nth-child(even)</code>.</div>
+  </div>
+
+  <div class="prac-card" id="cp1-q9">
+    <div class="prac-q"><span class="q-num">9</span> What is the height at 900px screen width? What about 1100px?</div>
+    <div class="prac-code">.flag { height: 200px; }
+@media (min-width: 800px)  { .flag { height: 400px; } }
+@media (min-width: 1000px) { .flag { height: 600px; } }</div>
+    <button class="prac-reveal-btn" onclick="revealAnswer('cp1-q9')">Show Answer</button>
+    <div class="prac-answer" id="cp1-q9-ans">✅ <strong>900px screen → 400px height</strong> (800px query fires, 1000px does not). <strong>1100px screen → 600px height</strong> (both queries fire; the last one wins — cascade order).</div>
+  </div>
+
+  <div class="prac-card" id="cp1-q10">
+    <div class="prac-q"><span class="q-num">10</span> How are the three items distributed horizontally?</div>
+    <div class="prac-code">&lt;div class="bar"&gt;
+  &lt;span&gt;Souq&lt;/span&gt;&lt;span&gt;Corniche&lt;/span&gt;&lt;span&gt;Metro&lt;/span&gt;
+&lt;/div&gt;
+
+.bar { display:flex; justify-content: space-between; width:300px; border:1px solid; }</div>
+    <button class="prac-reveal-btn" onclick="revealAnswer('cp1-q10')">Show Answer</button>
+    <div class="prac-answer" id="cp1-q10-ans">✅ <strong>Souq is flush left, Metro is flush right, Corniche is centered</strong> — <code>space-between</code> places the first item at the start, the last at the end, and distributes equal gaps between the remaining items.</div>
+  </div>
+
+  <div class="prac-card" id="cp1-q11">
+    <div class="prac-q"><span class="q-num">11</span> Approximately how much width does A get compared to B?</div>
+    <div class="prac-code">.row { display:flex; width: 300px; }
+.a { flex-grow: 1; }
+.b { flex-grow: 2; }</div>
+    <button class="prac-reveal-btn" onclick="revealAnswer('cp1-q11')">Show Answer</button>
+    <div class="prac-answer" id="cp1-q11-ans">✅ <strong>A gets ~100px (1/3), B gets ~200px (2/3)</strong> — flex-grow ratios: 1+2=3 total parts. A takes 1 part, B takes 2 parts of the available 300px.</div>
+  </div>
+
+  <div class="prac-card" id="cp1-q12">
+    <div class="prac-q"><span class="q-num">12</span> How many columns are created, and what does 1fr mean?</div>
+    <div class="prac-code">.grid { display:grid; grid-template-columns: 100px 1fr; width:320px; }</div>
+    <button class="prac-reveal-btn" onclick="revealAnswer('cp1-q12')">Show Answer</button>
+    <div class="prac-answer" id="cp1-q12-ans">✅ <strong>2 columns</strong> — Column 1 is a fixed <strong>100px</strong>. Column 2 is <strong>1fr = 220px</strong> (320px − 100px). <code>fr</code> = fraction of the remaining space after fixed columns are subtracted.</div>
+  </div>
+
+  <div class="prac-card" id="cp1-q13">
+    <div class="prac-q"><span class="q-num">13</span> Where does the .hero element appear?</div>
+    <div class="prac-code">.g { display:grid; grid-template-columns: 200px 1fr; }
+.hero { grid-column: 1 / -1; }</div>
+    <button class="prac-reveal-btn" onclick="revealAnswer('cp1-q13')">Show Answer</button>
+    <div class="prac-answer" id="cp1-q13-ans">✅ <strong>It spans the full width — both columns</strong> — <code>1 / -1</code> means "from the first grid line to the last grid line." In a 2-column grid that is all columns.</div>
+  </div>
+
+  <div class="prac-card" id="cp1-q14">
+    <div class="prac-q"><span class="q-num">14</span> At 600px screen width, what color is the text?</div>
+    <div class="prac-code">&lt;p class="msg"&gt;Hello Doha&lt;/p&gt;
+
+.msg { color: blue; }
+@media (max-width: 700px) { p { color: red; } }</div>
+    <button class="prac-reveal-btn" onclick="revealAnswer('cp1-q14')">Show Answer</button>
+    <div class="prac-answer" id="cp1-q14-ans">✅ <strong>Blue</strong> — Both rules apply at 600px. But <code>.msg</code> (class selector, specificity 10) beats <code>p</code> (element selector, specificity 1). Higher specificity wins, so blue applies.</div>
+  </div>
+
+  <div class="prac-card" id="cp1-q15">
+    <div class="prac-q"><span class="q-num">15</span> What is the total outer width of the card?</div>
+    <div class="prac-code">.card {
+  width: 200px;
+  padding: 20px;
+  border: 10px solid;
+  box-sizing: content-box;
+}</div>
+    <button class="prac-reveal-btn" onclick="revealAnswer('cp1-q15')">Show Answer</button>
+    <div class="prac-answer" id="cp1-q15-ans">✅ <strong>260px</strong> — With <code>box-sizing: content-box</code> (the default), width only sets the content area. Total = content (200) + padding left+right (20+20) + border left+right (10+10) = <strong>260px</strong>.</div>
+  </div>
+
+  <div class="prac-card" id="cp1-q16">
+    <div class="prac-q"><span class="q-num">16</span> How many columns does A occupy?</div>
+    <div class="prac-code">.grid { display:grid; grid-template-columns: 1fr 1fr 1fr; }
+.a { grid-column: span 2; }</div>
+    <button class="prac-reveal-btn" onclick="revealAnswer('cp1-q16')">Show Answer</button>
+    <div class="prac-answer" id="cp1-q16-ans">✅ <strong>2 columns</strong> — <code>span 2</code> tells the item to occupy 2 column tracks from its starting position.</div>
+  </div>
+
+  <div class="prac-card" id="cp1-q17">
+    <div class="prac-q"><span class="q-num">17</span> What is the font-size at 700px, 550px, and 480px?</div>
+    <div class="prac-code">.box { font-size: 16px; }
+@media (max-width: 900px) { .box { font-size: 14px; } }
+@media (max-width: 600px) { .box { font-size: 18px; } }
+@media (max-width: 500px) { .box { font-size: 12px; } }</div>
+    <button class="prac-reveal-btn" onclick="revealAnswer('cp1-q17')">Show Answer</button>
+    <div class="prac-answer" id="cp1-q17-ans">✅ <strong>700px → 14px</strong> (≤900 fires, ≤600 does not). <strong>550px → 18px</strong> (≤900 and ≤600 both fire; last applied rule wins = 18px). <strong>480px → 12px</strong> (all three fire; last = 12px).</div>
+  </div>
+
+  <div class="prac-card" id="cp1-q18">
+    <div class="prac-q"><span class="q-num">18</span> What is the final color?</div>
+    <div class="prac-code">&lt;p id="t" style="color: orange;"&gt;Karak time&lt;/p&gt;
+
+#t { color: blue; }
+p  { color: red; }</div>
+    <button class="prac-reveal-btn" onclick="revealAnswer('cp1-q18')">Show Answer</button>
+    <div class="prac-answer" id="cp1-q18-ans">✅ <strong>Orange</strong> — Inline styles (specificity 1000) beat everything: ID (100), class (10), element (1). Inline style wins unconditionally.</div>
+  </div>
+
+  <div class="prac-card" id="cp1-q19">
+    <div class="prac-q"><span class="q-num">19</span> Describe the page layout — who is top, left, right, bottom?</div>
+    <div class="prac-code">grid-template-areas:
+  "h h"
+  "a m"
+  "f f";</div>
+    <button class="prac-reveal-btn" onclick="revealAnswer('cp1-q19')">Show Answer</button>
+    <div class="prac-answer" id="cp1-q19-ans">✅ <strong>h = header (top, full width) · a = aside (left) · m = main (right) · f = footer (bottom, full width)</strong>. Each letter in quotes = a named grid area cell. Repeating the same letter spans multiple columns.</div>
+  </div>
+
+  <div class="prac-card" id="cp1-q20">
+    <div class="prac-q"><span class="q-num">20</span> How will the text "Spices" and "Oud" appear?</div>
+    <div class="prac-code">.souq p { font-weight: bold; }
+
+&lt;div class="souq"&gt;
+  &lt;p&gt;Spices&lt;/p&gt;
+  &lt;p&gt;Oud&lt;/p&gt;
+&lt;/div&gt;</div>
+    <button class="prac-reveal-btn" onclick="revealAnswer('cp1-q20')">Show Answer</button>
+    <div class="prac-answer" id="cp1-q20-ans">✅ Both <strong>Spices and Oud will be bold</strong> — <code>.souq p</code> targets all &lt;p&gt; descendants of .souq. Both paragraphs are inside .souq, so both get <code>font-weight: bold</code>.</div>
+  </div>
+
+  <div class="prac-card" id="cp1-q21">
+    <div class="prac-q"><span class="q-num">21</span> How will the two dhow boat images be arranged?</div>
+    <div class="prac-code">.dhow-container { display: flex; }
+
+&lt;div class="dhow-container"&gt;
+  &lt;img src="dhow.jpg" alt="A dhow boat"&gt;
+  &lt;img src="dhow2.jpg" alt="Another dhow boat"&gt;
+&lt;/div&gt;</div>
+    <button class="prac-reveal-btn" onclick="revealAnswer('cp1-q21')">Show Answer</button>
+    <div class="prac-answer" id="cp1-q21-ans">✅ <strong>Side by side (horizontally)</strong> — <code>display: flex</code> with default <code>flex-direction: row</code> places all children in a horizontal row.</div>
+  </div>
+
+  <div class="prac-card" id="cp1-q22">
+    <div class="prac-q"><span class="q-num">22</span> What will be the layout of the room?</div>
+    <div class="prac-code">.room { display: grid; grid-template-columns: 100px 100px; }
+
+&lt;div class="room"&gt;
+  &lt;div&gt;Guest 1&lt;/div&gt;
+  &lt;div&gt;Guest 2&lt;/div&gt;
+&lt;/div&gt;</div>
+    <button class="prac-reveal-btn" onclick="revealAnswer('cp1-q22')">Show Answer</button>
+    <div class="prac-answer" id="cp1-q22-ans">✅ <strong>Guest 1 and Guest 2 side by side in 2 equal 100px columns</strong> — Grid fills columns left to right. Two columns defined = two items placed in the same row.</div>
+  </div>
+
+  <div class="prac-card" id="cp1-q23">
+    <div class="prac-q"><span class="q-num">23</span> How will "Walk" and "Cycle" be displayed?</div>
+    <div class="prac-code">.corniche { display: flex; flex-direction: column; }
+
+&lt;div class="corniche"&gt;
+  &lt;span&gt;Walk&lt;/span&gt;
+  &lt;span&gt;Cycle&lt;/span&gt;
+&lt;/div&gt;</div>
+    <button class="prac-reveal-btn" onclick="revealAnswer('cp1-q23')">Show Answer</button>
+    <div class="prac-answer" id="cp1-q23-ans">✅ <strong>Stacked vertically</strong> — <code>flex-direction: column</code> makes the main axis vertical, so items flow top-to-bottom: Walk on top, Cycle below.</div>
+  </div>
+
+  <div class="prac-card" id="cp1-q24">
+    <div class="prac-q"><span class="q-num">24</span> Which paragraph's text will be gray?</div>
+    <div class="prac-code">.pearl-monument > p { color: gray; }
+
+&lt;div class="pearl-monument"&gt;
+  &lt;p&gt;A symbol of Qatar.&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;Located in Doha.&lt;/p&gt;</div>
+    <button class="prac-reveal-btn" onclick="revealAnswer('cp1-q24')">Show Answer</button>
+    <div class="prac-answer" id="cp1-q24-ans">✅ <strong>"A symbol of Qatar."</strong> only — <code>&gt;</code> is the direct child combinator. The second &lt;p&gt; is outside .pearl-monument and is not selected.</div>
+  </div>
+
+  <div class="prac-card" id="cp1-q25">
+    <div class="prac-q"><span class="q-num">25</span> What is the width ratio between the entrance and the gallery?</div>
+    <div class="prac-code">.museum-layout { display: grid; grid-template-columns: 1fr 3fr; }
+
+&lt;div class="museum-layout"&gt;
+  &lt;div class="entrance"&gt;&lt;/div&gt;
+  &lt;div class="gallery"&gt;&lt;/div&gt;
+&lt;/div&gt;</div>
+    <button class="prac-reveal-btn" onclick="revealAnswer('cp1-q25')">Show Answer</button>
+    <div class="prac-answer" id="cp1-q25-ans">✅ <strong>Entrance : Gallery = 1 : 3</strong> — Total = 4 fr parts. Entrance takes 1/4 of the width, Gallery takes 3/4. e.g., 800px → entrance = 200px, gallery = 600px.</div>
+  </div>
+
+  <div class="prac-card" id="cp1-q26">
+    <div class="prac-q"><span class="q-num">26</span> Which list item will be in italics?</div>
+    <div class="prac-code">li:nth-child(2) { font-style: italic; }
+
+&lt;ol&gt;
+  &lt;li&gt;First step&lt;/li&gt;
+  &lt;li&gt;Second step&lt;/li&gt;
+  &lt;li&gt;Third step&lt;/li&gt;
+&lt;/ol&gt;</div>
+    <button class="prac-reveal-btn" onclick="revealAnswer('cp1-q26')">Show Answer</button>
+    <div class="prac-answer" id="cp1-q26-ans">✅ <strong>"Second step"</strong> — <code>nth-child(2)</code> selects the second child element.</div>
+  </div>
+
+  <div class="prac-card" id="cp1-q27">
+    <div class="prac-q"><span class="q-num">27</span> How will the station divs be aligned vertically within the metro-line?</div>
+    <div class="prac-code">.metro-line { display: flex; align-items: center; }
+.station { height: 50px; }
+.station:nth-child(2) { height: 100px; }
+
+&lt;div class="metro-line"&gt;
+  &lt;div class="station"&gt;&lt;/div&gt;
+  &lt;div class="station"&gt;&lt;/div&gt;
+  &lt;div class="station"&gt;&lt;/div&gt;
+&lt;/div&gt;</div>
+    <button class="prac-reveal-btn" onclick="revealAnswer('cp1-q27')">Show Answer</button>
+    <div class="prac-answer" id="cp1-q27-ans">✅ <strong>All stations are vertically centered</strong> — <code>align-items: center</code> aligns items along the cross axis (vertical in a row flex). The tall station (100px) sets the row height; the shorter ones (50px) are centered within it.</div>
+  </div>
+
+  <div class="prac-card" id="cp1-q28">
+    <div class="prac-q"><span class="q-num">28</span> If the container has extra space, how will that space be distributed among the items?</div>
+    <div class="prac-code">.traditional-pattern { display: flex; }
+.item { flex-grow: 1; }
+.item:nth-child(3) { flex-grow: 3; }
+
+&lt;div class="traditional-pattern"&gt;
+  &lt;div class="item"&gt;1&lt;/div&gt;
+  &lt;div class="item"&gt;2&lt;/div&gt;
+  &lt;div class="item"&gt;3&lt;/div&gt;
+  &lt;div class="item"&gt;4&lt;/div&gt;
+&lt;/div&gt;</div>
+    <button class="prac-reveal-btn" onclick="revealAnswer('cp1-q28')">Show Answer</button>
+    <div class="prac-answer" id="cp1-q28-ans">✅ Total grow units = 1+1+3+1 = <strong>6</strong>. Items 1, 2, 4 each get <strong>1/6</strong> of extra space. Item 3 gets <strong>3/6 (half)</strong> of the extra space. Item 3 is significantly wider than the others.</div>
+  </div>
+
+  <div class="prac-card" id="cp1-q29">
+    <div class="prac-q"><span class="q-num">29</span> In what visual order will the articles appear?</div>
+    <div class="prac-code">.news-feed { display: flex; }
+.featured { order: -1; }
+
+&lt;div class="news-feed"&gt;
+  &lt;article&gt;Story 1&lt;/article&gt;
+  &lt;article class="featured"&gt;Story 2 (Featured)&lt;/article&gt;
+  &lt;article&gt;Story 3&lt;/article&gt;
+&lt;/div&gt;</div>
+    <button class="prac-reveal-btn" onclick="revealAnswer('cp1-q29')">Show Answer</button>
+    <div class="prac-answer" id="cp1-q29-ans">✅ Visual order: <strong>Story 2 (Featured) → Story 1 → Story 3</strong>. Default order is 0. <code>order: -1</code> moves .featured before all items with order 0 or higher. HTML source order is unchanged.</div>
+  </div>
+
+  <div class="prac-card" id="cp1-q30">
+    <div class="prac-q"><span class="q-num">30</span> What determines the width and height of the child div?</div>
+    <div class="prac-code">.parent { width: 200px; height: 200px; background-color: lightblue; }
+.child  { width: 50%; height: 10vw; background-color: maroon; }
+
+&lt;div class="parent"&gt;&lt;div class="child"&gt;&lt;/div&gt;&lt;/div&gt;</div>
+    <button class="prac-reveal-btn" onclick="revealAnswer('cp1-q30')">Show Answer</button>
+    <div class="prac-answer" id="cp1-q30-ans">✅ <strong>Width = 100px</strong> (50% of parent 200px). <strong>Height = 10vw</strong> (10% of viewport width — e.g., on a 1000px screen = 100px). Note: % width is relative to parent; <code>vw</code> is relative to the viewport, not the parent.</div>
+  </div>
+
+  <div class="prac-card" id="cp1-q31">
+    <div class="prac-q"><span class="q-num">31</span> How will the images in the gallery behave when you resize the browser window?</div>
+    <div class="prac-code">.gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
+}
+&lt;div class="gallery"&gt;
+  &lt;img src="1.jpg"&gt; &lt;img src="2.jpg"&gt; &lt;img src="3.jpg"&gt;
+  &lt;img src="4.jpg"&gt; &lt;img src="5.jpg"&gt; &lt;img src="6.jpg"&gt;
+&lt;/div&gt;</div>
+    <button class="prac-reveal-btn" onclick="revealAnswer('cp1-q31')">Show Answer</button>
+    <div class="prac-answer" id="cp1-q31-ans">✅ <strong>Responsive auto-fitting grid</strong> — <code>auto-fit</code> creates as many columns as fit. Each column is at least 150px wide and stretches equally with 1fr. On wide screens: 6 columns. As the window narrows, columns drop to 5, 4, 3, 2, 1 — no media queries needed.</div>
+  </div>
+
+  <div class="prac-card" id="cp1-q32">
+    <div class="prac-q"><span class="q-num">32</span> When you hover over the word "Click", what color will it be?</div>
+    <div class="prac-code">a:hover { color: red; }
+span { color: blue; }
+
+&lt;a&gt;&lt;span&gt;Click&lt;/span&gt;&lt;/a&gt;</div>
+    <button class="prac-reveal-btn" onclick="revealAnswer('cp1-q32')">Show Answer</button>
+    <div class="prac-answer" id="cp1-q32-ans">✅ <strong>Blue</strong> — <code>span { color: blue }</code> directly targets the &lt;span&gt; (specificity: element = 1). <code>a:hover</code> only sets color on the &lt;a&gt;, not on the &lt;span&gt; inside. The &lt;span&gt;'s direct rule wins over inherited color from the parent &lt;a&gt;.</div>
+  </div>
+</div>
+
+<!-- ===================== CSS PRACTICE II ===================== -->
+<div id="tab-cssprac2" class="tab-page">
+  <div class="ch-header">
+    <div class="badge" style="background:#c084fc">Practice Questions</div>
+    <h1>🎨 CSS Practice II</h1>
+    <p>21 questions · Code Reading · Mini Café Menu · What-If Analysis</p>
+  </div>
+
+  <div class="quiz-section-title">☕ Mini Café Menu — Code Analysis</div>
+  <div class="prac-card" style="border-color:#c084fc; margin-bottom:24px;">
+    <div class="prac-q" style="color:var(--accent2)">📋 Reference HTML/CSS</div>
+    <div class="prac-code" style="font-size:11px; max-height:260px; overflow-y:auto;">* { box-sizing: border-box; }
+body { margin: 0; font-family: Arial, sans-serif; background: #f6f6f6; }
+
+.container { max-width: 900px; margin: 0 auto; padding: 20px; }
+header { background: white; padding: 16px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.logo  { font-weight: bold; font-size: 18px; }
+.tag   { font-size: 12px; background: #eee; padding: 4px 8px; border-radius: 999px; }
+
+.grid { margin-top: 16px; display: grid; gap: 12px;
+  grid-template-columns: repeat(3, 1fr); }
+.card { background: white; border-radius: 10px; padding: 14px;
+  border: 1px solid #ddd; transition: transform 150ms ease, border-color 150ms ease; }
+.card:hover { transform: translateY(-2px); border-color: #999; }
+.card h3 { margin: 0 0 8px; font-size: 16px; }
+.price { font-weight: bold; }
+
+.btn { display: inline-block; margin-top: 10px; padding: 8px 12px;
+  border-radius: 8px; background: #222; color: white; text-decoration: none; }
+.btn:hover { background: #444; }
+
+@media (max-width: 700px) {
+  .grid { grid-template-columns: 1fr; }
+  header { flex-direction: column; align-items: flex-start; }
+}</div>
+  </div>
+
+  <div class="prac-card" id="cp2-q1">
+    <div class="prac-q"><span class="q-num">1</span> Which selector sets the page background color?</div>
+    <button class="prac-reveal-btn" onclick="revealAnswer('cp2-q1')">Show Answer</button>
+    <div class="prac-answer" id="cp2-q1-ans">✅ <code>body { background: #f6f6f6; }</code> — The body selector applies a light gray background to the entire page.</div>
+  </div>
+
+  <div class="prac-card" id="cp2-q2">
+    <div class="prac-q"><span class="q-num">2</span> What does <code>max-width: 900px</code> do for .container?</div>
+    <button class="prac-reveal-btn" onclick="revealAnswer('cp2-q2')">Show Answer</button>
+    <div class="prac-answer" id="cp2-q2-ans">✅ It <strong>caps the container width at 900px</strong>. On screens wider than 900px the container stays 900px and is centered with <code>margin: 0 auto</code>. On narrower screens the container shrinks to fit.</div>
+  </div>
+
+  <div class="prac-card" id="cp2-q3">
+    <div class="prac-q"><span class="q-num">3</span> Which CSS rule makes the header items go side-by-side?</div>
+    <button class="prac-reveal-btn" onclick="revealAnswer('cp2-q3')">Show Answer</button>
+    <div class="prac-answer" id="cp2-q3-ans">✅ <code>header { display: flex; }</code> — Flexbox places children (.logo and .tag) in a horizontal row by default.</div>
+  </div>
+
+  <div class="prac-card" id="cp2-q4">
+    <div class="prac-q"><span class="q-num">4</span> What property creates space between items in the header?</div>
+    <button class="prac-reveal-btn" onclick="revealAnswer('cp2-q4')">Show Answer</button>
+    <div class="prac-answer" id="cp2-q4-ans">✅ <code>gap: 12px</code> — The gap property on a flex container adds space between flex items (without affecting outer edges).</div>
+  </div>
+
+  <div class="prac-card" id="cp2-q5">
+    <div class="prac-q"><span class="q-num">5</span> Which selector styles all three cards?</div>
+    <button class="prac-reveal-btn" onclick="revealAnswer('cp2-q5')">Show Answer</button>
+    <div class="prac-answer" id="cp2-q5-ans">✅ <code>.card { ... }</code> — The class selector targets every element with <code>class="card"</code>. All three menu item divs share this class.</div>
+  </div>
+
+  <div class="prac-card" id="cp2-q6">
+    <div class="prac-q"><span class="q-num">6</span> What changes visually when you hover over .card?</div>
+    <button class="prac-reveal-btn" onclick="revealAnswer('cp2-q6')">Show Answer</button>
+    <div class="prac-answer" id="cp2-q6-ans">✅ Two things happen: <strong>(1)</strong> The card lifts slightly — <code>transform: translateY(-2px)</code> moves it 2px upward. <strong>(2)</strong> The border darkens — <code>border-color: #999</code> (was #ddd). The <code>transition</code> makes both changes animate smoothly over 150ms.</div>
+  </div>
+
+  <div class="prac-card" id="cp2-q7">
+    <div class="prac-q"><span class="q-num">7</span> Which selector makes the "Order" link look like a button?</div>
+    <button class="prac-reveal-btn" onclick="revealAnswer('cp2-q7')">Show Answer</button>
+    <div class="prac-answer" id="cp2-q7-ans">✅ <code>.btn { ... }</code> — The class selector applied to the &lt;a&gt; tags gives them a dark background, white text, padding, and border-radius — making them look like buttons.</div>
+  </div>
+
+  <div class="prac-card" id="cp2-q8">
+    <div class="prac-q"><span class="q-num">8</span> What does <code>text-decoration: none;</code> do in .btn?</div>
+    <button class="prac-reveal-btn" onclick="revealAnswer('cp2-q8')">Show Answer</button>
+    <div class="prac-answer" id="cp2-q8-ans">✅ It <strong>removes the default underline</strong> from the &lt;a&gt; link — making it look like a button rather than a text hyperlink.</div>
+  </div>
+
+  <div class="prac-card" id="cp2-q9">
+    <div class="prac-q"><span class="q-num">9</span> In .grid, what does <code>grid-template-columns: repeat(3, 1fr)</code> mean?</div>
+    <button class="prac-reveal-btn" onclick="revealAnswer('cp2-q9')">Show Answer</button>
+    <div class="prac-answer" id="cp2-q9-ans">✅ Creates <strong>3 equal-width columns</strong>. <code>repeat(3, 1fr)</code> is shorthand for <code>1fr 1fr 1fr</code> — each column gets 1/3 of available space.</div>
+  </div>
+
+  <div class="prac-card" id="cp2-q10">
+    <div class="prac-q"><span class="q-num">10</span> How many cards appear per row on a wide screen?</div>
+    <button class="prac-reveal-btn" onclick="revealAnswer('cp2-q10')">Show Answer</button>
+    <div class="prac-answer" id="cp2-q10-ans">✅ <strong>3 cards per row</strong> — The grid has <code>repeat(3, 1fr)</code> = 3 columns. All 3 menu cards fill exactly one row on desktop.</div>
+  </div>
+
+  <div class="prac-card" id="cp2-q11">
+    <div class="prac-q"><span class="q-num">11</span> What happens to the layout when the screen width is 650px?</div>
+    <button class="prac-reveal-btn" onclick="revealAnswer('cp2-q11')">Show Answer</button>
+    <div class="prac-answer" id="cp2-q11-ans">✅ The <code>@media (max-width: 700px)</code> breakpoint fires. Two things change: <strong>(1)</strong> The grid collapses to <strong>1 column</strong> — cards stack vertically. <strong>(2)</strong> The header switches to <code>flex-direction: column</code> — logo and tag stack vertically.</div>
+  </div>
+
+  <div class="prac-card" id="cp2-q12">
+    <div class="prac-q"><span class="q-num">12</span> Which media query rule changes the header layout on small screens?</div>
+    <button class="prac-reveal-btn" onclick="revealAnswer('cp2-q12')">Show Answer</button>
+    <div class="prac-answer" id="cp2-q12-ans">✅ <code>@media (max-width: 700px) { header { flex-direction: column; align-items: flex-start; } }</code> — This switches the header from horizontal to vertical layout on narrow screens.</div>
+  </div>
+
+  <div class="prac-card" id="cp2-q13">
+    <div class="prac-q"><span class="q-num">13</span> If you remove <code>border-radius: 10px</code> from .card, what changes?</div>
+    <button class="prac-reveal-btn" onclick="revealAnswer('cp2-q13')">Show Answer</button>
+    <div class="prac-answer" id="cp2-q13-ans">✅ The cards get <strong>sharp square corners</strong> instead of rounded ones. No layout change — only the visual shape of the card borders changes.</div>
+  </div>
+
+  <div class="prac-card" id="cp2-q14">
+    <div class="prac-q"><span class="q-num">14</span> What is the effect of <code>box-sizing: border-box;</code> on <code>*</code>?</div>
+    <button class="prac-reveal-btn" onclick="revealAnswer('cp2-q14')">Show Answer</button>
+    <div class="prac-answer" id="cp2-q14-ans">✅ It makes <strong>width and height include padding and border</strong> for every element. With <code>content-box</code> (default), padding/border are added on top of the declared width, causing overflow. <code>border-box</code> makes sizing predictable and is considered best practice.</div>
+  </div>
+
+  <div class="prac-card" id="cp2-q15">
+    <div class="prac-q"><span class="q-num">15</span> If you add <code>a { color: green; }</code> at the bottom — will the button text stay white or turn green? Why?</div>
+    <button class="prac-reveal-btn" onclick="revealAnswer('cp2-q15')">Show Answer</button>
+    <div class="prac-answer" id="cp2-q15-ans">✅ <strong>Turn green</strong> — <code>a { color: green }</code> (element, specificity 1) vs <code>.btn { color: white }</code> (class, specificity 10). But if <code>a { color: green }</code> is added later and specificity is equal or lower, class wins. However <strong>since .btn already sets color: white with higher specificity (class &gt; element)</strong>, the button stays white. The class rule wins.</div>
+  </div>
+
+  <div class="prac-card" id="cp2-q16">
+    <div class="prac-q"><span class="q-num">16</span> If you add <code>.card .price { color: red; }</code>, which elements change?</div>
+    <button class="prac-reveal-btn" onclick="revealAnswer('cp2-q16')">Show Answer</button>
+    <div class="prac-answer" id="cp2-q16-ans">✅ <strong>All three price divs</strong> (12 QAR, 15 QAR, 18 QAR) turn red — <code>.card .price</code> is a descendant selector targeting any element with class <code>price</code> inside any element with class <code>card</code>.</div>
+  </div>
+
+  <div class="prac-card" id="cp2-q17">
+    <div class="prac-q"><span class="q-num">17</span> If you add <code>.grid { gap: 40px; }</code>, what happens to spacing?</div>
+    <button class="prac-reveal-btn" onclick="revealAnswer('cp2-q17')">Show Answer</button>
+    <div class="prac-answer" id="cp2-q17-ans">✅ The gaps between cards increase from <strong>12px → 40px</strong>. Cards remain the same size but are spaced much further apart. Total grid width stays the same — cards shrink slightly to accommodate larger gutters.</div>
+  </div>
+
+  <div class="prac-card" id="cp2-q18">
+    <div class="prac-q"><span class="q-num">18</span> If you change the media query from <code>(max-width: 700px)</code> to <code>(max-width: 500px)</code>, what changes for tablets?</div>
+    <button class="prac-reveal-btn" onclick="revealAnswer('cp2-q18')">Show Answer</button>
+    <div class="prac-answer" id="cp2-q18-ans">✅ Tablets (~600-700px wide) will now show the <strong>3-column desktop layout</strong> instead of the single-column mobile layout. The breakpoint only triggers on screens ≤500px, which excludes most tablets.</div>
+  </div>
+
+  <div class="prac-card" id="cp2-q19">
+    <div class="prac-q"><span class="q-num">19</span> If you add a 4th .card, how does the grid behave on desktop?</div>
+    <button class="prac-reveal-btn" onclick="revealAnswer('cp2-q19')">Show Answer</button>
+    <div class="prac-answer" id="cp2-q19-ans">✅ The first 3 cards fill row 1; the 4th card starts a <strong>new row</strong> and occupies the first column. CSS Grid automatically creates new rows for overflow items using the implicit grid.</div>
+  </div>
+
+  <div class="prac-card" id="cp2-q20">
+    <div class="prac-q"><span class="q-num">20</span> If you add <code>header { justify-content: center; }</code>, how does the header change?</div>
+    <button class="prac-reveal-btn" onclick="revealAnswer('cp2-q20')">Show Answer</button>
+    <div class="prac-answer" id="cp2-q20-ans">✅ The logo and tag move to the <strong>center of the header</strong>. Currently they are spread apart with <code>space-between</code>; adding <code>center</code> overrides this, grouping them together in the middle.</div>
+  </div>
+
+  <div class="prac-card" id="cp2-q21">
+    <div class="prac-q"><span class="q-num">21</span> If you remove <code>display: grid;</code> from .grid, what happens to the cards?</div>
+    <button class="prac-reveal-btn" onclick="revealAnswer('cp2-q21')">Show Answer</button>
+    <div class="prac-answer" id="cp2-q21-ans">✅ The cards <strong>stack vertically</strong> in a single column. Without <code>display: grid</code>, the div children use their default <code>display: block</code> behavior — each card takes the full width and sits below the previous one.</div>
+  </div>
+</div>
+
+<!-- ===================== JS PRACTICE ===================== -->
+<div id="tab-jsprac" class="tab-page">
+  <div class="ch-header">
+    <div class="badge" style="background:#60b8f0;color:#051218">Practice Questions</div>
+    <h1>⚡ JavaScript Practice</h1>
+    <p>True/False · Output Questions · Writing Code · 107 Questions Total</p>
+  </div>
+
+  <div class="quiz-section-title" id="jsprac-tf-section">✅ True / False — 20 Questions</div>
+
+  <div id="jsprac-tf-container">
+  <!-- T/F questions generated by JS below -->
+  </div>
+
+  <div class="quiz-section-title" style="margin-top:32px">🔍 Find the Output — MCQ (Q1–Q50)</div>
+  <div id="jsprac-mcq-container">
+  <!-- MCQ output questions generated by JS -->
+  </div>
+
+  <div class="quiz-section-title" style="margin-top:32px">✏️ Write the Output (Q51–Q83)</div>
+  <div id="jsprac-write-container">
+  <!-- Write output questions -->
+  </div>
+
+  <div class="quiz-section-title" style="margin-top:32px">💻 Writing Code (Q84–Q107)</div>
+  <div id="jsprac-code-container">
+  <!-- Code writing questions -->
+  </div>
+</div>
+
+</div><!-- main -->
+<script>
+function switchTab(name) {
+  document.querySelectorAll('.tab-page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  document.querySelectorAll('.tab-btn').forEach(b => {
+    if (b.textContent.includes(name) || b.getAttribute('onclick')?.includes(`'${name}'`)) {
+      b.classList.add('active');
+    }
+  });
+}
+
+// ============================================================
+// MCQ LOGIC
+// ============================================================
+const answered = {};
+const totals = { html:10, css:10, cssresp:10, js:10, oop:10, dom:10, webapi:10, all:30 };
+
+function ans(el, isCorrect, qId, explanation) {
+  const prefix = qId.split('-q')[0];
+  if (answered[qId]) return;
+  answered[qId] = true;
+
+  const card = document.getElementById(qId);
+  const feedback = document.getElementById(qId + '-fb');
+  const opts = card.querySelectorAll('.mcq-opt');
+
+  opts.forEach(o => { o.classList.add('disabled'); o.style.pointerEvents = 'none'; });
+
+  if (isCorrect) {
+    el.classList.add('correct');
+    card.classList.add('answered-correct');
+    feedback.innerHTML = '✅ Correct! ' + explanation;
+    feedback.className = 'mcq-feedback show correct';
+  } else {
+    el.classList.add('wrong');
+    card.classList.add('answered-wrong');
+    feedback.innerHTML = '❌ Incorrect. ' + explanation;
+    feedback.className = 'mcq-feedback show wrong';
+    opts.forEach(o => { if (o.onclick && o.onclick.toString().includes('true,')) o.classList.add('correct'); });
+  }
+  updateProgress(prefix);
+  if (prefix.includes('all') || qId.startsWith('all')) updateProgress('all');
+}
+
+function updateProgress(prefix) {
+  const keys = Object.keys(answered).filter(k => k.startsWith(prefix + '-q'));
+  const count = keys.length;
+  const total = totals[prefix] || 10;
+  const bar = document.getElementById('pb-' + prefix);
+  const score = document.getElementById('sc-' + prefix);
+  if (bar) bar.style.width = (count / total * 100) + '%';
+  if (score) score.textContent = count + ' / ' + total;
+}
+
+function resetQuiz(prefix) {
+  const keys = Object.keys(answered).filter(k => k.startsWith(prefix + '-q'));
+  keys.forEach(k => delete answered[k]);
+  document.querySelectorAll(`[id^="${prefix}-q"]`).forEach(card => {
+    card.classList.remove('answered-correct','answered-wrong');
+    card.querySelectorAll('.mcq-opt').forEach(o => {
+      o.classList.remove('correct','wrong','disabled');
+      o.style.pointerEvents = '';
+    });
+    const fb = document.getElementById(card.id + '-fb');
+    if (fb) { fb.classList.remove('show','correct','wrong'); fb.textContent = ''; }
+  });
+  updateProgress(prefix);
+}
+
+// ============================================================
+// ALL-CHAPTERS MIX — pick 5 per chapter
+// ============================================================
+function buildAllQuiz() {
+  const allQs = [
+    // HTML
+    { id:'all-q1', q:'Which element defines the primary navigation of a page?', opts:[['&lt;header&gt;',false,'header is for introductory content.'],['&lt;nav&gt;',true,'&lt;nav&gt; is the semantic tag for navigation.'],['&lt;menu&gt;',false,'menu is not the standard nav element.'],['&lt;aside&gt;',false,'aside is sidebar content.']] },
+    { id:'all-q2', q:'Which attribute makes a form input mandatory before submission?', opts:[['placeholder',false,'placeholder is hint text.'],['required',true,'required triggers browser validation.'],['autofocus',false,'autofocus moves focus but doesn\'t validate.'],['disabled',false,'disabled prevents input.']] },
+    { id:'all-q3', q:'The &lt;tfoot&gt; element is written before &lt;tbody&gt; in the source code. How does it render?', opts:[['At the top',false,'Incorrect.'],['At the bottom',true,'Browser renders tfoot at the bottom despite its position in code.'],['Middle',false,'Incorrect.'],['Where it appears',false,'Incorrect.']] },
+    { id:'all-q4', q:'Which input type shows a calendar date picker?', opts:[['type="text"',false,'No calendar for plain text.'],['type="time"',false,'type=time is for time, not date.'],['type="date"',true,'type="date" shows a calendar date picker.'],['type="number"',false,'type=number is a spinbox.']] },
+    { id:'all-q5', q:'What is &lt;aside&gt; used for?', opts:[['Navigation links',false,'That\'s &lt;nav&gt;.'],['Page footer',false,'That\'s &lt;footer&gt;.'],['Sidebar / supplementary content',true,'aside is for tangentially related sidebar content.'],['Main unique content',false,'That\'s &lt;main&gt;.']] },
+    // CSS
+    { id:'all-q6', q:'Which CSS specificity order is correct (highest first)?', opts:[['Element > Class > ID > Inline',false,'Reversed.'],['Inline > ID > Class > Element',true,'Correct order from highest to lowest specificity.'],['Class > ID > Element > Inline',false,'Incorrect.'],['ID > Inline > Class > Element',false,'Incorrect.']] },
+    { id:'all-q7', q:'What does margin: 10px 20px set?', opts:[['All sides 10px',false,'That would be margin: 10px.'],['Top&bottom 10px; left&right 20px',true,'2-value: first = top/bottom, second = left/right.'],['Top 10px, right 20px, bottom 10px, left 20px individually',false,'That\'s 4-value with same values.'],['Top 20px; all others 10px',false,'Incorrect.']] },
+    { id:'all-q8', q:'What does grid-column: 1 / -1 mean?', opts:[['First column only',false,'That\'s 1/2.'],['Spans all columns (first to last line)',true,'1/-1 = from first to last grid line.'],['Last two columns',false,'Incorrect.'],['Hides the item',false,'Incorrect.']] },
+    { id:'all-q9', q:'Which approach is recommended for responsive CSS design?', opts:[['Desktop-first with max-width',false,'Mobile-first is preferred.'],['Mobile-first with min-width',true,'Start with single-column and add complexity as screen widens.'],['Fixed-width for all sizes',false,'Not responsive.'],['No media queries',false,'Media queries are essential for RWD.']] },
+    { id:'all-q10', q:'em units in CSS are relative to…', opts:[['Root element font-size',false,'That\'s rem.'],['Parent element font-size',true,'em = parent\'s font-size.'],['Viewport width',false,'That\'s vw.'],['1 pixel',false,'That\'s px.']] },
+    // JS
+    { id:'all-q11', q:'What is typeof null in JavaScript?', opts:['"null"','"undefined"','"object"','"function"'].map((v,i)=>[v,i===2,i===2?'typeof null returns "object" — a historical JS quirk.':`Incorrect.`]) },
+    { id:'all-q12', q:'Which value is NOT falsy?', opts:[['0',false,'0 is falsy.'],['""',false,'Empty string is falsy.'],['"0"',true,'"0" is a non-empty string — it is TRUTHY.'],['null',false,'null is falsy.']] },
+    { id:'all-q13', q:'What does .find() return on an array?', opts:[['All matching elements',false,'filter() returns all matches.'],['.find() returns the FIRST matching element',true,'find() stops at the first truthy callback result.'],['The index of the first match',false,'indexOf() returns the index.'],['A new transformed array',false,'map() transforms.']] },
+    { id:'all-q14', q:'What is the output of [1,2,3].map(x=>x*2).reduce((s,x)=>s+x)?', opts:[['6',false,'map doubles first.'],['12',true,'map→[2,4,6], reduce→12.'],['36',false,'Incorrect.'],['TypeError',false,'Valid code.']] },
+    { id:'all-q15', q:'Which variable declaration should you use by default?', opts:[['var',false,'var has scope/hoisting issues.'],['let',false,'let is for when value must change.'],['const',true,'Start with const by default.'],['function',false,'function is for function declarations.']] },
+    // OOP
+    { id:'all-q16', q:'Private class fields use which prefix?', opts:[['_',false,'Underscore is convention only.'],['$',false,'Not a privacy prefix.'],['#',true,'# makes a field truly private in JS.'],['@',false,'@ is for decorators.']] },
+    { id:'all-q17', q:'What does super() do in a child class constructor?', opts:[['Calls the parent class constructor',true,'super() invokes the parent constructor.'],['Creates a static member',false,'static is unrelated.'],['Accesses private fields',false,'# accesses private fields.'],['Exports the class',false,'Incorrect.']] },
+    { id:'all-q18', q:'At the end of a prototype chain is…', opts:[['Object.prototype',false,'Object.prototype comes before null.'],['undefined',false,'undefined is a value.'],['null',true,'The chain always ends at null.'],['window',false,'window is the global object.']] },
+    { id:'all-q19', q:'JSON.stringify() on an object with methods…', opts:[['Includes them as strings',false,'Methods can\'t be in JSON.'],['Throws TypeError',false,'No error is thrown.'],['Excludes them silently',true,'Methods are omitted from JSON output.'],['Converts them to null',false,'They are excluded, not nullified.']] },
+    { id:'all-q20', q:'Named exports are imported using…', opts:[['import name from "./file"',false,'That is default import syntax.'],['import { name } from "./file"',true,'Named exports require curly braces.'],['require("./file")',false,'CommonJS syntax.'],['include { name } from "./file"',false,'include is not valid JS.']] },
+    // Client-side JS
+    { id:'all-q21', q:'What does event.preventDefault() do on a form submit?', opts:[['Stops event bubbling',false,'stopPropagation() stops bubbling.'],['Prevents page reload on form submit',true,'preventDefault stops the browser\'s default submit behavior.'],['Clears form fields',false,'event.target.reset() clears fields.'],['Submits form via AJAX',false,'You must write the fetch call yourself.']] },
+    { id:'all-q22', q:'How do you correctly store an object in localStorage?', opts:[['localStorage.setItem("k", myObj)',false,'Objects become "[object Object]".'],['localStorage.setItem("k", JSON.stringify(myObj))',true,'Always serialize with JSON.stringify() first.'],['localStorage.store("k", myObj)',false,'store() does not exist.'],['localStorage.save("k", myObj)',false,'save() does not exist.']] },
+    { id:'all-q23', q:'What does classList.toggle("active") do?', opts:[['Always adds active',false,'add() always adds.'],['Always removes active',false,'remove() always removes.'],['Adds if absent, removes if present',true,'toggle() flips the class state.'],['Removes all other classes',false,'Incorrect.']] },
+    { id:'all-q24', q:'data-user-name="Ali" is accessed in JS as…', opts:[['el.dataset["user-name"]',false,'dataset uses camelCase.'],['el.dataset.userName',true,'Hyphens become camelCase in dataset.'],['el.data.userName',false,'el.data is not standard.'],['el.getAttribute("userName")',false,'Not the modern approach.']] },
+    { id:'all-q25', q:'response.json() returns…', opts:[['A JSON string',false,'Incorrect.'],['A JS object synchronously',false,'It returns a Promise.'],['A Promise resolving to a JS object',true,'response.json() is async and returns a Promise.'],['An array',false,'Not always — depends on the API.']] },
+    // Web API
+    { id:'all-q26', q:'Which HTTP method retrieves a resource?', opts:[['POST',false,'POST creates.'],['GET',true,'GET retrieves resources without side effects.'],['PUT',false,'PUT replaces.'],['DELETE',false,'DELETE removes.']] },
+    { id:'all-q27', q:'In Next.js, API route handlers export functions named…', opts:[['handler(), request()',false,'Not Next.js conventions.'],['GET, POST, PUT, DELETE',true,'Route handlers export async functions named by the HTTP verb.'],['getServerSideProps',false,'That is for pages, not API routes.'],['api(), serve()',false,'Not valid.']] },
+    { id:'all-q28', q:'What HTTP status code means a resource was successfully created?', opts:[['200',false,'200 = OK (existing resource returned).'],['201',true,'201 = Created — returned after a successful POST.'],['204',false,'204 = No Content (success but no body).'],['404',false,'404 = Not Found.']] },
+    { id:'all-q29', q:'Dynamic route segments in Next.js are created by…', opts:[['Using a colon: /books/:id',false,'That is Express.js syntax.'],['Wrapping the folder name in [brackets]',true,'[id] in the folder name creates a dynamic segment.'],['Using curly braces: /books/{id}',false,'Not Next.js syntax.'],['Using * wildcard',false,'Incorrect.']] },
+    { id:'all-q30', q:'What is the major goal of a Web API?', opts:[['Serve HTML pages to browsers',false,'Web APIs serve structured data, not HTML.'],['Store data in a database',false,'That is a database\'s role.'],['Interoperability between heterogeneous systems',true,'Web APIs allow any client (browser, mobile, IoT) to access data in any language.'],['Provide a GUI for server management',false,'Incorrect.']] },
+  ];
+
+  const container = document.getElementById('all-quiz-container');
+  let currentSection = '';
+  const sectionLabels = { 'all-q1':'🌐 HTML', 'all-q6':'🎨 CSS', 'all-q11':'⚡ JavaScript', 'all-q16':'🏛️ OOP', 'all-q21':'🌍 Client-Side JS', 'all-q26':'🔌 Web API' };
+
+  allQs.forEach((q, idx) => {
+    if (sectionLabels[q.id]) {
+      const div = document.createElement('div');
+      div.className = 'quiz-section-title';
+      div.textContent = sectionLabels[q.id];
+      container.appendChild(div);
+    }
+    const card = document.createElement('div');
+    card.className = 'mcq-card';
+    card.id = q.id;
+    const num = idx + 1;
+    const optsHtml = q.opts.map((o, i) => {
+      const label = ['A','B','C','D'][i];
+      const text = Array.isArray(o[0]) ? o[0] : o[0];
+      const correct = o[1];
+      const explanation = o[2];
+      return '<div class="mcq-opt" onclick="ans(this,' + correct + ',\'' + q.id + '\',\'' + explanation.replace(/'/g,"\\'").replace(/"/g,'&quot;') + '\')"><span class="opt-label">' + label + '</span> ' + text.replace(/'/g,"\\'").replace(/"/g,'&quot;') + '</div>';
+    }).join('');
+    card.innerHTML = '<div class="mcq-q"><span class="q-num">' + num + '</span> ' + q.q.replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/'/g,"\\'").replace(/"/g,'&quot;') + '</div><div class="mcq-options">' + optsHtml + '</div><div class="mcq-feedback" id="' + q.id + '-fb"></div>';
+    container.appendChild(card);
+  });
+}
+buildAllQuiz();
+
+// ============================================================
+// FLASHCARDS
+// ============================================================
+const flashcards = {
+  html: [
+    { q:'Write a complete HTML table with thead, tfoot (before tbody), and tbody.', a:`&lt;table&gt;\n  &lt;thead&gt;&lt;tr&gt;&lt;th&gt;Name&lt;/th&gt;&lt;th&gt;Score&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;\n  &lt;tfoot&gt;&lt;tr&gt;&lt;td&gt;Total&lt;/td&gt;&lt;td&gt;90&lt;/td&gt;&lt;/tr&gt;&lt;/tfoot&gt;\n  &lt;tbody&gt;\n    &lt;tr&gt;&lt;td&gt;Ali&lt;/td&gt;&lt;td&gt;90&lt;/td&gt;&lt;/tr&gt;\n  &lt;/tbody&gt;\n&lt;/table&gt;` },
+    { q:'Write an email input that is required and has a placeholder.', a:`&lt;input type="email"\n  name="email"\n  id="email"\n  required\n  placeholder="you@example.com"&gt;` },
+    { q:'Write a select dropdown with 3 options where the second is pre-selected.', a:`&lt;select name="role"&gt;\n  &lt;option value="dev"&gt;Dev&lt;/option&gt;\n  &lt;option value="des" selected&gt;Designer&lt;/option&gt;\n  &lt;option value="mgr"&gt;Manager&lt;/option&gt;\n&lt;/select&gt;` },
+    { q:'Write the semantic HTML skeleton: header, nav, main (with article + aside), footer.', a:`&lt;header&gt;…&lt;/header&gt;\n&lt;nav&gt;…&lt;/nav&gt;\n&lt;main&gt;\n  &lt;article&gt;Content&lt;/article&gt;\n  &lt;aside&gt;Sidebar&lt;/aside&gt;\n&lt;/main&gt;\n&lt;footer&gt;…&lt;/footer&gt;` },
+    { q:'Write an input that validates only letters and numbers via pattern attribute.', a:`&lt;input\n  type="text"\n  pattern="[a-zA-Z0-9]+"\n  title="Letters and numbers only"\n  required&gt;` },
+  ],
+  css: [
+    { q:'Write a flex container: items centered horizontally with space-between and gap.', a:`.container {\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n  gap: 1rem;\n  flex-wrap: wrap;\n}` },
+    { q:'Write a named grid with header spanning all 3 columns.', a:`.page {\n  display: grid;\n  grid-template-columns: 1fr 2fr 1fr;\n  grid-template-areas:\n    "hdr hdr hdr"\n    "side main aside";\n  gap: 1rem;\n}\nheader { grid-area: hdr; }` },
+    { q:'Write a media query that adds a 2-column grid above 768px.', a:`@media screen and (min-width: 768px) {\n  .container {\n    display: grid;\n    grid-template-columns: 1fr 1fr;\n  }\n}` },
+    { q:'Write CSS for zebra-striped table rows.', a:`tr:nth-child(odd) {\n  background-color: #f5f5f5;\n}\ntr:nth-child(even) {\n  background-color: #ffffff;\n}` },
+    { q:'Write the Pancake Stack layout (auto header, 1fr main, auto footer).', a:`body {\n  display: grid;\n  min-height: 100vh;\n  grid-template-rows: auto 1fr auto;\n}\n/* header → auto, main → 1fr, footer → auto */` },
+    { q:'Write margin shorthand: top 10, right 20, bottom 15, left 5.', a:`.box {\n  /* top right bottom left (clockwise) */\n  margin: 10px 20px 15px 5px;\n}` },
+  ],
+  js: [
+    { q:'Write a rest function that sums any number of arguments.', a:`function sum(...args) {\n  return args.reduce(\n    (acc, x) => acc + x\n  );\n}\nsum(1, 3, 5); // 9` },
+    { q:'Write a filter + map pipeline: full names of adults (age >= 18).', a:`const adults = people\n  .filter(p => p.age >= 18)\n  .map(p => p.fullname);` },
+    { q:'Write a closure that returns a counter starting from 0.', a:`function makeCounter() {\n  let i = 0;\n  return () => ++i;\n}\nconst c = makeCounter();\nc(); // 1  c(); // 2` },
+    { q:'Write a class Person with firstname, lastname, and a fullname getter/setter.', a:`class Person {\n  constructor(fn, ln) {\n    this.firstname = fn;\n    this.lastname = ln;\n  }\n  get fullname() {\n    return \`\${this.firstname} \${this.lastname}\`;\n  }\n  set fullname(v) {\n    [this.firstname, this.lastname] = v.split(' ');\n  }\n}` },
+    { q:'Write a Student extending Person with gpa and overriding greet().', a:`class Student extends Person {\n  constructor(fn, ln, gpa) {\n    super(fn, ln);\n    this.gpa = gpa;\n  }\n  greet() {\n    return \`\${super.greet()}. GPA: \${this.gpa}\`;\n  }\n}` },
+    { q:'Write an async fetch with error handling (try/catch).', a:`async function getData(url) {\n  try {\n    const res = await fetch(url);\n    if (!res.ok) throw new Error(res.status);\n    return await res.json();\n  } catch (e) {\n    console.error('Failed:', e);\n  }\n}` },
+    { q:'Write JS: select a button and toggle CSS class on click.', a:`const btn = document\n  .querySelector('#myBtn');\nbtn.addEventListener('click', e => {\n  e.target.classList\n    .toggle('active');\n});` },
+    { q:'Write renderList(items): generates card HTML into #container.', a:`function renderList(items) {\n  const html = items\n    .map(i => \`\n      &lt;div class="card"&gt;\n        &lt;h3&gt;\${i.title}&lt;/h3&gt;\n      &lt;/div&gt;\n    \`).join('');\n  document.querySelector('#container')\n    .innerHTML = html;\n}` },
+  ],
+  webapi: [
+    { q:'Write a Next.js GET handler that returns a JSON array.', a:`// app/api/books/route.js\nexport async function GET(request) {\n  return new Response(\n    JSON.stringify(books),\n    { headers: { 'Content-Type': 'application/json' } }\n  );\n}` },
+    { q:'Write a Next.js POST handler that reads a JSON body and pushes a new item.', a:`export async function POST(request) {\n  const body = await request.json();\n  books.push(body);\n  return new Response(\n    JSON.stringify(body), { status: 201 }\n  );\n}` },
+    { q:'Write a dynamic route handler that deletes by id (DELETE /api/books/[id]).', a:`// app/api/books/[id]/route.js\nexport async function DELETE(request, { params }) {\n  books = books.filter(\n    b => b.id !== Number(params.id)\n  );\n  return new Response(null, { status: 204 });\n}` },
+    { q:'Write client-side fetch: POST a new book to /api/books.', a:`async function addBook(book) {\n  const res = await fetch('/api/books', {\n    method: 'POST',\n    headers: {\n      'Content-Type': 'application/json'\n    },\n    body: JSON.stringify(book)\n  });\n  return res.json();\n}` },
+    { q:'Write a Next.js route handler that reads the sortBy query parameter.', a:`export async function GET(request) {\n  const { searchParams } =\n    new URL(request.url);\n  const sortBy = searchParams.get('sortBy');\n  const result = sortBy\n    ? books.sort((a,b) => a[sortBy] > b[sortBy] ? 1:-1)\n    : books;\n  return new Response(JSON.stringify(result));\n}` },
+  ],
+};
+
+const fcState = {};
+Object.keys(flashcards).forEach(t => { fcState[t] = { current: 0, flipped: false }; });
+
+function renderFC(topic) {
+  const state = fcState[topic];
+  const cards = flashcards[topic];
+  const card = cards[state.current];
+  const grid = document.getElementById('fc-grid-' + topic);
+  const counter = document.getElementById('fc-counter-' + topic);
+  counter.textContent = (state.current + 1) + ' / ' + cards.length;
+  grid.innerHTML = `
+    <div class="fc-grid">
+      <div class="flashcard ${state.flipped?'flipped':''}" id="fc-${topic}" onclick="fcFlip('${topic}')">
+        <div class="flashcard-inner">
+          <div class="fc-front">
+            <div class="fc-label">💻 Write the Code</div>
+            <div class="fc-question">${card.q}</div>
+            <div class="fc-hint">Click to reveal answer</div>
+          </div>
+          <div class="fc-back">
+            <div class="fc-label">✅ Answer</div>
+            <pre class="fc-code">${card.a}</pre>
+          </div>
+        </div>
+      </div>
+    </div>`;
+}
+function fcFlip(topic) {
+  fcState[topic].flipped = !fcState[topic].flipped;
+  const el = document.getElementById('fc-' + topic);
+  if (el) el.classList.toggle('flipped');
+}
+function fcNav(topic, dir) {
+  const s = fcState[topic];
+  s.current = (s.current + dir + flashcards[topic].length) % flashcards[topic].length;
+  s.flipped = false;
+  renderFC(topic);
+}
+Object.keys(flashcards).forEach(t => renderFC(t));
+
+// ============================================================
+// REVEAL ANSWER (Practice Questions)
+// ============================================================
+function revealAnswer(id) {
+  const ans = document.getElementById(id + '-ans');
+  const btn = document.querySelector(`#${id} .prac-reveal-btn`);
+  if (!ans) return;
+  ans.classList.toggle('show');
+  btn.textContent = ans.classList.contains('show') ? 'Hide Answer' : 'Show Answer';
+}
+
+// ============================================================
+// T/F LOGIC
+// ============================================================
+const tfAnswered = {};
+function tfAns(el, id, isTrue, explanation) {
+  if (tfAnswered[id]) return;
+  tfAnswered[id] = true;
+  const card = el.closest('.prac-card');
+  const ansDiv = document.getElementById(id + '-ans');
+  const btns = card.querySelectorAll('.tf-btn');
+  btns.forEach(b => b.classList.add('disabled'));
+  const clickedIsTrue = el.dataset.val === 'true';
+  const correct = clickedIsTrue === isTrue;
+  el.classList.add(correct ? 'correct' : 'wrong');
+  if (!correct) {
+    btns.forEach(b => { if ((b.dataset.val === 'true') === isTrue) b.classList.add('correct'); });
+  }
+  if (ansDiv) { ansDiv.innerHTML = (correct ? '✅ ' : '❌ ') + explanation; ansDiv.classList.add('show'); }
+}
+
+// ============================================================
+// BUILD JS PRACTICE CONTENT
+// ============================================================
+(function buildJSPractice() {
+
+  // ── TRUE / FALSE ──
+  const tfData = [
+    { id:'tf1',  s:'JavaScript can be used both for client-side scripting in the browser and for server-side development using Node.js.', ans:true,  exp:'True — JS runs in browsers (client-side) and on Node.js (server-side).' },
+    { id:'tf2',  s:'JavaScript is a platform-independent scripting language and is interpreted.', ans:true,  exp:'True — JS runs anywhere a JS engine exists and is interpreted at runtime.' },
+    { id:'tf3',  s:'null == undefined is false.', ans:false, exp:'False — null == undefined is TRUE (loose equality). null === undefined is false.' },
+    { id:'tf4',  s:'Use const for variables you intend to change later, and use let for variables you won\'t change.', ans:false, exp:'False — It\'s the opposite: use const for values that won\'t change, let for values that will be reassigned.' },
+    { id:'tf5',  s:'const creates a block-scoped variable (only accessible inside its scope).', ans:true,  exp:'True — const is block-scoped, just like let.' },
+    { id:'tf6',  s:'let is used to declare a mutable variable (its value can be reassigned).', ans:true,  exp:'True — let allows reassignment; const does not.' },
+    { id:'tf7',  s:'You can use typeof to find out a variable\'s type.', ans:true,  exp:'True — typeof returns a string like "number", "string", "boolean", "object", "undefined", "function".' },
+    { id:'tf8',  s:'JavaScript is loosely typed/dynamic, so a variable\'s data type is derived from its assigned value.', ans:true,  exp:'True — JS variables have no declared type; the type depends on what value is assigned.' },
+    { id:'tf9',  s:'JavaScript is an extension of Java.', ans:false, exp:'False — JS was inspired by Java\'s syntax but is a completely separate language with different design goals.' },
+    { id:'tf10', s:'undefined means a variable was declared but not assigned a value.', ans:true,  exp:'True — e.g., let x; → x is undefined.' },
+    { id:'tf11', s:'null is an assignment value representing "no value", and typeof null returns "object".', ans:true,  exp:'True — typeof null === "object" is a well-known historical JS quirk.' },
+    { id:'tf12', s:'NaN === NaN evaluates to true.', ans:false, exp:'False — NaN is the only value in JS not equal to itself. Use Number.isNaN() to check.' },
+    { id:'tf13', s:'0 == "" is true, but 0 === "" is false.', ans:true,  exp:'True — Loose equality (==) coerces types; both become 0. Strict equality (===) requires same type.' },
+    { id:'tf14', s:'In conditions, these are always false-like: false, 0, "", null, undefined, NaN.', ans:true,  exp:'True — These are the 6 falsy values in JavaScript.' },
+    { id:'tf15', s:'A for-of loop can iterate over Object.entries(obj) to get [key, value] pairs.', ans:true,  exp:'True — Object.entries() returns an array of [key, value] arrays, perfect for for-of destructuring.' },
+    { id:'tf16', s:'Arrow functions (lambdas) are anonymous.', ans:true,  exp:'True — Arrow functions have no name by default (though they can be assigned to a named variable).' },
+    { id:'tf17', s:'JavaScript arrays are dynamic; push() adds to the tail, and pop() removes and returns the tail element.', ans:true,  exp:'True — JS arrays resize automatically. push() appends; pop() removes from the end.' },
+    { id:'tf18', s:'splice() returns removed items and it changes the original array.', ans:true,  exp:'True — splice() mutates the array in place and returns an array of removed elements.' },
+    { id:'tf19', s:'The spread operator ... can turn an array into consecutive function arguments (e.g., Math.max(...nums)).', ans:true,  exp:'True — spread expands [5,4,23] into Math.max(5,4,23).' },
+    { id:'tf20', s:'A Set can have duplicates.', ans:false, exp:'False — A Set stores only unique values. Adding a duplicate is silently ignored.' },
+  ];
+
+  const tfContainer = document.getElementById('jsprac-tf-container');
+  tfData.forEach((item, i) => {
+    tfContainer.innerHTML += '<div class="prac-card" id="' + item.id + '"><div class="prac-q"><span class="q-num">' + (i+1) + '</span> ' + item.s.replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/'/g,"\\'").replace(/"/g,'&quot;') + '</div><div class="tf-options"><button class="tf-btn" data-val="true" onclick="tfAns(this,\'' + item.id + '\',' + item.ans + ',\'' + item.exp.replace(/'/g,"\\'").replace(/"/g,'&quot;') + '\')">TRUE</button><button class="tf-btn" data-val="false" onclick="tfAns(this,\'' + item.id + '\',' + item.ans + ',\'' + item.exp.replace(/'/g,"\\'").replace(/"/g,'&quot;') + '\')">FALSE</button></div><div class="prac-answer" id="' + item.id + '-ans"></div></div>';
+  });
+
+  // ── MCQ OUTPUT Q1–Q50 ──
+  const mcqData = [
+    { id:'jm1',  code:'const person = { fname: "Ayse", city: "Istanbul" };\nconsole.log(`Welcome to ${person.city}, ${person.fname}!`);', opts:['Welcome to Istanbul, Ayse!','Welcome to ${person.city}, ${person.fname}!','Welcome to city, fname!','Error'], ans:0, exp:'Template literals with backticks interpolate ${} expressions. Outputs the values.' },
+    { id:'jm2',  code:'let testVar = null;\nconsole.log(typeof testVar);', opts:['null','undefined','object','number'], ans:2, exp:'typeof null returns "object" — a historical JavaScript quirk.' },
+    { id:'jm3',  code:'console.log("Ankara" * 2);', opts:['0','NaN','AnkaraAnkara','Error'], ans:1, exp:'"Ankara" cannot be converted to a number, so the result is NaN.' },
+    { id:'jm4',  code:'console.log(isNaN("Ankara" * 2));', opts:['true','false','NaN','Error'], ans:0, exp:'"Ankara" * 2 = NaN; isNaN(NaN) = true.' },
+    { id:'jm5',  code:'console.log(parseInt("34"));', opts:['"34"','34','NaN','Error'], ans:1, exp:'parseInt converts the string "34" to the integer 34.' },
+    { id:'jm6',  code:'console.log(Number("06"));', opts:['"06"','6','NaN','undefined'], ans:1, exp:'Number("06") converts to the number 6 (leading zero is ignored).' },
+    { id:'jm7',  code:'const plate = +"16";\nconsole.log(plate + 1);', opts:['161','17','"17"','NaN'], ans:1, exp:'Unary + converts "16" to number 16. 16 + 1 = 17.' },
+    { id:'jm8',  code:'let counter = 0;\nwhile (counter < 3) {\n  console.log(`Step ${counter}`);\n  counter++;\n}', opts:['2','3','4','0'], ans:1, exp:'Loop runs for counter = 0, 1, 2 — that is 3 iterations, printing 3 lines.' },
+    { id:'jm9',  code:'let sum = 0;\nfor (const n of [1, 2, 3]) sum += n;\nconsole.log(sum);', opts:['5','6','123','Error'], ans:1, exp:'1+2+3 = 6.' },
+    { id:'jm10', code:'function double(number) { return number * 2; }\nconsole.log(double(21));', opts:['42','212','double(21)','Error'], ans:0, exp:'21 * 2 = 42.' },
+    { id:'jm11', code:'const array = [1, 2, 3];\nfor (let i = array.length - 1; i >= 0; i--) console.log(array[i]);', opts:['1 2 3','3 2 1','3 1 2','Error'], ans:1, exp:'Loop goes from index 2 to 0: array[2]=3, array[1]=2, array[0]=1.' },
+    { id:'jm12', code:'const foods = ["simit", "kebab", "baklava"];\nconst removed = foods.splice(1, 1);\nconsole.log(foods);\nconsole.log(removed);', opts:['["simit","kebab","baklava"] then ["kebab"]','["simit","baklava"] then ["kebab"]','["simit","baklava"] then "kebab"','["simit"] then ["kebab","baklava"]'], ans:1, exp:'splice(1,1) removes 1 element at index 1 ("kebab"). foods becomes ["simit","baklava"]; removed = ["kebab"].' },
+    { id:'jm13', code:'const nums = [5, 4, 23, 2];\nconsole.log(Math.max(...nums));', opts:['5','4','23','NaN'], ans:2, exp:'Spread expands to Math.max(5,4,23,2) = 23.' },
+    { id:'jm14', code:'const cities = new Set();\ncities.add("Istanbul");\ncities.add("Ankara");\ncities.add("Istanbul");\nconsole.log(cities.size);', opts:['3','2','1','Error'], ans:1, exp:'Sets store unique values only. "Istanbul" is added twice but counted once. Size = 2.' },
+    { id:'jm15', code:'const map = new Map();\nmap.set(1, "One");\nmap.set(2, "Two");\nfor (const pair of map) console.log(pair);', opts:['1 then 2','"One" then "Two"','[1,"One"] then [2,"Two"]','Error'], ans:2, exp:'Iterating a Map with for-of yields [key,value] arrays.' },
+    { id:'jm16', code:'console.log(0 == "");', opts:['true','false','0','Error'], ans:0, exp:'Loose equality (==) coerces "" to 0. 0 == 0 is true.' },
+    { id:'jm17', code:'console.log(0 === "");', opts:['true','false','""','Error'], ans:1, exp:'Strict equality (===) requires same type. number !== string → false.' },
+    { id:'jm18', code:'console.log(NaN === NaN);', opts:['true','false','NaN','Error'], ans:1, exp:'NaN is the only value not equal to itself in JS. Use Number.isNaN() instead.' },
+    { id:'jm19', code:'if ("") console.log("Istanbul");\nelse console.log("Ankara");', opts:['Istanbul','Ankara','(prints nothing)','Error'], ans:1, exp:'Empty string "" is falsy, so the else branch runs.' },
+    { id:'jm20', code:'let city;\nconsole.log(city);\nconsole.log(typeof city);', opts:['null then object','undefined then undefined','undefined then object','Error then Error'], ans:1, exp:'Declared but not assigned → value is undefined; typeof undefined is "undefined".' },
+    { id:'jm21', code:'const s = "Ankara";\nconsole.log(s[s.length]);', opts:['"a"','""','undefined','Error'], ans:2, exp:'s.length = 6; s[6] is out of bounds → undefined. Last valid index is 5.' },
+    { id:'jm22', code:'const student = { firstName: "Can", lastName: "Demir" };\nfor (const [key, value] of Object.entries(student)) {\n  console.log(`${key}=${value}`);\n}', opts:['Can=firstName then Demir=lastName','firstName=Can then lastName=Demir','firstName:lastName','Error'], ans:1, exp:'Object.entries() returns [[key,value],...]. Destructuring gives key and value in correct order.' },
+    { id:'jm23', code:'const colors = ["red", "green", "blue", "yellow"];\nconst [a, b, ...rest] = colors;\nconsole.log(rest);', opts:['["red","green"]','["blue","yellow"]','"blue,yellow"','[]'], ans:1, exp:'a="red", b="green", rest collects remaining elements: ["blue","yellow"].' },
+    { id:'jm24', code:'const cold = ["winter"];\nconst warm = ["spring", "summer"];\nconst seasons = [...cold, ...warm];\nconsole.log(seasons.join(","));', opts:['winter,spring,summer','winter spring summer','["winter","spring","summer"]','Error'], ans:0, exp:'Spread merges both arrays; join(",") produces "winter,spring,summer".' },
+    { id:'jm25', code:'const nums = [34, 6, 35];\nnums.forEach(n => console.log(n));', opts:['34 then 6 then 35','0 then 1 then 2','[34,6,35]','Error'], ans:0, exp:'forEach calls the callback for each element with the element value.' },
+    { id:'jm26', code:'const plates = [34, 6, 16, 1];\nconsole.log(plates.filter(p => p > 10));', opts:['[6,1]','[34,16]','[34,6,16,1]','[]'], ans:1, exp:'filter keeps only elements where callback returns true. 34>10 and 16>10.' },
+    { id:'jm27', code:'const plates = [34, 6];\nconsole.log(plates.map(p => p + 1));', opts:['[35,7]','[34,6,1]','41','Error'], ans:0, exp:'map transforms each element: 34+1=35, 6+1=7 → [35,7].' },
+    { id:'jm28', code:'const plates = [34, 6];\nconsole.log(plates.reduce((acc, p) => acc + p));', opts:['0','40','346','Error'], ans:1, exp:'No initial value — first element (34) is the initial accumulator. 34+6=40.' },
+    { id:'jm29', code:'console.log(["Istanbul", "Ankara"].join(" -> "));', opts:['Istanbul -> Ankara','Istanbul,Ankara','IstanbulAnkara','Error'], ans:0, exp:'join(" -> ") uses " -> " as separator between elements.' },
+    { id:'jm30', code:'const temps = [15, 3, 12];\ntemps.sort((a, b) => a - b);\nconsole.log(temps);', opts:['[15,12,3]','[3,12,15]','[12,3,15]','Error'], ans:1, exp:'a-b sorts ascending. Result: [3,12,15].' },
+    { id:'jm31', code:'const plates = [34, 6, 16, 1];\nconst result = plates\n  .filter(p => p >= 10)\n  .map(p => p - 10)\n  .reduce((acc, p) => acc + p, 0);\nconsole.log(result);', opts:['20','30','40','NaN'], ans:1, exp:'filter→[34,16], map→[24,6], reduce(0+24+6)=30.' },
+    { id:'jm32', code:'const books = [\n  { title: "Istanbul JS", authors: ["Ayse", "Mehmet"] },\n  { title: "Ankara JS",  authors: ["Mehmet", "Elif"] }\n];\nconst authors = books.flatMap(b => b.authors);\nconsole.log(authors);', opts:['["Ayse","Mehmet","Elif"]','["Ayse","Mehmet","Mehmet","Elif"]','[["Ayse","Mehmet"],["Mehmet","Elif"]]','Error'], ans:1, exp:'flatMap maps each book to its authors array then flattens one level. Duplicates are kept.' },
+    { id:'jm33', code:'const arr = [1, 2, 3, 4, 5, 6, 7];\nfunction countOccurences(value) {\n  let count = 0;\n  for (const num of arr) { if (num == value) count++; }\n  return count;\n}\nconsole.log(countOccurences("3"));', opts:['0','1','3','Error'], ans:1, exp:'Loose equality (==): 3 == "3" is true. The number 3 is found once.' },
+    { id:'jm34', code:'const x = "Kebab" * 2;\nconsole.log(x + 10);', opts:['10','"Kebab10"','NaN','Error'], ans:2, exp:'"Kebab"*2 = NaN. NaN+10 = NaN — NaN is toxic in arithmetic.' },
+    { id:'jm35', code:'const code = Number("34");\nconsole.log(isNaN(code));', opts:['true','false','NaN','Error'], ans:1, exp:'Number("34") = 34, which is a valid number. isNaN(34) = false.' },
+    { id:'jm36', code:'console.log(parseInt("34.5"), Number("34.5"));', opts:['34 34','34.5 34','34 34.5','NaN NaN'], ans:2, exp:'parseInt truncates decimals → 34. Number preserves decimals → 34.5.' },
+    { id:'jm37', code:'const cities = new Map();\ncities.set(34, "Istanbul");\ncities.set(6, "Ankara");\nfor (const key of cities.keys()) console.log(key);', opts:['Istanbul then Ankara','34 then 6','[34,6]','Error'], ans:1, exp:'.keys() iterates over Map keys in insertion order: 34, then 6.' },
+    { id:'jm38', code:'const cities = new Map();\ncities.set(34, "Istanbul");\ncities.set(6, "Ankara");\nfor (const value of cities.values()) console.log(value);', opts:['34 then 6','Istanbul then Ankara','[Istanbul, Ankara]','Error'], ans:1, exp:'.values() iterates over Map values: "Istanbul", then "Ankara".' },
+    { id:'jm39', code:'const s = new Set();\ns.add("Istanbul"); s.add("Ankara"); s.add("Istanbul"); s.add("Izmir");\nfor (const c of s) console.log(c);', opts:['Istanbul, Ankara, Istanbul, Izmir','Istanbul, Ankara, Izmir','Ankara, Istanbul, Izmir','Error'], ans:1, exp:'Set ignores duplicate "Istanbul". Iteration order = insertion order: Istanbul, Ankara, Izmir.' },
+    { id:'jm40', code:'const route = ["Istanbul", "Bursa", "Izmir", "Antalya"];\nconst [start, ...rest] = route;\nconst newRoute = [...rest, start];\nconsole.log(newRoute);', opts:['["Istanbul","Bursa","Izmir","Antalya"]','["Bursa","Izmir","Antalya","Istanbul"]','["Antalya","Izmir","Bursa","Istanbul"]','Error'], ans:1, exp:'start="Istanbul", rest=["Bursa","Izmir","Antalya"]. newRoute = [...rest, start] = ["Bursa","Izmir","Antalya","Istanbul"].' },
+    { id:'jm41', code:'const menu = { kebab: 50, baklava: 30 };\nfor (const [item, price] of Object.entries(menu)) {\n  console.log(`${item}:${price}`);\n}', opts:['kebab:50 then baklava:30','50:kebab then 30:baklava','kebab,baklava','Error'], ans:0, exp:'Object.entries() gives [["kebab",50],["baklava",30]]. Destructure to [item,price].' },
+    { id:'jm42', code:'const plates = [34, 6, 16];\nplates.sort((a, b) => b - a);\nconsole.log(plates[0]);', opts:['6','16','34','0'], ans:2, exp:'b-a sorts descending: [34,16,6]. First element (index 0) = 34.' },
+    { id:'jm43', code:'const a = ["Istanbul"];\nconst b = a.concat(["Ankara"]);\nconsole.log(a.length, b.length);', opts:['2 2','1 2','1 1','Error'], ans:1, exp:'concat returns a new array; original a is unchanged (length 1). b = ["Istanbul","Ankara"] (length 2).' },
+    { id:'jm44', code:'const arr = ["Trabzon", "Rize", "Artvin", "Giresun"];\nconst removed = arr.splice(1, 2);\nconsole.log(arr.join("|"));\nconsole.log(removed.join("|"));', opts:['Trabzon|Rize|Artvin|Giresun then Rize|Artvin','Trabzon|Giresun then Rize|Artvin','Trabzon|Rize then Artvin|Giresun','Error'], ans:1, exp:'splice(1,2) removes "Rize" and "Artvin" (2 elements from index 1). arr → ["Trabzon","Giresun"]; removed → ["Rize","Artvin"].' },
+    { id:'jm45', code:'const x = "A" * 2;\nif (x) console.log("YES");\nelse console.log("NO");', opts:['YES','NO','NaN','Error'], ans:1, exp:'"A"*2 = NaN. NaN is falsy → else branch runs → "NO".' },
+    { id:'jm46', code:'console.log("34" + 6 - 16);', opts:['24','34616','330','NaN'], ans:2, exp:'"34"+6 → string concatenation → "346". Then "346"-16 → JS coerces "346" to 346 → 346-16 = 330. Wait — re-check: "34"+6="346", "346"-16=330. Answer is 330.' },
+    { id:'jm47', code:'console.log([34, 6, 16].sort());', opts:['[6, 16, 34]','[34, 16, 6]','[16, 34, 6]','Error'], ans:2, exp:'Default sort() converts to strings and sorts lexicographically: "16" < "34" < "6" → [16,34,6].' },
+    { id:'jm48', code:'console.log(Number(""), parseInt(""));', opts:['0 0','NaN NaN','0 NaN','NaN 0'], ans:2, exp:'Number("") = 0 (empty string coerces to 0). parseInt("") = NaN (no valid digits).' },
+    { id:'jm49', code:'console.log(typeof (+"Ankara"), +"Ankara");', opts:['string Ankara','number NaN','undefined NaN','number 0'], ans:1, exp:'Unary + on "Ankara" = NaN. typeof NaN = "number" (NaN is of type number in JS).' },
+    { id:'jm50', code:'const arr = ["Istanbul", "Ankara", "Izmir"];\nconst r = arr.splice(1, 0, "Bursa");\nconsole.log(arr.join("-"));\nconsole.log(r);', opts:['Istanbul-Ankara-Izmir then ["Bursa"]','Istanbul-Bursa-Ankara-Izmir then []','Istanbul-Bursa-Ankara-Izmir then ["Ankara"]','Istanbul-Ankara-Izmir then []'], ans:1, exp:'splice(1,0,"Bursa") inserts "Bursa" at index 1, removes 0 elements. r = [] (nothing removed).' },
+  ];
+
+  const mcqContainer = document.getElementById('jsprac-mcq-container');
+  mcqData.forEach((item, i) => {
+    const opts = item.opts.map((o,j) => {
+      const labels = ['A','B','C','D'];
+      return `<div class="mcq-opt" onclick="jsMcqAns(this,${j === item.ans},'jsjm${item.id}','${item.exp.replace(/'/g,"\\'").replace(/"/g,'&quot;')}')"><span class="opt-label">${labels[j]}</span> ${o}</div>`
+    }).join('');
+    mcqContainer.innerHTML += '<div class="mcq-card" id="jsjm' + item.id + '"><div class="mcq-q"><span class="q-num">' + (i+1) + '</span> What is the output?<br><code style="display:block;margin-top:8px;white-space:pre;font-size:12px;">' + item.code.replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/`/g, '&#96;').replace(/\$\{/g, '&#36;&#123;') + '</code></div><div class="mcq-options">' + opts + '</div><div class="mcq-feedback" id="jsjm' + item.id + '-fb"></div></div>';
+  });
+
+  // ── WRITE THE OUTPUT Q51-Q83 ──
+  const writeData = [
+    { id:'jw51', code:'console.log(2 + 3 * 4);', ans:'14', exp:'Multiplication first: 3*4=12, then 2+12=14.' },
+    { id:'jw52', code:"console.log('Hello' + ' ' + 'JS');", ans:'Hello JS', exp:'String concatenation with spaces.' },
+    { id:'jw53', code:'let a = 5;\na++;\nconsole.log(a);', ans:'6', exp:'a++ increments a from 5 to 6.' },
+    { id:'jw54', code:"console.log('5' + 2);", ans:'52', exp:"'5' is a string; + with a string does concatenation: '5'+'2'='52'." },
+    { id:'jw55', code:"console.log('5' - 2);", ans:'3', exp:"'-' coerces '5' to number 5. 5-2=3." },
+    { id:'jw56', code:'const arr = [10, 20, 30];\nconsole.log(arr[1]);', ans:'20', exp:'Index 1 is the second element: 20.' },
+    { id:'jw57', code:"const arr = [1, 2, 3, 4];\nconsole.log(arr.slice(1, 3).join('-'));", ans:'2-3', exp:'slice(1,3) = [2,3] (end index exclusive). join("-") = "2-3".' },
+    { id:'jw58', code:'let s = 0;\nfor (let i = 1; i <= 3; i++) s += i;\nconsole.log(s);', ans:'6', exp:'1+2+3=6.' },
+    { id:'jw59', code:'function add(x, y) { return x + y; }\nconsole.log(add(7, 3));', ans:'10', exp:'7+3=10.' },
+    { id:'jw60', code:'console.log(true && false || true);', ans:'true', exp:'true&&false=false; false||true=true.' },
+    { id:'jw61', code:"const x = 9;\nconsole.log(x % 2 === 0 ? 'even' : 'odd');", ans:'odd', exp:'9%2=1; 1!==0 → "odd".' },
+    { id:'jw62', code:'console.log(Math.floor(7.9));', ans:'7', exp:'Math.floor rounds down to nearest integer.' },
+    { id:'jw63', code:"console.log(parseInt('101', 2));", ans:'5', exp:"'101' in base 2 = 1*4+0*2+1*1 = 5." },
+    { id:'jw64', code:'let b;\nconsole.log(typeof b);', ans:'undefined', exp:'Declared but not assigned → typeof = "undefined".' },
+    { id:'jw65', code:'console.log([1, 2, 3].length);', ans:'3', exp:'Array has 3 elements, length = 3.' },
+    { id:'jw66', code:"console.log(1 + '2' + 3);", ans:'123', exp:"1+'2'='12' (concatenation), then '12'+3='123'." },
+    { id:'jw67', code:"console.log(1 + +'2' + 3);", ans:'6', exp:"Unary + converts '2' to 2. 1+2+3=6." },
+    { id:'jw68', code:'console.log(0 == false, 0 === false);', ans:'true false', exp:'0==false: coercion → 0==0 → true. 0===false: different types → false.' },
+    { id:'jw69', code:"console.log([1, 2, 3].map(n => n * 2).join(','));", ans:'2,4,6', exp:'map doubles each: [2,4,6]. join gives "2,4,6".' },
+    { id:'jw70', code:"console.log([1, 2, 3, 4].filter(n => n % 2 === 0).join(','));", ans:'2,4', exp:'Even numbers: [2,4]. join gives "2,4".' },
+    { id:'jw71', code:'console.log([1, 2, 3].reduce((a, b) => a + b, 0));', ans:'6', exp:'0+1+2+3=6.' },
+    { id:'jw72', code:'let x = 1;\n{ let x = 2; }\nconsole.log(x);', ans:'1', exp:'let is block-scoped. Inner x is separate. Outer x stays 1.' },
+    { id:'jw73', code:'var y = 1;\n{ var y = 2; }\nconsole.log(y);', ans:'2', exp:'var is function-scoped, not block-scoped. Inner var y overwrites outer. y=2.' },
+    { id:'jw74', code:'console.log(foo);\nvar foo = 5;\nconsole.log(x);\nlet x = 5;', ans:'undefined then ReferenceError', exp:'var is hoisted (declared but not initialized) → undefined. let is NOT hoisted — accessing before declaration throws ReferenceError.' },
+    { id:'jw75', code:"const a = [1, 2];\nconst b = [...a, 3];\na.push(9);\nconsole.log(a.join(','), '|', b.join(','));", ans:'1,2,9 | 1,2,3', exp:'b is a shallow copy via spread — independent of a. Pushing 9 to a does not affect b.' },
+    { id:'jw76', code:'function g(...nums) { console.log(nums.length, nums[0] + nums[1]); }\ng(4, 5, 6);', ans:'3 9', exp:'Rest collects [4,5,6]; nums.length=3; nums[0]+nums[1]=4+5=9.' },
+    { id:'jw77', code:"let t = 'A';\nt += (t === 'A') ? 'B' : 'C';\nconsole.log(t);", ans:'AB', exp:"t==='A' is true → 'B'. t += 'B' → 'AB'." },
+    { id:'jw78', code:'const a = [1, 2, 3];\na.length = 2;\na[5] = 9;\nconsole.log(a.length, a[2], a[5]);', ans:'6 undefined 9', exp:'Setting length=2 truncates to [1,2]. Setting a[5]=9 creates a sparse array; length becomes 6. a[2]=undefined (hole).' },
+    { id:'jw79', code:"console.log([10, 2, 1].sort().join(','));", ans:'1,10,2', exp:'Default sort is lexicographic. "1"<"10"<"2" alphabetically → [1,10,2].' },
+    { id:'jw80', code:"console.log([10, 2, 1].sort((a, b) => a - b).join(','));", ans:'1,2,10', exp:'Numeric ascending sort: [1,2,10].' },
+    { id:'jw81', code:'let n = NaN;\nconsole.log(n === NaN, Number.isNaN(n));', ans:'false true', exp:'n===NaN is always false (NaN not equal to itself). Number.isNaN(NaN) is the correct check.' },
+    { id:'jw82', code:"let a = [1, 2, 3];\nlet b = a;\nb.push(4);\nconsole.log(a.join(','), '|', b.join(','));", ans:'1,2,3,4 | 1,2,3,4', exp:'b = a assigns the same reference — they point to the same array. Pushing to b also modifies a.' },
+    { id:'jw83', code:'function h() {\n  return [1, 2, 3].reduce((acc, v) => acc + v);\n}\nconsole.log(h());', ans:'6', exp:'No initial value — first element (1) is acc. 1+2+3=6.' },
+  ];
+
+  const writeContainer = document.getElementById('jsprac-write-container');
+  writeData.forEach((item, i) => {
+    writeContainer.innerHTML += '<div class="prac-card" id="' + item.id + '"><div class="prac-q"><span class="q-num">' + (i+51) + '</span> What is the output?</div><div class="prac-code">' + item.code.replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/`/g, '&#96;').replace(/\$\{/g, '&#36;&#123;') + '</div><button class="prac-reveal-btn" onclick="revealAnswer(\'' + item.id + '\')">Show Answer</button><div class="prac-answer" id="' + item.id + '-ans">✅ Output: <strong>' + item.ans.replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/`/g, '&#96;').replace(/\$\{/g, '&#36;&#123;') + '</strong><br><span style="color:var(--muted);font-size:12px">' + item.exp.replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/'/g,"\\'").replace(/"/g,'&quot;') + '</span></div></div>';
+  });
+
+  // ── CODE WRITING Q84-Q107 ──
+  const codeData = [
+    { q:'Declare a variable name and print: Hello, &lt;name&gt;!', ans:"const name = 'Ali';\nconsole.log(`Hello, ${name}!`);" },
+    { q:'Given a = 7 and b = 3, print the sum, difference, product, and quotient.', ans:"const a = 7, b = 3;\nconsole.log(a + b); // 10\nconsole.log(a - b); // 4\nconsole.log(a * b); // 21\nconsole.log(a / b); // 2.333..." },
+    { q:'Given a number n, print "even" if it\'s even, otherwise print "odd".', ans:'const n = 4;\nconsole.log(n % 2 === 0 ? "even" : "odd");' },
+    { q:'Print all even numbers from 0 to 10 (inclusive).', ans:'for (let i = 0; i <= 10; i += 2) {\n  console.log(i); // 0,2,4,6,8,10\n}' },
+    { q:'Given arr = [3, 7, 2, 9], compute and print the sum.', ans:'const arr = [3, 7, 2, 9];\nconst sum = arr.reduce((a, b) => a + b, 0);\nconsole.log(sum); // 21' },
+    { q:'Given s = "javascript", print the reversed string.', ans:'const s = "javascript";\nconsole.log(s.split("").reverse().join(""));\n// "tpircSavaj"' },
+    { q:'Given arr = [1,2,3,4,5], create a new array where each value is multiplied by 2.', ans:'const arr = [1, 2, 3, 4, 5];\nconst doubled = arr.map(n => n * 2);\nconsole.log(doubled); // [2,4,6,8,10]' },
+    { q:'Given a string email, print true if it contains "@", otherwise false.', ans:'const email = "user@example.com";\nconsole.log(email.includes("@")); // true' },
+    { q:'Given arr = ["Ali","Veli","Ayşe"], print them joined by commas.', ans:'const arr = ["Ali", "Veli", "Ayşe"];\nconsole.log(arr.join(",")); // "Ali,Veli,Ayşe"' },
+    { q:'Given arr = [5,1,5,3,5], count how many times 5 appears.', ans:'const arr = [5, 1, 5, 3, 5];\nconst count = arr.filter(n => n === 5).length;\nconsole.log(count); // 3' },
+    { q:'Write a function maxOfTwo(a, b) that returns the larger number.', ans:'function maxOfTwo(a, b) {\n  return a > b ? a : b;\n}\nconsole.log(maxOfTwo(7, 3)); // 7' },
+    { q:'Write a function sumEven(arr) that returns the sum of even numbers.', ans:'function sumEven(arr) {\n  return arr\n    .filter(n => n % 2 === 0)\n    .reduce((a, b) => a + b, 0);\n}\nconsole.log(sumEven([1,2,3,4,6])); // 12' },
+    { q:'Write a function removeSpaces(str). Example: "a b c" → "abc"', ans:'function removeSpaces(str) {\n  return str.split(" ").join("");\n  // or: return str.replaceAll(" ", "");\n}\nconsole.log(removeSpaces("a b c")); // "abc"' },
+    { q:'Write a function countVowels(str) that counts vowels (a,e,i,o,u) case-insensitively.', ans:"function countVowels(str) {\n  return [...str.toLowerCase()]\n    .filter(c => 'aeiou'.includes(c)).length;\n}\nconsole.log(countVowels('JavaScript')); // 3" },
+    { q:'Write a function unique(arr). Example: [1,2,2,3,1] → [1,2,3]', ans:'function unique(arr) {\n  return [...new Set(arr)];\n}\nconsole.log(unique([1,2,2,3,1])); // [1,2,3]' },
+    { q:'Write a function reverseWords(sentence). Example: "I love JS" → "JS love I"', ans:'function reverseWords(sentence) {\n  return sentence.split(" ").reverse().join(" ");\n}\nconsole.log(reverseWords("I love JS")); // "JS love I"' },
+    { q:'Write a function isPalindrome(str) that returns true if the string is a palindrome.', ans:'function isPalindrome(str) {\n  const clean = str.toLowerCase();\n  return clean === clean.split("").reverse().join("");\n}\nconsole.log(isPalindrome("racecar")); // true' },
+    { q:'Write a function mergeSorted(a, b) that merges two sorted arrays. Example: [1,4,7]+[2,3,6] → [1,2,3,4,6,7]', ans:'function mergeSorted(a, b) {\n  return [...a, ...b].sort((x, y) => x - y);\n}\nconsole.log(mergeSorted([1,4,7],[2,3,6]));\n// [1,2,3,4,6,7]' },
+    { q:'Write a function groupByLength(words). Example: ["a","bb","cc","ddd"] → {1:["a"],2:["bb","cc"],3:["ddd"]}', ans:'function groupByLength(words) {\n  return words.reduce((acc, w) => {\n    const len = w.length;\n    acc[len] = acc[len] || [];\n    acc[len].push(w);\n    return acc;\n  }, {});\n}' },
+    { q:'Write a function mostFrequent(arr) that returns the most frequent element.', ans:'function mostFrequent(arr) {\n  const freq = arr.reduce((acc, v) => {\n    acc[v] = (acc[v] || 0) + 1;\n    return acc;\n  }, {});\n  return Object.entries(freq)\n    .sort((a,b) => b[1]-a[1])[0][0];\n}' },
+    { q:'Write a function flatten(arr) that fully flattens a nested array. Example: [1,[2,[3,4]],5] → [1,2,3,4,5]', ans:'function flatten(arr) {\n  return arr.flat(Infinity);\n  // or recursive:\n  // return arr.reduce((a,v) =>\n  //   a.concat(Array.isArray(v) ? flatten(v) : v), []);\n}' },
+    { q:'Write a function chunk(arr, size). Example: chunk([1,2,3,4,5],2) → [[1,2],[3,4],[5]]', ans:'function chunk(arr, size) {\n  const result = [];\n  for (let i = 0; i < arr.length; i += size) {\n    result.push(arr.slice(i, i + size));\n  }\n  return result;\n}' },
+    { q:'Write a function parseQuery(queryString). Example: "a=1&b=hello" → {a:"1",b:"hello"}', ans:'function parseQuery(queryString) {\n  return Object.fromEntries(\n    queryString.split("&")\n      .map(pair => pair.split("="))\n  );\n}' },
+    { q:'Write a function topKFrequent(arr, k). Example: topKFrequent([1,1,1,2,2,3],2) → [1,2]', ans:'function topKFrequent(arr, k) {\n  const freq = arr.reduce((acc,v) => {\n    acc[v] = (acc[v]||0)+1;\n    return acc;\n  }, {});\n  return Object.entries(freq)\n    .sort((a,b) => b[1]-a[1])\n    .slice(0,k)\n    .map(([key]) => Number(key));\n}' },
+  ];
+
+  const codeContainer = document.getElementById('jsprac-code-container');
+  codeData.forEach((item, i) => {
+    codeContainer.innerHTML += '<div class="write-code-card" id="jwc' + (84+i) + '"><div class="prac-q"><span class="q-num">' + (84+i) + '</span> ' + item.q.replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/'/g,"\\'").replace(/"/g,'&quot;') + '</div><button class="prac-reveal-btn" onclick="revealAnswer(\'jwc' + (84+i) + '\')">Show Solution</button><div class="prac-answer" id="jwc' + (84+i) + '-ans"><div class="prac-code" style="color:#a5d6ff;margin-top:8px">' + item.ans.replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/`/g, '&#96;').replace(/\$\{/g, '&#36;&#123;') + '</div></div></div>';
+  });
+
+})();
+
+// JS MCQ answer handler
+const jsMcqAnswered = {};
+function jsMcqAns(el, isCorrect, qId, explanation) {
+  if (jsMcqAnswered[qId]) return;
+  jsMcqAnswered[qId] = true;
+  const card = document.getElementById(qId);
+  const feedback = document.getElementById(qId + '-fb');
+  const opts = card.querySelectorAll('.mcq-opt');
+  opts.forEach(o => { o.classList.add('disabled'); o.style.pointerEvents='none'; });
+  if (isCorrect) {
+    el.classList.add('correct');
+    card.classList.add('answered-correct');
+    feedback.innerHTML = '✅ Correct! ' + explanation;
+    feedback.className = 'mcq-feedback show correct';
+  } else {
+    el.classList.add('wrong');
+    card.classList.add('answered-wrong');
+    feedback.innerHTML = '❌ Incorrect. ' + explanation;
+    feedback.className = 'mcq-feedback show wrong';
+    opts.forEach(o => { if (o.onclick && o.onclick.toString().includes('true,')) o.classList.add('correct'); });
+  }
+}
+</script>
+</div><!-- layout-wrap -->
+
+</body>
+</html>

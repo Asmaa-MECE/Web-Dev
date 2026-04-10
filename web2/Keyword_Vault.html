@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>CMPS 350 · Keyword Vault</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg: #0a0a0f;
+  --surface: #11111a;
+  --surface2: #1a1a28;
+  --border: #2a2a40;
+  --accent: #f0c060;
+  --accent2: #60b8f0;
+  --accent3: #a060f0;
+  --income: #50e090;
+  --expense: #f05060;
+  --text: #e8e8f0;
+  --muted: #7878a0;
+  --mono: 'Space Mono', monospace;
+  --sans: 'Syne', sans-serif;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.6; min-height: 100vh; }
+
+/* ── HERO ── */
+.hero { position: relative; padding: 44px 40px 36px; border-bottom: 1px solid var(--border); overflow: hidden; }
+.hero::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 55% 55% at 85% 15%, rgba(96,184,240,.11) 0%, transparent 70%), radial-gradient(ellipse 35% 35% at 8% 85%, rgba(160,96,240,.09) 0%, transparent 70%); pointer-events: none; }
+.hero-inner { max-width: 1200px; margin: 0 auto; display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
+.hero-label { font-family: var(--mono); font-size: 10px; letter-spacing: 3px; color: var(--accent); text-transform: uppercase; margin-bottom: 10px; }
+.hero h1 { font-size: clamp(24px, 4vw, 48px); font-weight: 800; letter-spacing: -1px; line-height: 1.05; }
+.hero h1 span { color: var(--accent2); }
+.hero-sub { margin-top: 8px; color: var(--muted); font-size: 13px; font-family: var(--mono); }
+.hero-stats { display: flex; gap: 20px; flex-wrap: wrap; }
+.stat-pill { text-align: center; }
+.stat-pill .num { font-size: 26px; font-weight: 800; color: var(--accent); font-family: var(--mono); line-height: 1; }
+.stat-pill .lbl { font-family: var(--mono); font-size: 9px; letter-spacing: 2px; color: var(--muted); margin-top: 2px; }
+
+/* ── PAGE TABS ── */
+.vault-tabs { display: flex; gap: 0; border-bottom: 1px solid var(--border); background: var(--surface); overflow-x: auto; scrollbar-width: none; }
+.vault-tabs::-webkit-scrollbar { display: none; }
+.vault-tab { font-family: var(--mono); font-size: 11px; letter-spacing: 1px; padding: 14px 24px; border: none; background: none; color: var(--muted); cursor: pointer; border-bottom: 2px solid transparent; white-space: nowrap; transition: all .18s; }
+.vault-tab:hover { color: var(--text); }
+.vault-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+.vault-tab.html-tab.active { color: #fb923c; border-bottom-color: #fb923c; }
+.vault-tab.css-tab.active  { color: #a78bfa; border-bottom-color: #a78bfa; }
+.vault-tab.resp-tab.active { color: #34d399; border-bottom-color: #34d399; }
+.vault-tab.js-tab.active   { color: #60b8f0; border-bottom-color: #60b8f0; }
+.vault-tab.wa-tab.active   { color: #f87171; border-bottom-color: #f87171; }
+
+.vault-page { display: none; }
+.vault-page.active { display: block; }
+
+/* ── MAIN LAYOUT ── */
+.container { max-width: 1200px; margin: 0 auto; padding: 28px 40px; }
+
+/* ── CONTROLS ── */
+.controls { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-bottom: 20px; }
+.search-wrap { position: relative; flex: 1; min-width: 220px; }
+.search-wrap svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); opacity: .4; pointer-events: none; }
+.search-input { width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 10px 14px 10px 38px; color: var(--text); font-family: var(--mono); font-size: 12px; outline: none; transition: border-color .2s; }
+.search-input:focus { border-color: var(--accent2); }
+.search-input::placeholder { color: var(--muted); }
+.filters { display: flex; gap: 8px; flex-wrap: wrap; }
+.filter-btn { font-family: var(--mono); font-size: 10px; letter-spacing: 1px; padding: 7px 14px; background: var(--surface); border: 1px solid var(--border); border-radius: 100px; color: var(--muted); cursor: pointer; transition: all .18s; white-space: nowrap; }
+.filter-btn:hover { border-color: var(--accent); color: var(--accent); }
+.filter-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(240,192,96,.07); }
+
+/* ── ACTION BUTTONS ── */
+.actions { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px; }
+.btn { font-family: var(--mono); font-size: 11px; letter-spacing: 1px; padding: 8px 18px; border-radius: 100px; cursor: pointer; transition: all .2s; display: flex; align-items: center; gap: 7px; border: 1px solid; }
+.btn-add    { background: rgba(96,184,240,.08); border-color: var(--accent2); color: var(--accent2); }
+.btn-import { background: rgba(80,224,144,.07); border-color: var(--income);  color: var(--income);  }
+.btn-export { background: rgba(240,192,96,.07); border-color: var(--accent);  color: var(--accent);  }
+.btn:hover { opacity: .85; transform: translateY(-1px); }
+
+/* ── EMPTY STATE ── */
+.empty-state { text-align: center; padding: 80px 20px; color: var(--muted); font-family: var(--mono); font-size: 12px; letter-spacing: 1px; }
+.empty-state .icon { font-size: 40px; margin-bottom: 16px; opacity: .4; }
+
+/* ── GRID ── */
+.kw-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
+.kw-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: start; cursor: pointer; transition: border-color .18s, box-shadow .18s, transform .18s; position: relative; }
+.kw-card:hover { border-color: var(--accent2); box-shadow: 0 0 0 1px var(--accent2); transform: translateY(-2px); }
+.kw-card.hidden { display: none; }
+.kw-name { font-family: var(--mono); font-size: 12px; color: var(--accent2); margin-bottom: 4px; font-weight: 700; }
+.kw-desc { font-size: 12px; color: var(--muted); line-height: 1.5; }
+.kw-badges { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; }
+.kw-cat { font-family: var(--mono); font-size: 9px; letter-spacing: 1px; padding: 3px 8px; border-radius: 100px; border: 1px solid; white-space: nowrap; }
+/* JS cats */
+.cat-pill-vars    { color: var(--accent);  border-color: var(--accent);  background: rgba(240,192,96,.08); }
+.cat-pill-fn      { color: var(--accent2); border-color: var(--accent2); background: rgba(96,184,240,.08); }
+.cat-pill-array   { color: var(--income);  border-color: var(--income);  background: rgba(80,224,144,.08); }
+.cat-pill-dom     { color: var(--accent3); border-color: var(--accent3); background: rgba(160,96,240,.08); }
+.cat-pill-event   { color: var(--expense); border-color: var(--expense); background: rgba(240,80,96,.08); }
+.cat-pill-json    { color: #f0c060;        border-color: #f0c060;        background: rgba(240,192,96,.08); }
+.cat-pill-async   { color: #a0e8ff;        border-color: #a0e8ff;        background: rgba(160,232,255,.08); }
+.cat-pill-fetch   { color: #f09060;        border-color: #f09060;        background: rgba(240,144,96,.08); }
+.cat-pill-oop     { color: #c0a0f0;        border-color: #c0a0f0;        background: rgba(192,160,240,.08); }
+.cat-pill-other   { color: var(--muted);   border-color: var(--muted);   background: rgba(120,120,160,.08); }
+/* HTML cats */
+.cat-pill-html-struct  { color: #fb923c; border-color: #fb923c; background: rgba(251,146,60,.08); }
+.cat-pill-html-forms   { color: #fbbf24; border-color: #fbbf24; background: rgba(251,191,36,.08); }
+.cat-pill-html-tables  { color: #f87171; border-color: #f87171; background: rgba(248,113,113,.08); }
+.cat-pill-html-media   { color: #34d399; border-color: #34d399; background: rgba(52,211,153,.08); }
+.cat-pill-html-meta    { color: #a78bfa; border-color: #a78bfa; background: rgba(167,139,250,.08); }
+/* CSS cats */
+.cat-pill-css-sel      { color: #a78bfa; border-color: #a78bfa; background: rgba(167,139,250,.08); }
+.cat-pill-css-box      { color: #c084fc; border-color: #c084fc; background: rgba(192,132,252,.08); }
+.cat-pill-css-text     { color: #e879f9; border-color: #e879f9; background: rgba(232,121,249,.08); }
+.cat-pill-css-layout   { color: #34d399; border-color: #34d399; background: rgba(52,211,153,.08); }
+.cat-pill-css-flex     { color: #60b8f0; border-color: #60b8f0; background: rgba(96,184,240,.08); }
+.cat-pill-css-grid     { color: #50e090; border-color: #50e090; background: rgba(80,224,144,.08); }
+.cat-pill-css-resp     { color: #fbbf24; border-color: #fbbf24; background: rgba(251,191,36,.08); }
+.cat-pill-css-anim     { color: #f87171; border-color: #f87171; background: rgba(248,113,113,.08); }
+/* WA cats */
+.cat-pill-wa-http   { color: #f87171; border-color: #f87171; background: rgba(248,113,113,.08); }
+.cat-pill-wa-rest   { color: #fb923c; border-color: #fb923c; background: rgba(251,146,60,.08); }
+.cat-pill-wa-nextjs { color: #60b8f0; border-color: #60b8f0; background: rgba(96,184,240,.08); }
+.cat-pill-wa-crud   { color: #50e090; border-color: #50e090; background: rgba(80,224,144,.08); }
+
+.custom-badge { font-family: var(--mono); font-size: 8px; letter-spacing: 1px; padding: 2px 6px; border-radius: 100px; border: 1px solid var(--income); color: var(--income); background: rgba(80,224,144,.07); }
+
+/* ── MODAL OVERLAY ── */
+.modal-overlay { position: fixed; inset: 0; background: rgba(5,5,12,.88); backdrop-filter: blur(6px); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px; opacity: 0; pointer-events: none; transition: opacity .25s; }
+.modal-overlay.open { opacity: 1; pointer-events: all; }
+.modal { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; width: 100%; max-width: 600px; max-height: 90vh; overflow-y: auto; transform: translateY(24px) scale(.97); transition: transform .25s; position: relative; }
+.modal-overlay.open .modal { transform: translateY(0) scale(1); }
+.modal-header { padding: 26px 26px 0; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.modal-title-group { flex: 1; }
+.modal-label { font-family: var(--mono); font-size: 10px; letter-spacing: 3px; color: var(--accent3); margin-bottom: 6px; }
+.modal-title { font-family: var(--mono); font-size: 18px; font-weight: 700; color: var(--accent2); }
+.modal-close { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; color: var(--muted); width: 34px; height: 34px; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: border-color .15s, color .15s; }
+.modal-close:hover { border-color: var(--expense); color: var(--expense); }
+.modal-body { padding: 20px 26px 26px; }
+.popup-desc { font-size: 13px; color: var(--muted); line-height: 1.7; margin-bottom: 20px; padding-bottom: 18px; border-bottom: 1px solid var(--border); }
+.popup-example-label { font-family: var(--mono); font-size: 10px; letter-spacing: 3px; color: var(--accent); text-transform: uppercase; margin-bottom: 10px; }
+.code-block { background: #0d0d18; border: 1px solid var(--border); border-radius: 10px; padding: 18px; overflow-x: auto; }
+.code-block pre { font-family: var(--mono); font-size: 12px; line-height: 1.8; color: var(--text); white-space: pre; }
+.hl-comment { color: #4a4a7a; } .hl-kw { color: #a060f0; } .hl-fn { color: #60b8f0; } .hl-str { color: #50e090; } .hl-num { color: #f0c060; } .hl-op { color: #f05060; }
+.popup-tip { margin-top: 14px; background: rgba(240,192,96,.06); border: 1px solid rgba(240,192,96,.18); border-radius: 10px; padding: 12px 14px; font-size: 12px; color: var(--muted); line-height: 1.6; }
+.popup-tip strong { color: var(--accent); }
+.popup-actions { display: flex; gap: 8px; margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--border); }
+.popup-actions .btn { flex: 1; justify-content: center; border-radius: 8px; padding: 10px; font-size: 11px; }
+.btn-edit   { background: rgba(96,184,240,.08);  border-color: var(--accent2); color: var(--accent2); }
+.btn-delete { background: rgba(240,80,96,.08);   border-color: var(--expense); color: var(--expense); }
+
+/* ── FORM ── */
+.form-group { display: flex; flex-direction: column; gap: 14px; }
+.field label { font-family: var(--mono); font-size: 10px; letter-spacing: 2px; color: var(--muted); display: block; margin-bottom: 6px; }
+.field input, .field select, .field textarea { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; color: var(--text); font-family: var(--mono); font-size: 12px; outline: none; transition: border-color .2s; }
+.field input:focus, .field select:focus, .field textarea:focus { border-color: var(--accent2); }
+.field textarea { resize: vertical; line-height: 1.6; }
+.field select option { background: var(--surface2); }
+.editor-wrap { position: relative; }
+.code-editor { width: 100%; min-height: 120px; background: #0d0d18; border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; font-family: var(--mono); font-size: 12px; outline: none; line-height: 1.8; white-space: pre; overflow-x: auto; color: var(--text); caret-color: var(--accent2); }
+.code-editor:focus { border-color: var(--accent2); }
+.code-editor:empty::before { content: attr(data-placeholder); color: var(--muted); pointer-events: none; }
+.ai-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+.ai-row label { font-family: var(--mono); font-size: 10px; letter-spacing: 2px; color: var(--muted); }
+.btn-ai { font-family: var(--mono); font-size: 10px; letter-spacing: 1px; padding: 4px 12px; background: rgba(160,96,240,.1); border: 1px solid var(--accent3); border-radius: 100px; color: var(--accent3); cursor: pointer; transition: all .2s; }
+.btn-ai:hover { background: rgba(160,96,240,.2); }
+.api-key-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.api-key-row input { flex: 1; background: var(--surface2); border: 1px solid rgba(160,96,240,.3); border-radius: 8px; padding: 7px 12px; color: var(--text); font-family: var(--mono); font-size: 11px; outline: none; }
+.api-key-row a { font-family: var(--mono); font-size: 10px; color: var(--accent3); text-decoration: none; white-space: nowrap; opacity: .8; }
+.ai-status { font-family: var(--mono); font-size: 11px; color: var(--muted); min-height: 16px; margin-top: 5px; }
+.form-error { display: none; font-family: var(--mono); font-size: 11px; color: var(--expense); padding: 8px 12px; background: rgba(240,80,96,.07); border: 1px solid rgba(240,80,96,.2); border-radius: 8px; }
+.btn-save { width: 100%; padding: 13px; background: var(--accent2); border: none; border-radius: 10px; color: #0a0a0f; font-family: var(--mono); font-size: 13px; font-weight: 700; letter-spacing: 1px; cursor: pointer; transition: opacity .2s; margin-top: 4px; }
+.btn-save:hover { opacity: .88; }
+
+/* ── VAULT PAGE HEADER ── */
+.vault-page-header { display: flex; align-items: center; gap: 16px; padding: 24px 40px 0; max-width: 1200px; margin: 0 auto; }
+.vault-page-header h2 { font-size: 1.1rem; font-weight: 800; }
+.vault-page-header p { font-size: 12px; color: var(--muted); font-family: var(--mono); }
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+.kw-card { animation: fadeUp .3s ease both; }
+@media(max-width:600px){ .container { padding: 20px 16px; } .vault-page-header { padding: 16px 16px 0; } }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="hero-inner">
+    <div>
+      <p class="hero-label">CMPS 350 · Web Dev</p>
+      <h1>Keyword <span>Vault</span></h1>
+      <p class="hero-sub">// html · css · javascript · web api · search · expand</p>
+    </div>
+    <div class="hero-stats">
+      <div class="stat-pill"><div class="num" id="stat-total">0</div><div class="lbl">TOTAL</div></div>
+      <div class="stat-pill"><div class="num" id="stat-custom">0</div><div class="lbl">CUSTOM</div></div>
+    </div>
+  </div>
+</header>
+
+<!-- PAGE TABS -->
+<div class="vault-tabs">
+  <button class="vault-tab js-tab active"   onclick="switchVault('js')">⚡ JavaScript Vault</button>
+  <button class="vault-tab html-tab"        onclick="switchVault('html')">🌐 HTML Vault</button>
+  <button class="vault-tab css-tab"         onclick="switchVault('css')">🎨 CSS Vault</button>
+  <button class="vault-tab resp-tab"        onclick="switchVault('resp')">📐 Responsive CSS</button>
+  <button class="vault-tab wa-tab"          onclick="switchVault('wa')">🔌 Web API Vault</button>
+  <button class="vault-tab"                 onclick="switchVault('all')">🗂 All Keywords</button>
+</div>
+
+<!-- ===== JS VAULT ===== -->
+<div id="vault-js" class="vault-page active">
+  <div class="vault-page-header">
+    <div>
+      <h2 style="color:#60b8f0">⚡ JavaScript Vault</h2>
+      <p>Variables · Functions · Arrays · OOP · Async · Fetch · DOM · Events · JSON</p>
+    </div>
+  </div>
+  <div class="container">
+    <div class="controls">
+      <div class="search-wrap"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg><input type="text" class="search-input" id="search-js" placeholder="Search JS keywords…" oninput="filterGrid('js',this.value)"/></div>
+      <div class="filters" id="filter-bar-js"></div>
+    </div>
+    <div class="actions">
+      <button class="btn btn-add" onclick="openForm(null,'js')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>Add Keyword</button>
+      <button class="btn btn-export" id="btn-export-js" onclick="exportVault('js')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Export</button>
+    </div>
+    <div class="kw-grid" id="grid-js"></div>
+    <div class="empty-state" id="empty-js" style="display:none"><div class="icon">🔍</div><div>No keywords match.</div></div>
+  </div>
+</div>
+
+<!-- ===== HTML VAULT ===== -->
+<div id="vault-html" class="vault-page">
+  <div class="vault-page-header">
+    <div>
+      <h2 style="color:#fb923c">🌐 HTML Vault</h2>
+      <p>Structure · Semantic Tags · Tables · Forms · Media · Accessibility</p>
+    </div>
+  </div>
+  <div class="container">
+    <div class="controls">
+      <div class="search-wrap"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg><input type="text" class="search-input" id="search-html" placeholder="Search HTML keywords…" oninput="filterGrid('html',this.value)"/></div>
+      <div class="filters" id="filter-bar-html"></div>
+    </div>
+    <div class="actions">
+      <button class="btn btn-add" onclick="openForm(null,'html')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>Add Keyword</button>
+      <button class="btn btn-export" onclick="exportVault('html')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Export</button>
+    </div>
+    <div class="kw-grid" id="grid-html"></div>
+    <div class="empty-state" id="empty-html" style="display:none"><div class="icon">🔍</div><div>No keywords match.</div></div>
+  </div>
+</div>
+
+<!-- ===== CSS VAULT ===== -->
+<div id="vault-css" class="vault-page">
+  <div class="vault-page-header">
+    <div>
+      <h2 style="color:#a78bfa">🎨 CSS Vault</h2>
+      <p>Selectors · Specificity · Box Model · Text · Borders · Pseudo-classes</p>
+    </div>
+  </div>
+  <div class="container">
+    <div class="controls">
+      <div class="search-wrap"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg><input type="text" class="search-input" id="search-css" placeholder="Search CSS keywords…" oninput="filterGrid('css',this.value)"/></div>
+      <div class="filters" id="filter-bar-css"></div>
+    </div>
+    <div class="actions">
+      <button class="btn btn-add" onclick="openForm(null,'css')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>Add Keyword</button>
+      <button class="btn btn-export" onclick="exportVault('css')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Export</button>
+    </div>
+    <div class="kw-grid" id="grid-css"></div>
+    <div class="empty-state" id="empty-css" style="display:none"><div class="icon">🔍</div><div>No keywords match.</div></div>
+  </div>
+</div>
+
+<!-- ===== RESPONSIVE CSS VAULT ===== -->
+<div id="vault-resp" class="vault-page">
+  <div class="vault-page-header">
+    <div>
+      <h2 style="color:#34d399">📐 Responsive CSS Vault</h2>
+      <p>Flexbox · Grid · Media Queries · Layout Patterns · clamp()</p>
+    </div>
+  </div>
+  <div class="container">
+    <div class="controls">
+      <div class="search-wrap"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg><input type="text" class="search-input" id="search-resp" placeholder="Search Responsive CSS…" oninput="filterGrid('resp',this.value)"/></div>
+      <div class="filters" id="filter-bar-resp"></div>
+    </div>
+    <div class="actions">
+      <button class="btn btn-add" onclick="openForm(null,'resp')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>Add Keyword</button>
+    </div>
+    <div class="kw-grid" id="grid-resp"></div>
+    <div class="empty-state" id="empty-resp" style="display:none"><div class="icon">🔍</div><div>No keywords match.</div></div>
+  </div>
+</div>
+
+<!-- ===== WEB API VAULT ===== -->
+<div id="vault-wa" class="vault-page">
+  <div class="vault-page-header">
+    <div>
+      <h2 style="color:#f87171">🔌 Web API Vault</h2>
+      <p>HTTP · REST · CRUD · Status Codes · Next.js · Route Handlers</p>
+    </div>
+  </div>
+  <div class="container">
+    <div class="controls">
+      <div class="search-wrap"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg><input type="text" class="search-input" id="search-wa" placeholder="Search Web API keywords…" oninput="filterGrid('wa',this.value)"/></div>
+      <div class="filters" id="filter-bar-wa"></div>
+    </div>
+    <div class="actions">
+      <button class="btn btn-add" onclick="openForm(null,'wa')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>Add Keyword</button>
+    </div>
+    <div class="kw-grid" id="grid-wa"></div>
+    <div class="empty-state" id="empty-wa" style="display:none"><div class="icon">🔍</div><div>No keywords match.</div></div>
+  </div>
+</div>
+
+<!-- ===== ALL VAULT ===== -->
+<div id="vault-all" class="vault-page">
+  <div class="vault-page-header">
+    <div><h2>🗂 All Keywords</h2><p>Every keyword across all vaults</p></div>
+  </div>
+  <div class="container">
+    <div class="controls">
+      <div class="search-wrap"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg><input type="text" class="search-input" id="search-all" placeholder="Search all keywords…" oninput="filterGrid('all',this.value)"/></div>
+      <div class="filters" id="filter-bar-all"></div>
+    </div>
+    <div class="actions">
+      <button class="btn btn-import" id="btn-import"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>Import JSON</button>
+      <button class="btn btn-export" onclick="exportVault('all')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Export All</button>
+    </div>
+    <div class="kw-grid" id="grid-all"></div>
+    <div class="empty-state" id="empty-all" style="display:none"><div class="icon">🔍</div><div>No keywords match.</div></div>
+  </div>
+</div>
+<input type="file" id="import-input" accept=".json" style="display:none"/>
+
+<!-- DETAIL POPUP -->
+<div class="modal-overlay" id="detail-overlay">
+  <div class="modal" id="detail-modal">
+    <div class="modal-header">
+      <div class="modal-title-group"><div class="modal-label" id="d-cat"></div><div class="modal-title" id="d-title"></div></div>
+      <button class="modal-close" id="detail-close">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="popup-desc" id="d-desc"></div>
+      <div class="popup-example-label">// code example</div>
+      <div class="code-block"><pre id="d-code"></pre></div>
+      <div class="popup-tip" id="d-tip" style="display:none"></div>
+      <div class="popup-actions" id="d-actions" style="display:none">
+        <button class="btn btn-edit" id="d-edit-btn">✎ EDIT</button>
+        <button class="btn btn-delete" id="d-delete-btn">✕ DELETE</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ADD/EDIT MODAL -->
+<div class="modal-overlay" id="form-overlay">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title-group"><div class="modal-label" id="form-mode-label">NEW KEYWORD</div><div class="modal-title" id="form-mode-title">Add to Study List</div></div>
+      <button class="modal-close" id="form-close">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <div class="field"><label>KEYWORD NAME *</label><input type="text" id="f-name" placeholder="e.g. display:flex, border-radius"/></div>
+        <div class="field">
+          <label>CATEGORY *</label>
+          <select id="f-cat">
+            <optgroup label="JavaScript">
+              <option value="vars">Variables</option><option value="fn">Functions</option><option value="array">Arrays</option><option value="dom">DOM</option><option value="event">Events</option><option value="json">JSON</option><option value="async">Async</option><option value="fetch">Fetch API</option><option value="oop">OOP / Classes</option><option value="other">Other JS</option>
+            </optgroup>
+            <optgroup label="HTML">
+              <option value="html-struct">Structure &amp; Semantics</option><option value="html-forms">Forms &amp; Inputs</option><option value="html-tables">Tables</option><option value="html-media">Media</option><option value="html-meta">Meta &amp; Head</option>
+            </optgroup>
+            <optgroup label="CSS Fundamentals">
+              <option value="css-sel">Selectors &amp; Specificity</option><option value="css-box">Box Model</option><option value="css-text">Text &amp; Fonts</option><option value="css-layout">Layout Basics</option><option value="css-anim">Transitions &amp; Animations</option>
+            </optgroup>
+            <optgroup label="CSS Responsive">
+              <option value="css-flex">Flexbox</option><option value="css-grid">CSS Grid</option><option value="css-resp">Media Queries</option>
+            </optgroup>
+            <optgroup label="Web API">
+              <option value="wa-http">HTTP &amp; URLs</option><option value="wa-rest">REST Principles</option><option value="wa-crud">CRUD &amp; HTTP Verbs</option><option value="wa-nextjs">Next.js Routes</option>
+            </optgroup>
+          </select>
+        </div>
+        <div class="field"><label>DESCRIPTION *</label><textarea id="f-desc" rows="3" placeholder="What does this keyword do?"></textarea></div>
+        <div class="field">
+          <div class="ai-row"><label>CODE EXAMPLE</label><button class="btn-ai" id="ai-btn">✦ Generate with AI</button></div>
+          <div class="api-key-row"><input type="password" id="f-apikey" placeholder="Paste Anthropic API key (sk-ant-…)"/><a href="https://console.anthropic.com/settings/keys" target="_blank">Get key ↗</a></div>
+          <div class="editor-wrap"><div class="code-editor" id="f-example" contenteditable="true" spellcheck="false" data-placeholder="// Write code here…"></div></div>
+          <div class="ai-status" id="ai-status"></div>
+        </div>
+        <div class="field"><label>PRO TIP <span style="opacity:.5">(optional)</span></label><input type="text" id="f-tip" placeholder="e.g. Watch out for X…"/></div>
+        <div class="form-error" id="form-error"></div>
+        <button class="btn-save" id="form-save">SAVE KEYWORD</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── VAULT DATA ──────────────────────────────────────────────────────────────
+const VAULTS = {
+  js:   { grid:'grid-js',   empty:'empty-js',   filterBar:'filter-bar-js',   search:'search-js'  },
+  html: { grid:'grid-html', empty:'empty-html', filterBar:'filter-bar-html', search:'search-html' },
+  css:  { grid:'grid-css',  empty:'empty-css',  filterBar:'filter-bar-css',  search:'search-css'  },
+  resp: { grid:'grid-resp', empty:'empty-resp', filterBar:'filter-bar-resp', search:'search-resp' },
+  wa:   { grid:'grid-wa',   empty:'empty-wa',   filterBar:'filter-bar-wa',   search:'search-wa'   },
+  all:  { grid:'grid-all',  empty:'empty-all',  filterBar:'filter-bar-all',  search:'search-all'  },
+};
+
+const CAT_VAULT = {
+  // JS
+  vars:'js', fn:'js', array:'js', dom:'js', event:'js', json:'js', async:'js', fetch:'js', oop:'js', other:'js',
+  // HTML
+  'html-struct':'html', 'html-forms':'html', 'html-tables':'html', 'html-media':'html', 'html-meta':'html',
+  // CSS
+  'css-sel':'css', 'css-box':'css', 'css-text':'css', 'css-layout':'css', 'css-anim':'css',
+  // Responsive
+  'css-flex':'resp', 'css-grid':'resp', 'css-resp':'resp',
+  // Web API
+  'wa-http':'wa', 'wa-rest':'wa', 'wa-crud':'wa', 'wa-nextjs':'wa',
+};
+
+const CAT_LABEL = {
+  vars:'Variables', fn:'Functions', array:'Arrays', dom:'DOM', event:'Events', json:'JSON', async:'Async', fetch:'Fetch API', oop:'OOP / Classes', other:'Other',
+  'html-struct':'Structure', 'html-forms':'Forms', 'html-tables':'Tables', 'html-media':'Media', 'html-meta':'Meta',
+  'css-sel':'Selectors', 'css-box':'Box Model', 'css-text':'Text', 'css-layout':'Layout', 'css-anim':'Animations',
+  'css-flex':'Flexbox', 'css-grid':'Grid', 'css-resp':'Media Queries',
+  'wa-http':'HTTP', 'wa-rest':'REST', 'wa-crud':'CRUD', 'wa-nextjs':'Next.js',
+};
+
+const CAT_CLASS = {
+  vars:'cat-pill-vars', fn:'cat-pill-fn', array:'cat-pill-array', dom:'cat-pill-dom', event:'cat-pill-event',
+  json:'cat-pill-json', async:'cat-pill-async', fetch:'cat-pill-fetch', oop:'cat-pill-oop', other:'cat-pill-other',
+  'html-struct':'cat-pill-html-struct','html-forms':'cat-pill-html-forms','html-tables':'cat-pill-html-tables',
+  'html-media':'cat-pill-html-media','html-meta':'cat-pill-html-meta',
+  'css-sel':'cat-pill-css-sel','css-box':'cat-pill-css-box','css-text':'cat-pill-css-text',
+  'css-layout':'cat-pill-css-layout','css-anim':'cat-pill-css-anim',
+  'css-flex':'cat-pill-css-flex','css-grid':'cat-pill-css-grid','css-resp':'cat-pill-css-resp',
+  'wa-http':'cat-pill-wa-http','wa-rest':'cat-pill-wa-rest','wa-crud':'cat-pill-wa-crud','wa-nextjs':'cat-pill-wa-nextjs',
+};
+
+// ─── KEYWORD DATA ─────────────────────────────────────────────────────────────
+const ALL_KEYWORDS = [
+  // ── JS VAULT ──
+  { key:'const',         name:'const',                 cat:'vars',  desc:'Block-scoped variable that cannot be reassigned. Use by default for everything.',         example:'const name = "Ali";\nconst rate = 0.05;\n// name = "other"; // ERROR — const is read-only', tip:'Start with const for everything. Only switch to let when the value needs to reassign.' },
+  { key:'let',           name:'let',                   cat:'vars',  desc:'Block-scoped variable that can be reassigned. Use only when the value must change.',       example:'let balance = 15250;\nbalance += 500;\nbalance -= 200; // OK', tip:'Block-scoped: only exists within the {} it was declared in. Prefer const unless reassignment is needed.' },
+  { key:'template-lit',  name:'Template Literals',     cat:'vars',  desc:'Strings in backticks that allow embedded expressions ${} and multi-line content.',        example:'const name = "Ali";\nconst msg = `Hello ${name}, balance: ${(4500).toLocaleString()} QAR`;\nconsole.log(msg);', tip:'Used everywhere in renderTransactions() to build HTML strings.' },
+  { key:'number-conv',   name:'Number()',               cat:'vars',  desc:'Converts a string input value to a number. All form input values are strings by default.',example:'const raw = input.value; // "4500" (string)\nconst amount = Number(raw); // 4500 (number)', tip:'Forgetting Number() causes string concatenation instead of addition — common bug.' },
+  { key:'tolocalestr',   name:'toLocaleString()',       cat:'vars',  desc:'Formats a number with locale-appropriate commas for readability.',                        example:'(15250).toLocaleString() // "15,250"\n\nconst fmt = n => (n ?? 0).toLocaleString() + " QAR";', tip:'Always call on a number. Guard with ?? 0 to avoid calling on null/undefined.' },
+  { key:'tofixed',       name:'toFixed(n)',             cat:'vars',  desc:'Rounds a number to n decimal places and returns a string.',                               example:'(35.567).toFixed(1) // "35.6"\n(29.1666).toFixed(2) // "29.17"', tip:'Returns a string, not a number. Do not use before more arithmetic.' },
+  { key:'fn-decl',       name:'Function Declaration',  cat:'fn',    desc:'Classic named function syntax. Hoisted — can be called before it appears in the file.',    example:'function formatCurrency(amount) {\n  return amount.toLocaleString() + " QAR";\n}\nformatCurrency(15250); // "15,250 QAR"', tip:'Hoisted to the top of scope. Arrow functions are NOT hoisted.' },
+  { key:'arrow-fn',      name:'Arrow Function',        cat:'fn',    desc:'Concise ES6 function syntax. Single expression returns implicitly (no return keyword).',   example:'const double = n => n * 2;\nconst greet = name => `Hello, ${name}!`;\nconst add = (a, b) => a + b;', tip:'Single param: parens optional. Returning an object literal: wrap in parens: x => ({ id: x })' },
+  { key:'rest-op',       name:'Rest Operator (...)',    cat:'fn',    desc:'In function params, collects remaining arguments into an array.',                          example:'function sum(...args) {\n  return args.reduce((acc, n) => acc + n, 0);\n}\nsum(1, 2, 3, 4); // 10', tip:'Always the last parameter. Gives you a real array (not arguments object).' },
+  { key:'spread-op',     name:'Spread Operator (...)', cat:'fn',    desc:'Expands an array or object into individual elements. Used to clone or merge.',              example:'const a = [1,2,3];\nconst b = [...a, 4, 5]; // [1,2,3,4,5]\nconst obj2 = { ...obj1, extra: true };', tip:'Spread creates a shallow copy. Changes to nested objects still affect the original.' },
+  { key:'push',          name:'push()',                cat:'array', desc:'Adds one or more items to the END of an array. Mutates the original array.',               example:'const arr = [];\narr.push({ desc: "Salary", amount: 12000 });\nconsole.log(arr.length); // 1', tip:'Mutates the original array. Unlike filter/map which return new arrays.' },
+  { key:'pop',           name:'pop()',                 cat:'array', desc:'Removes and returns the LAST element. Mutates the original.',                              example:'const arr = [1, 2, 3];\nconst last = arr.pop(); // 3\nconsole.log(arr); // [1, 2]', tip:'Pairs with push() for a stack (LIFO) pattern.' },
+  { key:'filter-m',      name:'filter()',              cat:'array', desc:'Returns a NEW array containing only elements where the callback returns true.',            example:'const expenses = transactions.filter(t => t.type === "expense");\nconst big = transactions.filter(t => t.amount > 1000);', tip:'Key step in updateDashboard(): filter income/expenses before summing.' },
+  { key:'map-m',         name:'map()',                 cat:'array', desc:'Returns a NEW array of same length with each element transformed by the callback.',        example:'const html = transactions.map(t =>\n  `<tr><td>${t.description}</td><td>${t.amount}</td></tr>`\n).join("");', tip:'Always returns same length. Chain filter() first if you want fewer items.' },
+  { key:'reduce-m',      name:'reduce()',              cat:'array', desc:'Combines all elements into a single value using an accumulator.',                          example:'const total = transactions\n  .filter(t => t.type === "expense")\n  .reduce((sum, t) => sum + t.amount, 0);', tip:'Always provide the initial value (0 for sums). Without it, breaks on empty arrays.' },
+  { key:'foreach-m',     name:'forEach()',             cat:'array', desc:'Executes a callback for each element. Returns undefined — use for side effects only.',     example:'transactions.forEach(t => {\n  console.log(t.description, t.amount);\n});', tip:'Unlike map, returns nothing. Use map when you need the resulting array.' },
+  { key:'find-m',        name:'find()',                cat:'array', desc:'Returns the FIRST element where the callback returns true, or undefined.',                 example:'const user = users.find(u => u.id === targetId);\nif (user) console.log(user.name);', tip:'Stops at first match — more efficient than filter()[0].' },
+  { key:'splice-m',      name:'splice()',              cat:'array', desc:'Removes or replaces elements in-place. splice(startIndex, deleteCount).',                  example:'// Remove 1 item at index 2\naccounts.splice(2, 1);\n// Insert at index 1\naccounts.splice(1, 0, newItem);', tip:'Mutates the original. Use findIndex() first to find the item\'s index.' },
+  { key:'chaining',      name:'Method Chaining',       cat:'array', desc:'Calling multiple array methods in sequence: .filter().map().reduce()',                     example:'const totalIncome = transactions\n  .filter(t => t.type === "income")\n  .reduce((sum, t) => sum + t.amount, 0);', tip:'Read left to right: each dot operates on the previous step\'s result.' },
+  { key:'dom-api',       name:'DOM',                   cat:'dom',   desc:'Document Object Model — the browser\'s live, editable object representation of the page.', example:'document.getElementById("balance").textContent = "7,500 QAR";\ndocument.querySelector(".card").classList.add("active");', tip:'Changes to DOM reflect on screen immediately.' },
+  { key:'getelbyid',     name:'getElementById()',      cat:'dom',   desc:'Selects exactly one element by its unique id attribute.',                                  example:'const el = document.getElementById("total-balance");\nel.textContent = "15,250 QAR";', tip:'IDs must be unique. A typo silently returns null, causing cryptic errors.' },
+  { key:'qselector',     name:'querySelector()',       cat:'dom',   desc:'Selects the FIRST element matching a CSS selector.',                                       example:'const btn = document.querySelector("#clear-btn");\nconst card = document.querySelector(".card:first-child");', tip:'Only returns the first match. Use querySelectorAll for all matches.' },
+  { key:'qselectorall',  name:'querySelectorAll()',    cat:'dom',   desc:'Selects ALL elements matching a CSS selector. Returns a NodeList.',                       example:'document.querySelectorAll(".delete-btn").forEach(btn =>\n  btn.addEventListener("click", handleDelete)\n);', tip:'Call AFTER rendering HTML — elements must exist in the DOM first.' },
+  { key:'textcontent',   name:'textContent',           cat:'dom',   desc:'Gets or sets the plain text content of an element. Safer than innerHTML.',                example:'document.getElementById("total-income").textContent = "12,000 QAR";', tip:'Prefer over innerHTML for plain text — cannot accidentally run scripts.' },
+  { key:'innerhtml',     name:'innerHTML',             cat:'dom',   desc:'Gets or sets the HTML markup inside an element, including tags.',                         example:'tbody.innerHTML = rows\n  .map(r => `<tr><td>${r.desc}</td></tr>`)\n  .join("");', tip:'Replaces everything. Re-attach event listeners after setting innerHTML.' },
+  { key:'classlist-api', name:'classList',             cat:'dom',   desc:'API to add, remove, toggle, or check CSS classes on an element.',                         example:'el.classList.add("active");\nel.classList.remove("hidden");\nel.classList.toggle("open");\nel.classList.contains("done"); // true/false', tip:'Non-destructive: add() keeps existing classes and appends the new one.' },
+  { key:'createel',      name:'createElement()',       cat:'dom',   desc:'Creates a new HTML element in memory. Not visible until appended to the DOM.',            example:'const li = document.createElement("li");\nli.textContent = "New item";\ndocument.querySelector("ul").appendChild(li);', tip:'Safer than innerHTML (no XSS risk) but more verbose.' },
+  { key:'appendchild',   name:'appendChild()',         cat:'dom',   desc:'Adds a new child node to the end of a parent element.',                                   example:'const row = document.createElement("tr");\nrow.innerHTML = `<td>Salary</td><td>12,000</td>`;\ntbody.appendChild(row);', tip:'Adds to the end. Use innerHTML = "" to clear and rebuild the whole list.' },
+  { key:'addeventlist',  name:'addEventListener()',    cat:'event', desc:'Attaches a callback function to run when a specific event fires on an element.',          example:'btn.addEventListener("click", () => {\n  console.log("clicked!");\n});\n// NO parentheses on the callback!', tip:'No () on the callback. With () you call it immediately instead of registering it.' },
+  { key:'click-ev',      name:'click event',           cat:'event', desc:'Fires when a user clicks (or taps on mobile) a clickable element.',                       example:'clearBtn.addEventListener("click", () => {\n  transactions.length = 0;\n  renderTransactions();\n});', tip:'Also fires on Enter key for buttons — keyboard accessible by default.' },
+  { key:'submit-ev',     name:'submit event',          cat:'event', desc:'Fires when a form is submitted. Must call e.preventDefault() to stop page reload.',       example:'form.addEventListener("submit", (e) => {\n  e.preventDefault(); // ALWAYS FIRST\n  transactions.push(buildObj());\n  e.target.reset();\n});', tip:'Always the first line: e.preventDefault(). Without it the page reloads and you lose all state.' },
+  { key:'preventdef',    name:'event.preventDefault()',cat:'event', desc:'Stops the browser\'s default behaviour — critical for form submit (prevents reload).',    example:'form.addEventListener("submit", (e) => {\n  e.preventDefault();\n  // your logic here\n});', tip:'Most common mistake: forgetting this causes the page to reload.' },
+  { key:'ev-target',     name:'event.target',          cat:'event', desc:'The element that triggered the event.',                                                    example:'form.addEventListener("submit", (e) => {\n  e.preventDefault();\n  e.target.reset(); // clears form\n});', tip:'In arrow functions, event.target is safer than using this.' },
+  { key:'ev-target-val', name:'event.target.value',    cat:'event', desc:'The current value of an input/select that fired the event.',                              example:'input.addEventListener("input", (e) => {\n  const val = Number(e.target.value);\n});', tip:'Always a string. Wrap with Number() before arithmetic.' },
+  { key:'json-str',      name:'JSON.stringify()',       cat:'json',  desc:'Converts a JS object/array into a JSON string. Methods are excluded.',                    example:'const obj = { name: "Ali", amount: 500 };\nconst str = JSON.stringify(obj, null, 2);\n// \'{"name":"Ali","amount":500}\'', tip:'Third arg (2) = indentation for pretty printing. Always needed for localStorage.' },
+  { key:'json-prs',      name:'JSON.parse()',           cat:'json',  desc:'Converts a JSON string back into a JavaScript object or array.',                          example:'const str = \'{"name":"Ali","amount":500}\';\nconst obj = JSON.parse(str);\nconsole.log(obj.name); // "Ali"', tip:'Wrap in try/catch — throws SyntaxError if the string is not valid JSON.' },
+  { key:'promise-kw',    name:'Promise',                cat:'async', desc:'An object representing a value that will arrive in the future (pending → resolved/rejected).',example:'const p = fetch(url); // Promise, data not yet here\np.then(res => res.json()).then(data => console.log(data));', tip:'Think of it as a ticket — you will get the data (or an error) eventually.' },
+  { key:'async-kw',      name:'async',                  cat:'async', desc:'Marks a function as asynchronous. Always returns a Promise. Required to use await inside.',example:'async function loadData() {\n  const res = await fetch(url);\n  return res.json();\n}', tip:'Mark a function async before you can use await inside it.' },
+  { key:'await-kw',      name:'await',                  cat:'async', desc:'Pauses execution of the async function until the Promise resolves. Does not freeze the page.',example:'async function getTransactions() {\n  const res  = await fetch(API_URL);\n  const data = await res.json();\n  return data;\n}', tip:'Two awaits needed for fetch: one for headers, one for body parsing.' },
+  { key:'try-catch-kw',  name:'try / catch',            cat:'async', desc:'Wraps async code to handle errors. Rejected Promises jump to the catch block.',          example:'try {\n  const res  = await fetch(url);\n  const data = await res.json();\n} catch (err) {\n  console.error("Error:", err.message);\n}', tip:'Always wrap fetch in try/catch. Without it, failures crash silently.' },
+  { key:'promise-all-kw',name:'Promise.all()',           cat:'async', desc:'Runs multiple Promises in parallel and waits for ALL to resolve.',                        example:'const [users, items] = await Promise.all([\n  fetch("/api/users").then(r => r.json()),\n  fetch("/api/items").then(r => r.json())\n]);', tip:'Faster than sequential awaits. If any one rejects, all reject.' },
+  { key:'fetch-get',     name:'fetch() GET',             cat:'fetch', desc:'Sends an HTTP GET request and returns a Promise. The default method.',                   example:'const res  = await fetch("https://api.example.com/books");\nconst data = await res.json();\nconsole.log(data);', tip:'Always two awaits. Check res.ok before calling res.json().' },
+  { key:'res-json-m',    name:'response.json()',         cat:'fetch', desc:'Parses the response body as JSON. Returns a Promise resolving to a JS object.',           example:'const res  = await fetch(url);\nconst data = await res.json(); // second await\nconsole.log(data);', tip:'Body downloads separately from headers — hence the second await.' },
+  { key:'fetch-post-kw', name:'fetch() POST',            cat:'fetch', desc:'Sends data to create a new resource. Requires method, headers, and body.',               example:'await fetch(url, {\n  method: "POST",\n  headers: { "Content-Type": "application/json" },\n  body: JSON.stringify(newItem)\n});', tip:'The three always travel together: method + headers + body.' },
+  { key:'fetch-put-kw',  name:'fetch() PUT',             cat:'fetch', desc:'Sends data to replace an existing resource. ID goes in the URL.',                        example:'await fetch(`${API_URL}/${id}`, {\n  method: "PUT",\n  headers: { "Content-Type": "application/json" },\n  body: JSON.stringify(updated)\n});', tip:'PUT replaces the whole item. PATCH for partial updates.' },
+  { key:'fetch-del-kw',  name:'fetch() DELETE',          cat:'fetch', desc:'Deletes a resource on the server. No body required.',                                    example:'await fetch(`${API_URL}/${id}`, { method: "DELETE" });\nrenderTable(); // refresh after deletion', tip:'Simplest CRUD op. Always refresh the UI after to reflect the change.' },
+  { key:'class-kw',      name:'class',                   cat:'oop',   desc:'A blueprint for creating objects with shared properties and methods.',                    example:'class Transaction {\n  constructor(desc, amount, type) {\n    this.desc = desc;\n    this.amount = amount;\n    this.type = type;\n  }\n  format() {\n    return `${this.desc}: ${this.amount} QAR`;\n  }\n}', tip:'Classes group related data and behaviour. Syntactic sugar over prototypes.' },
+  { key:'constructor-kw',name:'constructor()',            cat:'oop',   desc:'Runs automatically when new is used to create an instance. Sets initial properties.',    example:'class Account {\n  constructor(name, balance) {\n    this.name = name;\n    this.balance = balance;\n    this.transactions = [];\n  }\n}', tip:'Use it to assign initial values. Runs once per new instance.' },
+  { key:'this-kw',       name:'this',                    cat:'oop',   desc:'Inside a class, refers to the current instance of the object.',                          example:'class Wallet {\n  constructor(balance) { this.balance = balance; }\n  deposit(n) { this.balance += n; return this; }\n}', tip:'Inside a method, this always refers to the object the method was called on.' },
+  { key:'new-kw',        name:'new',                     cat:'oop',   desc:'Creates a new instance of a class by invoking its constructor.',                         example:'const t = new Transaction("Salary", 8000, "income");\nconst t2 = new Transaction("Rent", 4500, "expense");\nt.format(); // "Salary: 8000 QAR"', tip:'Each new creates a completely separate object.' },
+  { key:'extends-kw',    name:'extends',                 cat:'oop',   desc:'Creates a child class that inherits from a parent class.',                               example:'class Student extends Person {\n  constructor(fn, ln, gpa) {\n    super(fn, ln); // must call first\n    this.gpa = gpa;\n  }\n}', tip:'Must call super() before accessing this in the child constructor.' },
+  { key:'super-kw',      name:'super()',                  cat:'oop',   desc:'Calls the parent class constructor or accesses parent methods.',                         example:'class Student extends Person {\n  greet() {\n    return super.greet() + `. GPA: ${this.gpa}`;\n  }\n}', tip:'super() calls the constructor; super.method() calls a parent method.' },
+  { key:'private-kw',    name:'Private Fields (#)',       cat:'oop',   desc:'Truly private class fields using # prefix. Not accessible outside the class.',          example:'class User {\n  #id = crypto.randomUUID();\n  get userId() { return this.#id; }\n}', tip:'Accessing a private field outside the class causes a SyntaxError.' },
+  { key:'static-kw',     name:'static',                  cat:'oop',   desc:'Belongs to the class itself, not instances. Access via ClassName.member.',               example:'class Animal {\n  static planet = "Earth";\n  static create(name) { return new Animal(name); }\n}\nAnimal.planet; // "Earth"', tip:'Static methods/properties are shared across all instances.' },
+  { key:'getter-kw',     name:'get / set',               cat:'oop',   desc:'Accessor properties that look like normal properties but run code when accessed.',       example:'class Person {\n  get fullname() {\n    return `${this.firstname} ${this.lastname}`;\n  }\n  set fullname(v) {\n    [this.firstname, this.lastname] = v.split(" ");\n  }\n}', tip:'Used like a property: person.fullname = "Ali Saad" triggers the setter.' },
+  { key:'proto-inherit',  name:'Prototypal Inheritance',  cat:'oop',   desc:'Objects can inherit from other objects via Object.setPrototypeOf or Object.create.',     example:'const cat   = { legs: 4, eyes: 2 };\nconst myCat = { name: "Garfield" };\nObject.setPrototypeOf(myCat, cat);\nconsole.log(myCat.legs); // 4 (inherited)', tip:'The prototype chain: myCat → cat → Object.prototype → null.' },
+  { key:'named-export',   name:'Named Export',           cat:'other', desc:'Exports multiple named items from a module. Imported with curly braces.',                example:'// lib.js\nexport function add(a, b) { return a + b; }\nexport const PI = 3.14;\n\n// main.js\nimport { add, PI } from "./lib.js";', tip:'Name must match exactly. Use "as" to rename: import { add as sum }' },
+  { key:'default-export', name:'Default Export',         cat:'other', desc:'One default export per module. Imported without curly braces, any name.',                example:'// calc.js\nexport default class Calculator { ... }\n\n// main.js\nimport Calc from "./calc.js"; // any name', tip:'Only ONE default export per file. Named exports are unlimited.' },
+  { key:'localstorage-kw',name:'localStorage',           cat:'other', desc:'Browser key-value store that persists across sessions. Stores strings only.',           example:'// Save\nlocalStorage.setItem("user", JSON.stringify({name:"Ali"}));\n// Load\nconst obj = JSON.parse(localStorage.getItem("user"));\n// Delete\nlocalStorage.removeItem("user");', tip:'Objects must be stringified. sessionStorage clears on tab close; localStorage persists.' },
+  { key:'dataset-kw',     name:'element.dataset',        cat:'other', desc:'Accesses data-* attributes on an HTML element. Converts kebab-case to camelCase.',      example:'// <button data-item-id="3">Delete</button>\nbtn.addEventListener("click", e => {\n  const id = Number(e.target.dataset.itemId);\n});', tip:'Always convert to Number() when using as an array index.' },
+  { key:'nullish-kw',     name:'Nullish Coalescing (??)',cat:'other', desc:'Returns the right side if the left is null or undefined. Safer than || for 0 and "".',   example:'const amount = t.amount ?? 0; // 0 stays 0\nconst name   = user.name   ?? "Anonymous";', tip:'Use ?? over || when 0 or empty string are valid values to keep.' },
+  { key:'obj-entries-kw', name:'Object.entries()',       cat:'other', desc:'Returns an array of [key, value] pairs from an object.',                                 example:'const totals = { Food: 850, Housing: 4500 };\nObject.entries(totals).forEach(([cat, total]) => {\n  console.log(`${cat}: ${total}`);\n});', tip:'Destructure the pair directly: ([key, value]) => ...' },
+  { key:'destructuring',  name:'Destructuring',          cat:'other', desc:'Extracts values from objects or arrays into variables in one statement.',                example:'// Object destructuring\nconst { name, age, address: { city } } = student;\n\n// Array destructuring\nconst [first, ...rest] = numbers;', tip:'Use default values: const { name = "Anonymous" } = obj;' },
+
+  // ── HTML VAULT ──
+  { key:'doctype',        name:'<!DOCTYPE html>',        cat:'html-meta',   desc:'Declaration at top of every HTML file telling the browser this is HTML5.',           example:'<!DOCTYPE html>\n<html lang="en">\n  <head>\n    <meta charset="UTF-8">\n    <title>My Page</title>\n  </head>\n  <body>...</body>\n</html>', tip:'Always the very first line. Without it browsers may enter "quirks mode".' },
+  { key:'meta-charset',   name:'<meta charset>',         cat:'html-meta',   desc:'Declares the character encoding of the document. UTF-8 supports all characters.',    example:'<meta charset="UTF-8">', tip:'Always include in <head>. Prevents mojibake on special/Arabic characters.' },
+  { key:'meta-viewport',  name:'<meta name="viewport">', cat:'html-meta',   desc:'Controls how the browser scales the page on mobile devices.',                        example:'<meta name="viewport"\n  content="width=device-width, initial-scale=1.0">', tip:'Essential for responsive design. Without it mobile browsers zoom out.' },
+  { key:'link-tag',       name:'<link rel="stylesheet">',cat:'html-meta',   desc:'Links an external CSS file to the HTML document. Goes inside <head>.',               example:'<link rel="stylesheet" href="styles.css">', tip:'Preferred over <style> blocks — external files are reusable and cacheable.' },
+  { key:'script-tag',     name:'	&lt;script src	&gt;',           cat:'html-meta',   desc:'Links an external JS file. Place at bottom of 	&lt;body&gt; so HTML loads first.',          example:'<!-- Bottom of </body> -->\n	&lt;script src="app.js"&gt;&lt;/script&gt;', tip:'Placing in <head> without defer causes getElementById to return null.' },
+  { key:'header-tag',     name:'<header>',               cat:'html-struct', desc:'Introductory content: logo, site title, navigation. Typically at the top of page.',   example:'<header>\n  <img src="img/logo.png" alt="Logo">\n  <nav>...</nav>\n</header>', tip:`Can appear multiple times — once for the page, once per article/section.` },
+  { key:'nav-tag',        name:'<nav>',                  cat:'html-struct', desc:'Contains primary navigation links. Typically inside <header> or standalone.',         example:'<nav>\n  <a href="/">Home</a>\n  <a href="/about">About</a>\n  <a href="/contact">Contact</a>\n</nav>', tip:'Use for major navigation blocks only — not every set of links needs <nav>.' },
+  { key:'main-tag',       name:'<main>',                 cat:'html-struct', desc:'The dominant content of the page. Unique — should appear only ONCE per page.',        example:'<main>\n  <h1>Welcome</h1>\n  <article>...</article>\n</main>', tip:'Only one <main> per page. Screen readers use it to jump to main content.' },
+  { key:'section-tag',    name:'<section>',              cat:'html-struct', desc:'Thematic grouping of content, like sections in a newspaper or book chapter.',          example:'<section id="features">\n  <h2>Features</h2>\n  <p>...</p>\n</section>', tip:'Usually has its own heading. Use when content forms a distinct theme.' },
+  { key:'article-tag',    name:'<article>',              cat:'html-struct', desc:'Self-contained content that makes sense independently: a blog post, news item.',       example:'<article>\n  <h2>Post Title</h2>\n  <p>Content...</p>\n  <footer>Published: 2024</footer>\n</article>', tip:'Ask: would this still make sense if extracted to another page? If yes → article.' },
+  { key:'aside-tag',      name:'<aside>',                cat:'html-struct', desc:'Sidebar/supplementary content tangentially related to the main content.',              example:'<aside>\n  <h3>Related Articles</h3>\n  <ul>...</ul>\n</aside>', tip:'Can be removed without reducing the main content\'s meaning.' },
+  { key:'footer-tag',     name:'<footer>',               cat:'html-struct', desc:'Footer content: copyright, contact links, social media. Can appear per section too.',  example:'<footer>\n  <p>&copy; 2024 My Site</p>\n  <nav>...</nav>\n</footer>', tip:'Use inside articles/sections for article-specific footers.' },
+  { key:'div-tag',        name:'<div>',                  cat:'html-struct', desc:'Generic block container with no semantic meaning. Use when no semantic tag applies.',   example:'<div class="card">\n  <h3>Title</h3>\n  <p>Description</p>\n</div>', tip:'Prefer semantic tags when possible. Use div only for layout/styling hooks.' },
+  { key:'span-tag',       name:'<span>',                 cat:'html-struct', desc:'Generic inline container with no semantic meaning. Use for styling inline text.',       example:'<p>Price: <span class="highlight">4,500 QAR</span></p>', tip:'Block equivalent is <div>. Only use for styling or scripting hooks.' },
+  { key:'heading-tags',   name:'<h1> – <h6>',            cat:'html-struct', desc:'Heading hierarchy. h1 = main title (once per page ideally), h2–h6 = subheadings.',    example:'<h1>Page Title</h1>\n<h2>Section Title</h2>\n<h3>Subsection</h3>', tip:'Don\'t skip levels for visual sizing — use CSS. Only one h1 per page for SEO.' },
+  { key:'para-tag',       name:'<p>',                    cat:'html-struct', desc:'Paragraph of text. Block-level — adds space above and below by default.',               example:'<p>This is a paragraph of text content.</p>', tip:'Do not use for spacing — use CSS margin/padding instead.' },
+  { key:'table-tag',      name:'<table> structure',      cat:'html-tables', desc:'HTML table with semantic sections: thead, tfoot (before tbody!), tbody, tr, th, td.',  example:'<table>\n  <thead>\n    <tr><th>Name</th><th>Score</th></tr>\n  </thead>\n  <tfoot>\n    <tr><td>Total</td><td>90</td></tr>\n  </tfoot>\n  <tbody>\n    <tr><td>Ali</td><td>90</td></tr>\n  </tbody>\n</table>', tip:'tfoot comes BEFORE tbody in the HTML source, but renders at the bottom.' },
+  { key:'colspan-tag',    name:'colspan / rowspan',      cat:'html-tables', desc:'colspan merges cells horizontally; rowspan merges vertically.',                        example:'<td colspan="2">Spans 2 columns</td>\n<td rowspan="3">Spans 3 rows</td>', tip:'Use for summary rows or grouped headers.' },
+  { key:'img-tag',        name:'<img>',                  cat:'html-media',  desc:'Embeds an image. src = file path/URL. alt = text alternative for accessibility.',      example:'<img src="img/logo.png" alt="Company logo"\n  width="200" height="100"\n  loading="lazy">', tip:'Always include alt — required for accessibility. loading="lazy" improves performance.' },
+  { key:'video-tag',      name:'<video>',                cat:'html-media',  desc:'Embeds a video file. controls shows play/pause UI.',                                   example:'<video controls width="640" height="360"\n  src="img/video.mp4"\n  poster="img/thumb.jpg">\n  Your browser does not support video.\n</video>', tip:'Include fallback text inside tags. Use poster for a preview image.' },
+  { key:'audio-tag',      name:'<audio>',                cat:'html-media',  desc:'Embeds an audio file. controls shows the browser\'s audio player UI.',                 example:'<audio controls src="img/audio.mp3">\n  Your browser does not support audio.\n</audio>', tip:'Use multiple <source> tags for different audio formats for compatibility.' },
+  { key:'form-tag',       name:'<form>',                 cat:'html-forms',  desc:'Container that collects user input and submits it to a server via HTTP.',               example:'<form action="/submit" method="POST">\n  <label for="name">Name</label>\n  <input type="text" id="name" name="name" required>\n  <button type="submit">Submit</button>\n</form>', tip:'Each input needs name= for submission and id= for label association.' },
+  { key:'input-types',    name:'Input Types',            cat:'html-forms',  desc:'type= attribute controls the kind of input: text, email, number, date, tel, password…', example:'<input type="text"     name="q"     placeholder="Search">\n<input type="email"    name="em"    required>\n<input type="password" name="pw"    required>\n<input type="number"   name="qty"   min="1" max="100">\n<input type="date"     name="dob">\n<input type="tel"      name="phone">\n<input type="range"    name="vol"   min="0" max="100">\n<input type="checkbox" name="agree" value="yes">\n<input type="radio"    name="role"  value="admin">', tip:'Use the most specific type — browsers validate and display appropriate UI (e.g., date picker, numeric keypad).' },
+  { key:'label-tag',      name:'<label>',                cat:'html-forms',  desc:'Associates a text label with an input. Clicking the label focuses the input.',          example:'<label for="email">Email Address</label>\n<input type="email" id="email" name="email">', tip:'for= must match the input\'s id=. Improves usability and accessibility.' },
+  { key:'textarea-tag',   name:'<textarea>',             cat:'html-forms',  desc:'Multi-line text input field.',                                                          example:'<label for="msg">Message</label>\n<textarea id="msg" name="msg"\n  rows="4" cols="50"\n  placeholder="Your message…"></textarea>', tip:'Unlike input, textarea has no value= attribute — initial content goes between tags.' },
+  { key:'select-tag',     name:'<select> / <option>',   cat:'html-forms',  desc:'Dropdown list. Can be single-select or multi-select.',                                  example:'<select name="country" id="country">\n  <option value="">-- Choose --</option>\n  <option value="qa">Qatar</option>\n  <option value="sa" selected>Saudi Arabia</option>\n</select>', tip:'Add an empty default option to force the user to choose. selected pre-selects an option.' },
+  { key:'fieldset-tag',   name:'<fieldset> / <legend>',  cat:'html-forms',  desc:'Groups related form inputs. legend provides a caption for the group.',                  example:'<fieldset>\n  <legend>Personal Information</legend>\n  <label for="fn">First Name</label>\n  <input type="text" id="fn" name="fn">\n</fieldset>', tip:'Use for grouping radio buttons or related form sections.' },
+  { key:'datalist-tag',   name:'<datalist>',             cat:'html-forms',  desc:'Provides autocomplete suggestions for a text input via the list= attribute.',           example:'<input type="text" list="countries" name="country">\n<datalist id="countries">\n  <option value="Qatar">\n  <option value="UAE">\n  <option value="Kuwait">\n</datalist>', tip:'list= on the input must match id= on the datalist.' },
+  { key:'input-attrs',    name:'Input Attributes',       cat:'html-forms',  desc:'Key HTML attributes for form inputs: required, placeholder, pattern, disabled, min/max.',example:'<input type="text"\n  placeholder="Enter name…"\n  required\n  autofocus\n  minlength="2"\n  maxlength="50"\n  pattern="[A-Za-z]+">', tip:'pattern uses regex. required prevents submission if empty. autofocus only on the first relevant field.' },
+
+  // ── CSS VAULT ──
+  { key:'css-cascade',    name:'The Cascade',            cat:'css-layout',  desc:'When rules conflict, the LAST rule wins. Inline styles beat all. !important beats all.',example:'/* Earlier rule */\np { color: blue; }\n\n/* Later rule wins */\np { color: red; } /* applies */\n\n/* Inline wins */\n<p style="color: green"> /* applies */\n\np { color: black !important; } /* beats inline */\n\n/* Note: avoid !important — fix specificity instead */', tip:'Cascade order: Inline > ID > Class > Element. Later always beats earlier.' },
+  { key:'css-inherit',    name:'Inheritance',            cat:'css-layout',  desc:'Child elements inherit certain properties from parents (mostly text properties).',       example:'body {\n  font-family: "Sora", sans-serif;\n  color: #333; /* inherited by all children */\n}\n\n/* Not all properties inherit:\nborder, margin, padding, background do NOT */', tip:'Text properties (font, color) inherit. Layout properties (margin, padding) do not.' },
+  { key:'css-select',     name:'CSS Selectors',          cat:'css-sel',     desc:'Patterns to target HTML elements: element, .class, #id, descendant, child, pseudo.',    example:'p { }              /* all <p> */\n.btn { }           /* class="btn" */\n#logo { }          /* id="logo" */\n* { }              /* all elements */\ndiv p { }          /* all <p> inside div */\ndiv > p { }        /* direct child <p> only */\na:hover { }        /* pseudo-class */\np::before { }      /* pseudo-element */\na[href^="https"]   /* attribute selector */', tip:'Specificity: Inline(1000) > ID(100) > Class(10) > Element(1). Higher = wins.' },
+  { key:'css-pseudo-cls', name:'Pseudo-classes',         cat:'css-sel',     desc:'Target elements based on state or position: :hover, :focus, :nth-child(), :first-child.',example:'a:hover { color: red; }\ninput:focus { outline: 2px solid blue; }\ntr:nth-child(odd)  { background: #f5f5f5; } /* zebra */\ntr:nth-child(even) { background: #fff; }\nli:first-child { font-weight: bold; }\nli:last-child  { border-bottom: none; }', tip:':nth-child(odd/even) is perfect for zebra-striped tables.' },
+  { key:'css-pseudo-el',  name:'Pseudo-elements',        cat:'css-sel',     desc:'Generate virtual content before or after an element: ::before, ::after.',              example:'/* Add icon before nav links */\nnav a::before {\n  content: "→ ";\n  color: #3ecf8e;\n}\n\n/* Clear float trick */\n.clearfix::after {\n  content: "";\n  display: block;\n  clear: both;\n}', tip:'::before and ::after require content: "" even if empty.' },
+  { key:'css-box',        name:'Box Model',              cat:'css-box',     desc:'Every element = 4 layers from inside out: Content → Padding → Border → Margin.',        example:'/* Layers (inside → out):\n   Content | Padding | Border | Margin */\n.box {\n  width: 200px;        /* content */\n  padding: 20px;       /* space inside */\n  border: 2px solid #333;\n  margin: 16px;        /* space outside */\n  box-sizing: border-box; /* width includes padding+border */\n}', tip:'box-sizing: border-box is standard today — width includes padding & border.' },
+  { key:'css-margin',     name:'margin shorthand',       cat:'css-box',     desc:'Shorthand for setting all four margins. 1, 2, 3, or 4 values possible.',               example:'margin: 10px;              /* all 4 sides */\nmargin: 10px 20px;         /* top/bottom | left/right */\nmargin: 10px 20px 15px;    /* top | left/right | bottom */\nmargin: 10px 20px 15px 5px;/* top right bottom left */\n\nmargin: 0 auto; /* horizontally center a block */\nmargin-top: 1rem; /* individual side */', tip:'Clockwise from top: T R B L. Two values: top/bottom | left/right.' },
+  { key:'css-padding',    name:'padding shorthand',      cat:'css-box',     desc:'Shorthand for inner spacing. Same syntax as margin: 1, 2, 3, or 4 values.',            example:'.card {\n  padding: 24px;         /* all sides */\n  padding: 16px 24px;    /* top/bottom | left/right */\n  padding: 8px 16px 12px 16px;\n}', tip:'Padding is inside the border; margin is outside. Both use same shorthand rules.' },
+  { key:'css-border',     name:'border shorthand',       cat:'css-box',     desc:'Sets width, style, and color in one declaration. border-radius rounds corners.',        example:'.card {\n  border: 1px solid #ccc;      /* width style color */\n  border-radius: 12px;          /* round all corners */\n  border-top: 3px solid #3ecf8e; /* individual side */\n  border-bottom: 2px dashed red;\n}', tip:'Without a border-style (solid/dashed/dotted), the border won\'t appear.' },
+  { key:'css-display',    name:'display property',       cat:'css-layout',  desc:'Controls how an element participates in layout. block, inline, flex, grid, none.',     example:'p { display: block; }     /* stacks vertically, full width */\nspan { display: inline; }  /* flows in text line */\n.nav { display: flex; }    /* flexbox container */\n.page { display: grid; }   /* grid container */\n.hidden { display: none; } /* removed from layout */', tip:'display: none removes the element from flow (invisible + no space). visibility: hidden hides but keeps space.' },
+  { key:'css-colors',     name:'CSS Colors',             cat:'css-text',    desc:'Colors can be named, hex, rgb(), rgba(), hsl(), or CSS variables.',                   example:'color: red;             /* named */\ncolor: #3ecf8e;          /* hex */\ncolor: rgb(62, 207, 142); /* RGB */\ncolor: rgba(0,0,0,0.5);  /* RGB + alpha */\ncolor: hsl(156, 57%, 53%);\n\n:root { --brand: #7c6dfa; }\ncolor: var(--brand);', tip:'CSS variables (--name) make theme colors easy to maintain and change.' },
+  { key:'css-units',      name:'CSS Length Units',       cat:'css-text',    desc:'px (absolute), em (parent-relative), rem (root-relative), %, vh/vw, fr (Grid).',      example:'font-size: 16px;      /* absolute */\nfont-size: 1rem;      /* relative to root <html> */\nfont-size: 1.2em;     /* relative to parent */\nwidth: 50%;           /* relative to parent */\nheight: 100vh;        /* viewport height */\ngap: 1fr;             /* fraction of grid space */', tip:'Prefer rem for font sizes — scales with user\'s browser settings.' },
+  { key:'css-font-props', name:'Font Properties',        cat:'css-text',    desc:'font-family, font-size, font-weight, font-style, line-height, letter-spacing.',        example:'.heading {\n  font-family: "Sora", sans-serif;\n  font-size: 2rem;\n  font-weight: 700; /* bold */\n  font-style: italic;\n  line-height: 1.4;\n  letter-spacing: 0.5px;\n}', tip:'Always provide a generic fallback: "Sora", sans-serif — in case the font fails to load.' },
+  { key:'css-text-props', name:'Text Properties',        cat:'css-text',    desc:'text-align, text-decoration, text-transform, color, word-spacing.',                    example:'h1 {\n  text-align: center;\n  text-transform: uppercase;\n}\na {\n  text-decoration: none; /* remove underline */\n}\np {\n  text-align: justify;\n  word-spacing: 2px;\n}', tip:'text-decoration: none is commonly used to remove underlines from links.' },
+  { key:'css-specificity', name:'CSS Specificity',       cat:'css-sel',     desc:'Determines which rule wins when multiple rules target the same element.',             example:'/* Specificity scores (a,b,c):\n   a = inline styles\n   b = ID selectors\n   c = class/pseudo/attr selectors\n   d = element selectors */\n\nstyle="…"          /* (1,0,0,0) */\n#logo              /* (0,1,0,0) */\n.btn.active        /* (0,0,2,0) */\ndiv p              /* (0,0,0,2) */\n* { }              /* (0,0,0,0) */', tip:'Higher specificity wins, regardless of source order. Use classes for styling, IDs sparingly.' },
+  { key:'css-var',        name:'CSS Variables (--custom)',cat:'css-layout', desc:'Custom properties defined with -- and accessed with var(). Reusable design tokens.',   example:':root {\n  --color-primary: #7c6dfa;\n  --spacing-md: 1rem;\n  --radius: 8px;\n}\n\n.btn {\n  background: var(--color-primary);\n  padding: var(--spacing-md);\n  border-radius: var(--radius);\n}', tip:'Define in :root to make them global. Can be overridden in child scopes.' },
+  { key:'css-transition',  name:'transition',            cat:'css-anim',    desc:'Smoothly animates CSS property changes when state changes (hover, focus, etc.).',      example:'.btn {\n  background: blue;\n  transition: background 0.3s ease,\n              transform 0.2s ease;\n}\n.btn:hover {\n  background: darkblue;\n  transform: translateY(-2px);\n}', tip:'Only animates properties with numeric/color values. transform and opacity are most performant.' },
+  { key:'css-transform',   name:'transform',             cat:'css-anim',    desc:'Moves, rotates, scales, or skews elements without affecting layout flow.',             example:'.card:hover {\n  transform: translateY(-4px) scale(1.02);\n}\n\n.icon {\n  transform: rotate(45deg);\n}\n\n.badge {\n  transform: translate(10px, -5px);\n}', tip:'GPU-accelerated — preferred for animations. Does not affect surrounding elements.' },
+
+  // ── RESPONSIVE CSS VAULT ──
+  { key:'flex-container',  name:'Flexbox Container',     cat:'css-flex',    desc:'display: flex turns an element into a flex container. Children become flex items.',    example:'.navbar {\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n  gap: 1rem;\n  flex-wrap: wrap;\n}', tip:'flex-direction: row (default) = horizontal. column = vertical.' },
+  { key:'justify-cont',    name:'justify-content',       cat:'css-flex',    desc:'Aligns flex items along the MAIN axis (horizontal by default).',                       example:'.flex {\n  justify-content: flex-start;  /* left aligned */\n  justify-content: center;       /* centered */\n  justify-content: flex-end;     /* right aligned */\n  justify-content: space-between; /* equal gaps between */\n  justify-content: space-around;  /* equal gaps including edges */\n}', tip:'Main axis = direction of flex-direction.' },
+  { key:'align-items',     name:'align-items',           cat:'css-flex',    desc:'Aligns flex items along the CROSS axis (perpendicular to main axis).',                 example:'.flex {\n  align-items: stretch;    /* default: fill height */\n  align-items: center;     /* vertically center */\n  align-items: flex-start; /* top */\n  align-items: flex-end;   /* bottom */\n  align-items: baseline;   /* align text baseline */\n}', tip:'Use align-self on individual items to override this for one item.' },
+  { key:'flex-grow-prop',  name:'flex-grow / shrink / basis',cat:'css-flex',desc:'Controls how items grow (flex-grow), shrink (flex-shrink), and base size (flex-basis).',example:'.item { flex: 1; }             /* grows equally */\n.sidebar { flex: 0 0 250px; }    /* fixed 250px, no grow/shrink */\n.main { flex: 1 1 0; }           /* grows, shrinks, from 0 */\n\n/* Shorthand: grow shrink basis */\n.item { flex: 1 1 200px; }       /* "Deconstructed Pancake" */', tip:'flex: 1 is shorthand for flex: 1 1 0 — most common usage.' },
+  { key:'flex-wrap-prop',  name:'flex-wrap',             cat:'css-flex',    desc:'Controls whether items wrap onto multiple lines when they overflow.',                    example:'.gallery {\n  display: flex;\n  flex-wrap: wrap;     /* items wrap to next line */\n  gap: 1rem;\n}\n\n/* flex-wrap: nowrap (default) — items shrink to fit */\n/* flex-wrap: wrap-reverse — wraps upward */', tip:'Combine flex-wrap: wrap with flex: 1 1 200px for responsive card grids.' },
+  { key:'grid-container',  name:'CSS Grid Container',    cat:'css-grid',    desc:'display: grid turns an element into a 2D grid. Define columns and rows with template properties.',example:'.layout {\n  display: grid;\n  grid-template-columns: 2fr 1fr;\n  grid-template-rows: auto 1fr auto;\n  gap: 1.5rem;\n}', tip:'fr = fraction of available space. 2fr 1fr = 2:1 ratio columns.' },
+  { key:'grid-template-c', name:'grid-template-columns', cat:'css-grid',    desc:'Defines the number and size of grid columns. Accepts px, %, fr, auto, repeat().',    example:'.grid {\n  /* 3 equal columns */\n  grid-template-columns: 1fr 1fr 1fr;\n  /* Shorthand */\n  grid-template-columns: repeat(3, 1fr);\n  /* Responsive: auto-fill */\n  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));\n}', tip:'auto-fill + minmax = responsive grid without media queries.' },
+  { key:'grid-area-prop',  name:'grid-area & template-areas',cat:'css-grid',desc:'Names grid items and uses visual ASCII art to define the layout.',                     example:'.page {\n  display: grid;\n  grid-template-areas:\n    "header header"\n    "sidebar main"\n    "footer footer";\n}\nheader { grid-area: header; }\nmain   { grid-area: main;   }\nsidebar{ grid-area: sidebar;}\nfooter { grid-area: footer; }', tip:'Named areas make layouts readable. Period (.) = empty cell.' },
+  { key:'grid-col-span',   name:'grid-column & row span', cat:'css-grid',   desc:'Place items manually: grid-column: start/end. -1 = last line.',                        example:'.full-width {\n  grid-column: 1 / -1;   /* span all columns */\n}\n.two-col {\n  grid-column: 2 / 4;    /* span from line 2 to 4 */\n}\n.two-row {\n  grid-row: 1 / 3;       /* span 2 rows */\n}', tip:'1/-1 spans from first to last line — use for full-width headers.' },
+  { key:'media-query',     name:'@media query',           cat:'css-resp',   desc:'Applies CSS only when conditions (screen width, orientation) are met.',                example:'/* Mobile-first: base styles for mobile */\n.container { display: block; }\n\n/* Add columns above 768px (tablet) */\n@media screen and (min-width: 768px) {\n  .container { display: grid; grid-template-columns: 1fr 2fr; }\n}\n\n/* Desktop */\n@media screen and (min-width: 1200px) {\n  .container { max-width: 1200px; margin: 0 auto; }\n}', tip:'Mobile-first (min-width) is preferred over desktop-first (max-width).' },
+  { key:'clamp-fn',        name:'clamp(min, val, max)',   cat:'css-resp',   desc:'Constrains a value between a min and max. Perfect for responsive typography and widths.',example:'.heading {\n  font-size: clamp(1.2rem, 4vw, 3rem);\n  /* min=1.2rem, preferred=4vw, max=3rem */\n}\n\n.card {\n  width: clamp(200px, 40%, 600px);\n}', tip:'Replaces media queries for fluid scaling. min-width: clamp(…) is a common pattern.' },
+  { key:'minmax-fn',       name:'minmax(min, max)',       cat:'css-resp',   desc:'Grid function: sets a min and max size for a grid track.',                              example:'.sidebar-layout {\n  grid-template-columns:\n    minmax(100px, 20%) 1fr;\n  /* sidebar: min 100px, max 20% */\n  /* main: fills rest */\n}\n\n/* Responsive cards */\ngrid-template-columns:\n  repeat(auto-fill, minmax(200px, 1fr));', tip:'auto-fill + minmax creates responsive grids with no media queries.' },
+  { key:'pancake-layout',  name:'Pancake Stack Layout',   cat:'css-resp',   desc:'Header + Main + Footer where main fills remaining space. Uses grid-template-rows.',    example:'body {\n  display: grid;\n  min-height: 100vh;\n  grid-template-rows: auto 1fr auto;\n}\n/* auto = shrinks to content */\n/* 1fr  = takes all remaining space */\nheader { /* auto */ }\nmain   { /* 1fr  */ }\nfooter { /* auto */ }', tip:'The classic "sticky footer" solved with 3 lines of CSS Grid.' },
+  { key:'resp-menu',       name:'Responsive Menu / Navbar',cat:'css-resp',  desc:'Horizontal nav using flex that wraps on small screens.',                               example:'nav ul {\n  display: flex;\n  list-style: none;\n  gap: 1rem;\n  flex-wrap: wrap;\n  padding: 0;\n}\n\n/* On mobile: full-width stack */\n@media (max-width: 600px) {\n  nav ul { flex-direction: column; }\n}', tip:'flex-wrap: wrap lets nav items flow to next line without JS.' },
+
+  // ── WEB API VAULT ──
+  { key:'wa-web-api-def',  name:'Web API',                cat:'wa-rest',   desc:'A set of HTTP endpoints returning structured data (JSON). Enables interoperability between systems.',example:'// A Web API is like a web page that returns JSON\n// instead of HTML\n//\n// URL: GET /api/books\n// Response:\n// [\n//   { "id": 1, "title": "Clean Code" },\n//   { "id": 2, "title": "Refactoring" }\n// ]', tip:'Any client (browser, mobile, IoT) can consume a Web API in any language.' },
+  { key:'wa-spa',          name:'SPA (Single Page App)',  cat:'wa-rest',   desc:'Web app that fits on one page. Content loads dynamically via Web API without full reloads.',example:'// Traditional: every click = full page reload\n// SPA: only fetch data and update DOM\n\nasync function loadPage(section) {\n  const data = await fetch(`/api/${section}`)\n    .then(r => r.json());\n  renderSection(data);\n  // Page never reloads!\n}', tip:'React, Vue, Angular are all SPA frameworks. The Web API layer is what they consume.' },
+  { key:'wa-http-def',     name:'HTTP Protocol',          cat:'wa-http',   desc:'HyperText Transfer Protocol — the application-level message protocol of the Web.',    example:'// Request → Response model\n//\n// CLIENT → GET /api/books HTTP/1.1\n//          Host: example.com\n//\n// SERVER → HTTP/1.1 200 OK\n//          Content-Type: application/json\n//\n//          [{ "id":1, "title":"..." }]', tip:'HTTP is an application protocol. Every web request uses it.' },
+  { key:'wa-url-struct',   name:'URL Structure',          cat:'wa-http',   desc:'URL = protocol + host + port + path + query string.',                                  example:'// https://api.example.com:443/books?sort=title\n//  └─────┘  └──────────────┘ └──┘└──────┘ └──────────┘\n// protocol     host           port  path     query string\n\n// Common URL-encoded chars:\n// space = %20  |  & = %26  |  = = %3D', tip:'Query strings (?key=value) are optional. Use for filtering/sorting, not IDs.' },
+  { key:'wa-req-methods',  name:'HTTP Request Methods',   cat:'wa-http',   desc:'GET retrieves; POST creates; PUT replaces; PATCH updates; DELETE removes.',            example:'GET    /api/books       // get all books\nPOST   /api/books       // create new book\nGET    /api/books/42    // get book 42\nPUT    /api/books/42    // replace book 42\nPATCH  /api/books/42    // update parts of book 42\nDELETE /api/books/42    // delete book 42', tip:'GET = safe (no side effects). PUT = idempotent (repeating is safe). POST = not idempotent.' },
+  { key:'wa-status-codes', name:'HTTP Status Codes',      cat:'wa-http',   desc:'2xx = success, 3xx = redirect, 4xx = client error, 5xx = server error.',              example:'200 OK              // GET success\n201 Created         // POST success\n204 No Content      // DELETE success\n301 Moved Permanently\n302 Found           // temporary redirect\n400 Bad Request     // invalid data sent\n401 Unauthorized    // not logged in\n403 Forbidden       // logged in but no access\n404 Not Found       // resource doesn\'t exist\n500 Internal Server Error', tip:'Always return the right status code — it tells the client what happened.' },
+  { key:'wa-rest-prins',   name:'REST Principles',        cat:'wa-rest',   desc:'REST = Nouns (Resource URIs) + Verbs (HTTP Methods) + Representations (JSON/XML).',  example:'// Nouns: resources identified by URI\nhttp://example.com/api/employees/123\n\n// Verbs: HTTP methods\nGET POST PUT DELETE\n\n// Representations: data format\n{ "id": 123, "name": "Ali", "dept": "IT" }', tip:'Use plural nouns for collections: /books not /book. Never use verbs in URLs.' },
+  { key:'wa-naming',       name:'REST Resource Naming',   cat:'wa-rest',   desc:'Use plural nouns in URLs. Traverse path from generic to specific.',                    example:'GET /api/books                 // collection\nGET /api/books/ISBN-001          // specific resource\nGET /api/books/ISBN-001/authors  // sub-collection\n\nGET /api/classes/cmps350/students\n// Each segment narrows the scope', tip:'Dedicated /api prefix recommended. Never use verbs (/getBooks is wrong).' },
+  { key:'wa-post-vs-put',  name:'POST vs PUT',            cat:'wa-crud',   desc:'POST = server assigns URI, not idempotent. PUT = client specifies URI, idempotent.',   example:'// POST: server creates and assigns ID\nPOST /api/books\nBody: { "title": "Clean Code" }\nResponse: 201 Created\n         Location: /api/books/7\n\n// PUT: client knows the ID to replace\nPUT /api/books/7\nBody: { "title": "Clean Code 2nd Ed" }\nResponse: 200 OK', tip:'POST twice → 2 items (not idempotent). PUT twice → same result (idempotent).' },
+  { key:'wa-nextjs-routes', name:'Next.js API Routes',    cat:'wa-nextjs', desc:'Create API endpoints by adding route.js to app/api/. Export functions named by HTTP verb.',example:'// app/api/books/route.js → /api/books\nexport async function GET(request) {\n  return Response.json(books);\n}\n\nexport async function POST(request) {\n  const body = await request.json();\n  books.push(body);\n  return Response.json(body, { status: 201 });\n}', tip:'File must be named route.js. Each subfolder = one endpoint.' },
+  { key:'wa-dynamic-rt',   name:'Dynamic Routes [id]',    cat:'wa-nextjs', desc:'Wrap folder name in [brackets] to create a dynamic path segment.',                    example:'// app/api/books/[id]/route.js\n// Handles: /api/books/42, /api/books/abc\n\nexport async function GET(req, { params }) {\n  const id = Number(params.id);\n  const book = books.find(b => b.id === id);\n  if (!book) return new Response("Not Found", { status: 404 });\n  return Response.json(book);\n}', tip:'params.id is always a STRING — convert with Number() for array operations.' },
+  { key:'wa-query-params', name:'Query Parameters',       cat:'wa-nextjs', desc:'Optional parameters after ? in the URL. Accessed via new URL(request.url).searchParams.',example:'// URL: /api/books?sort=title&limit=10\n\nexport async function GET(request) {\n  const { searchParams } = new URL(request.url);\n  const sort  = searchParams.get("sort");\n  const limit = Number(searchParams.get("limit")) || 20;\n\n  let result = [...books];\n  if (sort) result.sort((a,b) => a[sort] > b[sort] ? 1:-1);\n  return Response.json(result.slice(0, limit));\n}', tip:'Query params are optional extras. Path params (like /books/42) identify the resource.' },
+  { key:'wa-req-body',     name:'Request Body',           cat:'wa-nextjs', desc:'Read the request body with await request.json(), .text(), or .formData().',           example:'export async function POST(request) {\n  // JSON body (fetch with Content-Type: application/json)\n  const body = await request.json();\n\n  // Form data\n  const form = await request.formData();\n  const obj  = Object.fromEntries(form);\n\n  // Plain text\n  const text = await request.text();\n}', tip:'Use .json() for API calls from fetch(). Use .formData() for HTML form submissions.' },
+  { key:'wa-catch-all',    name:'Catch-all Routes [...slug]',cat:'wa-nextjs',desc:'[...slug] matches any number of path segments as an array.',                         example:'// app/api/blog/[...slug]/route.js\n// Matches: /api/blog/2024\n//          /api/blog/2024/03\n//          /api/blog/2024/03/10\n\nexport async function GET(req, { params }) {\n  const [year, month, day] = params.slug;\n  // params.slug = ["2024", "03", "10"]\n}', tip:'[[...slug]] (double brackets) = optional catch-all: also matches the base path.' },
+];
+
+// ─── STATE ───────────────────────────────────────────────────────────────────
+let customKeys = new Set();
+let detailKey  = null;
+let editingKey = null;
+let formVault  = 'js';
+let activeFilters = { js:'all', html:'all', css:'all', resp:'all', wa:'all', all:'all' };
+let activeVault   = 'js';
+
+// ─── STORAGE ─────────────────────────────────────────────────────────────────
+const STORAGE_KEY = 'kw-vault-custom-v2';
+const useCloud = typeof window.storage !== 'undefined' && typeof window.storage.get === 'function';
+
+async function loadCustom() {
+  try {
+    if (useCloud) { const r = await window.storage.get(STORAGE_KEY); return r ? JSON.parse(r.value) : []; }
+    else { const r = localStorage.getItem(STORAGE_KEY); return r ? JSON.parse(r) : []; }
+  } catch { return []; }
+}
+async function saveCustom(list) {
+  try {
+    if (useCloud) await window.storage.set(STORAGE_KEY, JSON.stringify(list));
+    else localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+  } catch(e) { console.error(e); }
+}
+
+// ─── VAULT SWITCHING ─────────────────────────────────────────────────────────
+function switchVault(name) {
+  activeVault = name;
+  document.querySelectorAll('.vault-page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.vault-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('vault-' + name).classList.add('active');
+  document.querySelectorAll('.vault-tab').forEach(b => {
+    if (b.getAttribute('onclick')?.includes(`'${name}'`)) b.classList.add('active');
+  });
+}
+
+// ─── GET KEYWORDS FOR VAULT ───────────────────────────────────────────────────
+function getVaultKeywords(vault) {
+  return ALL_KEYWORDS.filter(kw => {
+    const v = CAT_VAULT[kw.cat] || 'js';
+    if (vault === 'all') return true;
+    return v === vault;
+  });
+}
+
+// ─── RENDER GRID ─────────────────────────────────────────────────────────────
+function renderGridForVault(vault) {
+  const v = VAULTS[vault];
+  const grid = document.getElementById(v.grid);
+  const empty = document.getElementById(v.empty);
+  const q = (document.getElementById(v.search)?.value || '').toLowerCase();
+  const activeFilter = activeFilters[vault] || 'all';
+
+  grid.innerHTML = '';
+  const kws = getVaultKeywords(vault);
+  const visible = kws.filter(kw => {
+    const catOk = activeFilter === 'all' || kw.cat === activeFilter;
+    const sOk = !q || kw.name.toLowerCase().includes(q) || kw.desc.toLowerCase().includes(q) || (kw.tip||'').toLowerCase().includes(q) || (CAT_LABEL[kw.cat]||'').toLowerCase().includes(q);
+    return catOk && sOk;
+  });
+
+  empty.style.display = visible.length ? 'none' : 'block';
+  visible.forEach((kw, i) => {
+    const isCustom = customKeys.has(kw.key);
+    const card = document.createElement('div');
+    card.className = 'kw-card';
+    card.style.animationDelay = `${i * 0.025}s`;
+    card.innerHTML = `
+      <div>
+        <div class="kw-name">${escHtml(kw.name)}</div>
+        <div class="kw-desc">${escHtml(kw.desc)}</div>
+      </div>
+      <div class="kw-badges">
+        <span class="kw-cat ${CAT_CLASS[kw.cat]||'cat-pill-other'}">${(CAT_LABEL[kw.cat]||kw.cat).toUpperCase().slice(0,8)}</span>
+        ${isCustom ? '<span class="custom-badge">CUSTOM</span>' : ''}
+      </div>`;
+    card.addEventListener('click', () => openDetail(kw.key));
+    grid.appendChild(card);
+  });
+}
+
+function filterGrid(vault, q) {
+  renderGridForVault(vault);
+}
+
+// ─── RENDER FILTER BARS ───────────────────────────────────────────────────────
+function renderFilterBar(vault) {
+  const v = VAULTS[vault];
+  const bar = document.getElementById(v.filterBar);
+  const kws = getVaultKeywords(vault);
+  const cats = [...new Set(kws.map(k => k.cat))];
+
+  bar.innerHTML = '<button class="filter-btn active" data-vault="' + vault + '" onclick="setFilter(\'' + vault + '\',\'all\',this)">All</button>';
+  cats.forEach(cat => {
+    const btn = document.createElement('button');
+    btn.className = 'filter-btn';
+    btn.dataset.vault = vault;
+    btn.textContent = CAT_LABEL[cat] || cat;
+    btn.addEventListener('click', function() { setFilter(vault, cat, this); });
+    bar.appendChild(btn);
+  });
+}
+
+function setFilter(vault, cat, btn) {
+  activeFilters[vault] = cat;
+  document.querySelectorAll(`[data-vault="${vault}"].filter-btn`).forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderGridForVault(vault);
+}
+
+// ─── SYNTAX HIGHLIGHT ────────────────────────────────────────────────────────
+function highlight(code) {
+  return code
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/(\/\/[^\n]*)/g,'<span class="hl-comment">$1</span>')
+    .replace(/(`[^`]*`|"[^"]*"|'[^']*')/g,'<span class="hl-str">$1</span>')
+    .replace(/\b(\d+\.?\d*)\b/g,'<span class="hl-num">$1</span>')
+    .replace(/\b(const|let|var|function|return|if|else|for|while|new|typeof|class|this|true|false|null|undefined|async|await|of|in|import|export|default|get|set|extends|super|static)\b/g,'<span class="hl-kw">$1</span>')
+    .replace(/\b([a-zA-Z_$][a-zA-Z0-9_$]*)\s*(?=\()/g,'<span class="hl-fn">$1</span>')
+    .replace(/=&gt;/g,'<span class="hl-op">=&gt;</span>');
+}
+
+// ─── DETAIL POPUP ─────────────────────────────────────────────────────────────
+function openDetail(key) {
+  const kw = ALL_KEYWORDS.find(k => k.key === key);
+  if (!kw) return;
+  detailKey = key;
+  const isCustom = customKeys.has(key);
+
+  document.getElementById('d-cat').textContent   = (CAT_LABEL[kw.cat] || kw.cat).toUpperCase();
+  document.getElementById('d-title').textContent = kw.name;
+  document.getElementById('d-desc').textContent  = kw.desc;
+  document.getElementById('d-code').innerHTML    = highlight(kw.example || '// no example');
+
+  const tipEl = document.getElementById('d-tip');
+  if (kw.tip) { tipEl.style.display = 'block'; tipEl.innerHTML = `<strong>Tip:</strong> ${escHtml(kw.tip)}`; }
+  else tipEl.style.display = 'none';
+
+  document.getElementById('d-actions').style.display = isCustom ? 'flex' : 'none';
+  document.getElementById('detail-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeDetail() { document.getElementById('detail-overlay').classList.remove('open'); document.body.style.overflow = ''; }
+
+document.getElementById('d-edit-btn').addEventListener('click', () => { closeDetail(); openForm(detailKey); });
+document.getElementById('d-delete-btn').addEventListener('click', async () => {
+  const key = detailKey; closeDetail();
+  const idx = ALL_KEYWORDS.findIndex(k => k.key === key);
+  if (idx !== -1) ALL_KEYWORDS.splice(idx, 1);
+  customKeys.delete(key);
+  const saved = await loadCustom();
+  await saveCustom(saved.filter(k => k.key !== key));
+  renderAll(); updateStats();
+});
+
+// ─── FORM ─────────────────────────────────────────────────────────────────────
+function openForm(editKey = null, vault = null) {
+  editingKey = editKey;
+  formVault  = vault || activeVault || 'js';
+  const kw = editKey ? ALL_KEYWORDS.find(k => k.key === editKey) : null;
+  document.getElementById('form-mode-label').textContent = editKey ? 'EDIT KEYWORD' : 'NEW KEYWORD';
+  document.getElementById('form-mode-title').textContent = editKey ? 'Update Details' : 'Add to Study List';
+  document.getElementById('f-name').value   = kw ? kw.name    : '';
+  document.getElementById('f-cat').value    = kw ? (kw.cat || 'vars') : 'vars';
+  document.getElementById('f-desc').value   = kw ? kw.desc    : '';
+  document.getElementById('f-tip').value    = kw ? (kw.tip||'') : '';
+  document.getElementById('f-example').innerText = kw ? (kw.example||'') : '';
+  document.getElementById('form-save').textContent = editKey ? 'UPDATE KEYWORD' : 'SAVE KEYWORD';
+  document.getElementById('form-error').style.display = 'none';
+  document.getElementById('ai-status').textContent = '';
+  document.getElementById('form-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  setTimeout(() => document.getElementById('f-name').focus(), 200);
+}
+function closeForm() { document.getElementById('form-overlay').classList.remove('open'); document.body.style.overflow = ''; editingKey = null; }
+
+document.getElementById('form-close').addEventListener('click', closeForm);
+document.getElementById('form-overlay').addEventListener('click', e => { if (e.target === e.currentTarget) closeForm(); });
+
+document.getElementById('form-save').addEventListener('click', async () => {
+  const name    = document.getElementById('f-name').value.trim();
+  const cat     = document.getElementById('f-cat').value;
+  const desc    = document.getElementById('f-desc').value.trim();
+  const example = document.getElementById('f-example').innerText.trim();
+  const tip     = document.getElementById('f-tip').value.trim();
+  const errEl   = document.getElementById('form-error');
+  if (!name || !desc) { errEl.textContent = 'Name and description are required.'; errEl.style.display = 'block'; return; }
+  errEl.style.display = 'none';
+  const key = editingKey || name.toLowerCase().replace(/[^a-z0-9]+/g, '-') + '-' + Date.now();
+  const kw  = { key, name, cat, desc, example, tip };
+  if (editingKey) {
+    const idx = ALL_KEYWORDS.findIndex(k => k.key === editingKey);
+    if (idx !== -1) ALL_KEYWORDS[idx] = kw;
+    const saved = await loadCustom(); const si = saved.findIndex(k => k.key === editingKey);
+    if (si !== -1) saved[si] = kw; else saved.push(kw); await saveCustom(saved);
+  } else {
+    ALL_KEYWORDS.push(kw); customKeys.add(key);
+    const saved = await loadCustom(); saved.push(kw); await saveCustom(saved);
+  }
+  closeForm(); renderAll(); updateStats();
+});
+
+// ─── AI GENERATION ───────────────────────────────────────────────────────────
+document.getElementById('ai-btn').addEventListener('click', async () => {
+  const name   = document.getElementById('f-name').value.trim();
+  const desc   = document.getElementById('f-desc').value.trim();
+  const cat    = document.getElementById('f-cat').value;
+  const apiKey = document.getElementById('f-apikey').value.trim();
+  const status = document.getElementById('ai-status');
+  if (!name)   { status.style.color='var(--expense)'; status.textContent='⚠ Enter a keyword name first.'; return; }
+  if (!apiKey) { status.style.color='var(--expense)'; status.textContent='⚠ Paste your Anthropic API key above.'; return; }
+  document.getElementById('ai-btn').disabled = true;
+  document.getElementById('ai-btn').textContent = '✦ Generating…';
+  status.style.color = 'var(--muted)'; status.textContent = 'Asking AI for a code example…';
+  try {
+    const prompt = `You are a web dev tutor writing study notes for university students.\n\nKeyword: "${name}"\nCategory: ${CAT_LABEL[cat]||cat}\nDescription: "${desc||'A web dev concept'}"\n\nWrite a clear, practical 8-15 line code example. Include short inline // comments. Respond ONLY with raw code — no markdown, no explanation.`;
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST', headers:{ 'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-allow-browser':'true' },
+      body: JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:800, messages:[{ role:'user', content:prompt }] })
+    });
+    if (!res.ok) { const e = await res.json().catch(()=>({})); throw new Error(e?.error?.message||`HTTP ${res.status}`); }
+    const data = await res.json();
+    const code = (data.content?.map(b=>b.text||'').join('')||'').trim().replace(/^```[a-z]*\n?/i,'').replace(/\n?```$/,'');
+    document.getElementById('f-example').innerText = code;
+    status.style.color = 'var(--income)'; status.textContent = '✓ Generated! Edit if needed.';
+  } catch(err) { status.style.color='var(--expense)'; status.textContent=`✗ ${err.message||'Generation failed.'}`; }
+  finally { document.getElementById('ai-btn').disabled=false; document.getElementById('ai-btn').textContent='✦ Generate with AI'; }
+});
+
+// ─── EXPORT ───────────────────────────────────────────────────────────────────
+function exportVault(vault) {
+  const kws = vault === 'all' ? ALL_KEYWORDS : getVaultKeywords(vault);
+  const payload = { lab:'CMPS350', vault, version:2, keywords: kws };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type:'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = `keywords-${vault}.json`; a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ─── IMPORT ───────────────────────────────────────────────────────────────────
+document.getElementById('btn-import').addEventListener('click', () => document.getElementById('import-input').click());
+document.getElementById('import-input').addEventListener('change', async e => {
+  const file = e.target.files[0]; if (!file) return;
+  try {
+    const parsed   = JSON.parse(await file.text());
+    const incoming = parsed.keywords || (Array.isArray(parsed) ? parsed : null);
+    if (!incoming) throw new Error('Invalid format');
+    const existingSet = new Set(ALL_KEYWORDS.map(k => k.key));
+    const saved = await loadCustom(); const merged = [...saved]; let added = 0;
+    incoming.forEach(kw => {
+      if (!kw.key||!kw.name||!kw.desc) return;
+      if (existingSet.has(kw.key)) return;
+      ALL_KEYWORDS.push(kw); customKeys.add(kw.key); merged.push(kw); added++;
+    });
+    await saveCustom(merged); e.target.value = '';
+    if (added===0) alert('All keywords already in your list.');
+    else { alert(`✓ Imported ${added} keyword(s)!`); renderAll(); updateStats(); }
+  } catch(err) { alert('Import failed: ' + err.message); e.target.value = ''; }
+});
+
+// ─── STATS ───────────────────────────────────────────────────────────────────
+function updateStats() {
+  document.getElementById('stat-total').textContent  = ALL_KEYWORDS.length;
+  document.getElementById('stat-custom').textContent = customKeys.size;
+}
+
+// ─── RENDER ALL VAULTS ────────────────────────────────────────────────────────
+function renderAll() {
+  Object.keys(VAULTS).forEach(v => { renderFilterBar(v); renderGridForVault(v); });
+}
+
+// ─── CLOSE HANDLERS ──────────────────────────────────────────────────────────
+document.getElementById('detail-close').addEventListener('click', closeDetail);
+document.getElementById('detail-overlay').addEventListener('click', e => { if (e.target===e.currentTarget) closeDetail(); });
+document.addEventListener('keydown', e => { if (e.key==='Escape') { closeDetail(); closeForm(); } });
+
+function escHtml(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+// ─── INIT ────────────────────────────────────────────────────────────────────
+async function init() {
+  const saved = await loadCustom();
+  const existingKeys = new Set(ALL_KEYWORDS.map(k => k.key));
+  saved.forEach(kw => {
+    if (!kw.key||!kw.name||!kw.desc) return;
+    if (existingKeys.has(kw.key)) { const idx = ALL_KEYWORDS.findIndex(k=>k.key===kw.key); if (idx!==-1) ALL_KEYWORDS[idx]=kw; }
+    else ALL_KEYWORDS.push(kw);
+    customKeys.add(kw.key);
+  });
+  renderAll();
+  updateStats();
+}
+init();
+</script>
+</body>
+</html>

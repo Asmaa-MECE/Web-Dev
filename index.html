@@ -546,6 +546,21 @@
     <a href="#wa-dynamic"><span class="dot"></span>Dynamic Routes</a>
     <a href="#wa-request"><span class="dot"></span>Request &amp; Response</a>
   </div>
+
+  <!-- Chapter 7: React Fundamentals -->
+  <div class="toc-group">
+    <span class="toc-group-label" style="color:#61dafb">⑦ React Fundamentals</span>
+    <a href="#react-intro"><span class="dot"></span>Introduction</a>
+    <a href="#react-components"><span class="dot"></span>Components &amp; JSX</a>
+    <a href="#react-props"><span class="dot"></span>Props</a>
+    <a href="#react-lists"><span class="dot"></span>Rendering Lists</a>
+    <a href="#react-state"><span class="dot"></span>State &amp; useState</a>
+    <a href="#react-events"><span class="dot"></span>Events &amp; Forms</a>
+    <a href="#react-vdom"><span class="dot"></span>Virtual DOM</a>
+    <a href="#react-comm"><span class="dot"></span>Components Communication</a>
+    <a href="#react-hooks"><span class="dot"></span>Common Hooks</a>
+    <a href="#react-examples"><span class="dot"></span>📌 React Examples</a>
+  </div>
 </nav>
 
 <!-- ===== MAIN CONTENT ===== -->
@@ -2011,6 +2026,551 @@ Query     : ?key=value — optional parameters after ?</pre>
     </section>
 
   </div><!-- end chapter 6 Web API -->
+
+
+  <!-- ================================================================
+       CHAPTER 7 — REACT FUNDAMENTALS
+       ================================================================ -->
+  <div class="chapter-break">
+    <div class="ch-header">
+      <div class="badge" style="background:#61dafb; color:#0a1a2f;">Chapter Study Notes</div>
+      <h1><span style="color:#61dafb">React</span> Fundamentals</h1>
+      <p>Components · JSX · Props · State · Hooks · Communication · Virtual DOM</p>
+    </div>
+
+    <section id="react-intro">
+      <div class="section-header">
+        <div class="section-number" style="background:#61dafb; color:#0a1a2f;">1</div>
+        <h2>Introduction to React</h2>
+      </div>
+      <div class="card" style="border-color:#61dafb; background: linear-gradient(135deg, #141626, #091a2a);">
+        <h3>What is React?</h3>
+        <ul>
+          <li><strong>Open-source JavaScript library</strong> for building component-based User Interfaces (UI)</li>
+          <li>UI is composed of <strong>small, reusable components</strong></li>
+          <li>A component <strong>encapsulates UI elements</strong> and the <strong>behavior</strong> associated with them</li>
+          <li>React components can be rendered on <strong>server-side or client-side</strong></li>
+          <li>Open-sourced by <strong>Facebook mid-2013</strong> — <a href="https://reactjs.org/" style="color:#61dafb">reactjs.org</a></li>
+          <li>Competing with <strong>Angular</strong> and <strong>Vue.js</strong></li>
+          <li>Used by: Facebook, Instagram, Netflix, Dropbox, Outlook, Yahoo, Khan Academy…</li>
+        </ul>
+      </div>
+      <div class="two-col">
+        <div class="card">
+          <h3>Web App Architecture</h3>
+          <ul>
+            <li>A web app has <strong>pages</strong></li>
+            <li>A page is composed of <strong>components</strong> (1 page → many components)</li>
+            <li>A component can be a <strong>tree of components</strong></li>
+            <li>App → Pages → Components</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>React as a Declarative Model</h3>
+          <ul>
+            <li>UI is built using <strong>JavaScript functions</strong></li>
+            <li>Each function defines a piece of the app's UI <strong>programmatically</strong></li>
+            <li>As state changes, the UI <strong>automatically updates</strong> (Reactive UI)</li>
+            <li><strong>Declarative</strong> — you define structure &amp; states; React handles the DOM</li>
+          </ul>
+        </div>
+      </div>
+      <div class="card tip">
+        <h3>React Component Libraries</h3>
+        <ul>
+          <li><strong>Material-UI</strong> — React components with Material Design (<a href="https://mui.com/" style="color:#61dafb">mui.com</a>)</li>
+          <li><strong>Grommet</strong> — accessible component library (<a href="https://v2.grommet.io/components" style="color:#61dafb">v2.grommet.io</a>)</li>
+          <li><strong>Blueprint</strong> — React-based UI toolkit (<a href="https://blueprintjs.com/" style="color:#61dafb">blueprintjs.com</a>)</li>
+          <li><strong>Fluent UI</strong> — Microsoft's React components (<a href="https://react.fluentui.dev/" style="color:#61dafb">react.fluentui.dev</a>)</li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="react-components">
+      <div class="section-header">
+        <div class="section-number" style="background:#61dafb; color:#0a1a2f;">2</div>
+        <h2>React Components &amp; JSX</h2>
+      </div>
+      <div class="card" style="border-color:#61dafb; background: linear-gradient(135deg, #141626, #091a2a);">
+        <h3>What is a React Component?</h3>
+        <ul>
+          <li>A component <strong>returns HTML elements</strong> to provide the UI</li>
+          <li>Encapsulates <strong>state</strong> (internal data) and <strong>functions</strong> to handle events</li>
+          <li><strong>Component = UI + display logic</strong></li>
+          <li>Components allow creating new custom <strong>"HTML tags"</strong></li>
+          <li><strong>Component name must start with a capital letter</strong></li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>What is JSX?</h3>
+        <ul>
+          <li><strong>JSX</strong> = JavaScript XML — HTML-like markup to describe the component's UI</li>
+          <li>JSX allows writing HTML-like syntax which gets <strong>transformed to JavaScript objects</strong></li>
+          <li>You can <strong>embed JavaScript expressions</strong> in JSX using <code>{}</code></li>
+        </ul>
+      </div>
+      <div class="card highlight" style="border-color:#61dafb;">
+        <h3>Creating &amp; Using a Component</h3>
+        <pre><span class="cmt">// Create a Welcome component</span>
+<span class="kw">function</span> <span class="fn">Welcome</span>(props) {
+    <span class="kw">return</span> (<span class="tag-html">&lt;h1&gt;</span>Welcome to {props.appName}<span class="tag-html">&lt;/h1&gt;</span>);
+}
+<span class="kw">export default</span> Welcome;
+
+<span class="cmt">// Use the Welcome component</span>
+<span class="tag-html">&lt;Welcome</span> <span class="attr">appName</span>=<span class="str">'React Demo App'</span> <span class="tag-html">/&gt;</span></pre>
+        <p style="font-size:13px; color:var(--muted); margin-top:8px">Props are <strong>read-only</strong> — the component can read them but cannot modify them.</p>
+      </div>
+    </section>
+
+    <section id="react-props">
+      <div class="section-header">
+        <div class="section-number" style="background:#61dafb; color:#0a1a2f;">3</div>
+        <h2>Props</h2>
+      </div>
+      <div class="card" style="border-color:#61dafb; background: linear-gradient(135deg, #141626, #091a2a);">
+        <h3>What are Props?</h3>
+        <ul>
+          <li>Props = <strong>data passed from the parent component to the child component</strong></li>
+          <li>Props parameters are <strong>read-only</strong> — child cannot modify them</li>
+          <li>Work just like HTML attributes — they configure the component with different content</li>
+          <li>Makes components <strong>reusable</strong> with different data</li>
+        </ul>
+      </div>
+      <div class="two-col">
+        <div class="card">
+          <h3>Props Destructuring</h3>
+          <p>Instead of accessing <code>props.firstName</code> you can destructure props into variables directly in the function signature:</p>
+          <pre><span class="cmt">// Without destructuring</span>
+<span class="kw">function</span> <span class="fn">UserInfo</span>(props) {
+    <span class="kw">return</span> (
+        <span class="tag-html">&lt;div&gt;</span>
+            {props.firstName}
+            {props.lastName}
+        <span class="tag-html">&lt;/div&gt;</span>
+    );
+}
+
+<span class="cmt">// With destructuring (preferred)</span>
+<span class="kw">function</span> <span class="fn">UserInfo</span>({ firstName, lastName }) {
+    <span class="kw">return</span> (
+        <span class="tag-html">&lt;div&gt;</span>
+            {firstName}
+            {lastName}
+        <span class="tag-html">&lt;/div&gt;</span>
+    );
+}</pre>
+        </div>
+        <div class="card">
+          <h3>Special "children" Prop</h3>
+          <ul>
+            <li>The <strong>children</strong> property holds the content between the component's <strong>opening and closing tags</strong></li>
+            <li>A special property <strong>auto-added by React</strong></li>
+          </ul>
+          <pre><span class="cmt">// Usage</span>
+<span class="tag-html">&lt;Welcome</span> <span class="attr">name</span>=<span class="str">"Ali Faleh"</span><span class="tag-html">&gt;</span>
+    <span class="tag-html">&lt;h2&gt;</span>Welcome to QU<span class="tag-html">&lt;/h2&gt;</span>
+    <span class="tag-html">&lt;img</span> <span class="attr">src</span>=<span class="str">"logo.png"</span> <span class="tag-html">/&gt;</span>
+<span class="tag-html">&lt;/Welcome&gt;</span>
+
+<span class="cmt">// Component definition</span>
+<span class="kw">function</span> <span class="fn">Welcome</span>({name, children}) {
+    <span class="kw">return</span> (
+        <span class="tag-html">&lt;&gt;</span>
+            <span class="tag-html">&lt;h1&gt;</span>Welcome {name}<span class="tag-html">&lt;/h1&gt;</span>
+            {children}
+        <span class="tag-html">&lt;/&gt;</span>
+    );
+}</pre>
+        </div>
+      </div>
+    </section>
+
+    <section id="react-lists">
+      <div class="section-header">
+        <div class="section-number" style="background:#61dafb; color:#0a1a2f;">4</div>
+        <h2>Rendering Lists</h2>
+      </div>
+      <div class="card" style="border-color:#61dafb; background: linear-gradient(135deg, #141626, #091a2a);">
+        <h3>Rendering a List of Items with .map()</h3>
+        <pre><span class="cmt">// Use the FriendsList component</span>
+<span class="tag-html">&lt;FriendsList</span> <span class="attr">friends</span>={['Fatima', 'Mouza', 'Sarah']}<span class="tag-html">/&gt;</span>
+
+<span class="cmt">// Lists are handled using .map() array function</span>
+<span class="kw">function</span> <span class="fn">FriendsList</span>({friends}) {
+  <span class="kw">return</span> <span class="tag-html">&lt;ul&gt;</span>
+            {friends.<span class="fn">map</span>( (friend, i) =&gt;
+                <span class="tag-html">&lt;li</span> <span class="attr">key</span>={i}&gt;{friend}<span class="tag-html">&lt;/li&gt;</span>
+            )}
+         <span class="tag-html">&lt;/ul&gt;</span>
+}</pre>
+      </div>
+      <div class="card warn">
+        <h3>⚠️ Keys are Very Important in Lists</h3>
+        <ul>
+          <li>A <strong>key</strong> is a unique identifier to identify which list items have <strong>changed, been added, or deleted</strong></li>
+          <li>Helps React determine which components need to be <strong>re-rendered</strong> (instead of re-rendering all components)</li>
+          <li>Increases <strong>performance</strong> — only updated components are re-rendered</li>
+          <li>Keys must be <strong>unique among siblings</strong></li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="react-state">
+      <div class="section-header">
+        <div class="section-number" style="background:#61dafb; color:#0a1a2f;">5</div>
+        <h2>State &amp; useState Hook</h2>
+      </div>
+      <div class="card" style="border-color:#61dafb; background: linear-gradient(135deg, #141626, #091a2a);">
+        <h3>What is State?</h3>
+        <ul>
+          <li>State = <strong>any value that can change over time</strong></li>
+          <li>A component can store its <strong>own local data (state)</strong></li>
+          <li>State is <strong>private and fully controlled</strong> by the component</li>
+          <li>Can be <strong>passed as props to children</strong></li>
+          <li><strong>UI = f(state)</strong> — UI is a visual representation of state</li>
+          <li>State changes trigger <strong>automatic update of the UI</strong></li>
+        </ul>
+      </div>
+      <div class="two-col">
+        <div class="card">
+          <h3>useState Hook</h3>
+          <ul>
+            <li>Use <code>useState</code> hook to create a state variable and an update function</li>
+            <li><strong>Never change state directly</strong> — always use the setter function</li>
+          </ul>
+          <pre><span class="kw">const</span> [count, setCount] = useState(<span class="num">0</span>);
+<span class="cmt">// count    = state variable (initialized to 0)
+// setCount = function to update it</span>
+
+<span class="cmt">// Calling setCount causes React to re-render</span>
+<span class="fn">setCount</span>(count + <span class="num">1</span>);</pre>
+          <p style="font-size:12px; color:var(--accent4); margin-top:8px">⚠️ <strong>Never</strong> assign directly: <code>count = 5</code> — React will NOT re-render the UI!</p>
+        </div>
+        <div class="card">
+          <h3>State Variables as Change Notifiers</h3>
+          <ul>
+            <li>State variables must be declared using <code>useState</code> to act as <strong>Change Notifiers</strong></li>
+            <li>They are <strong>observed by the React runtime</strong></li>
+            <li>Any change triggers <strong>re-rendering of any function that reads the state variable</strong></li>
+            <li>Both <strong>props and state changes</strong> trigger a render update</li>
+          </ul>
+          <div class="card tip" style="margin-top:10px; padding:10px;">
+            <p style="font-size:12px"><strong>Observer Pattern</strong>: Like a celebrity with fans on Twitter. Fans (React runtime) observe the celebrity (state variable) and auto-update when something changes.</p>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Imperative UI vs. Declarative UI (React)</h3>
+        <table>
+          <tr><th>Imperative (Traditional DOM)</th><th>Declarative (React)</th></tr>
+          <tr>
+            <td>Manipulate DOM directly to change UI state</td>
+            <td>Update state variables — React updates DOM automatically</td>
+          </tr>
+          <tr>
+            <td><pre style="margin:0;background:none;border:none;padding:0;font-size:11px;">document.querySelector('#bulbImage')
+  .src = 'bulb-on.png';</pre></td>
+            <td><pre style="margin:0;background:none;border:none;padding:0;font-size:11px;">&lt;input type="button"
+  value={isBulbOn ? "Turn off" : "Turn on"}
+  onClick={() =&gt; setIsBulbOn(!isBulbOn)} /&gt;</pre></td>
+          </tr>
+        </table>
+        <p style="font-size:13px; color:var(--muted); margin-top:8px">In React, UI is <strong>immutable</strong> — do NOT access/update UI elements directly. Instead, update state variables.</p>
+      </div>
+      <div class="card info">
+        <h3>Virtual DOM</h3>
+        <ul>
+          <li><strong>Virtual DOM</strong> = Pure JavaScript lightweight DOM, totally separate from the browser's slow DOM API</li>
+          <li>Every time a component updates its state or receives new props → a <strong>new virtual DOM tree is generated</strong></li>
+          <li>New tree is <strong>diffed against the old</strong> tree</li>
+          <li>Produces a <strong>minimum set of changes</strong> to perform on the real DOM to bring it up to date</li>
+          <li>Result: <strong>excellent performance</strong> — only necessary DOM updates happen</li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="react-events">
+      <div class="section-header">
+        <div class="section-number" style="background:#61dafb; color:#0a1a2f;">6</div>
+        <h2>Events &amp; Forms</h2>
+      </div>
+      <div class="card" style="border-color:#61dafb; background: linear-gradient(135deg, #141626, #091a2a);">
+        <h3>Handling Events</h3>
+        <ul>
+          <li>Event handling works similarly to how events are handled on DOM elements</li>
+          <li><strong>Common events</strong>: <code>onClick</code> · <code>onSubmit</code> · <code>onChange</code></li>
+          <li>Event handlers <strong>update state</strong> → React <strong>updates the UI</strong></li>
+          <li>Every place a state variable is displayed is <strong>guaranteed to be auto-updated</strong></li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Counter Component — State + Events</h3>
+        <pre><span class="kw">import</span> React, { useState } <span class="kw">from</span> <span class="str">"react"</span>;
+
+<span class="kw">function</span> <span class="fn">Counter</span>(props) {
+    <span class="kw">const</span> [count, setCount] = <span class="fn">useState</span>(props.startValue);
+    <span class="kw">const</span> <span class="var">increment</span> = () =&gt; { <span class="fn">setCount</span>(count + <span class="num">1</span>); };
+    <span class="kw">const</span> <span class="var">decrement</span> = () =&gt; { <span class="fn">setCount</span>(count - <span class="num">1</span>); };
+
+    <span class="kw">return</span> <span class="tag-html">&lt;div&gt;</span>
+            Count: {count}
+            <span class="tag-html">&lt;button</span> <span class="attr">type</span>=<span class="str">"button"</span> <span class="attr">onClick</span>={increment}&gt;+<span class="tag-html">&lt;/button&gt;</span>
+            <span class="tag-html">&lt;button</span> <span class="attr">type</span>=<span class="str">"button"</span> <span class="attr">onClick</span>={decrement}&gt;-<span class="tag-html">&lt;/button&gt;</span>
+        <span class="tag-html">&lt;/div&gt;</span>
+}
+<span class="kw">export default</span> Counter;
+
+<span class="cmt">// Use: &lt;Counter startValue={3}/&gt;</span></pre>
+      </div>
+      <div class="card">
+        <h3>Forms with React — Controlled Components</h3>
+        <pre><span class="kw">const</span> [state, setState] = <span class="fn">useState</span>({ email: <span class="str">""</span>, password: <span class="str">""</span> });
+
+<span class="kw">const</span> <span class="var">handleChange</span> = e =&gt; {
+    <span class="kw">const</span> name = e.target.name;
+    <span class="kw">const</span> value = e.target.value;
+    <span class="cmt">// Merge the object before change with updated property</span>
+    <span class="fn">setState</span>({ ...state, [name]: value });
+};
+
+<span class="kw">const</span> <span class="var">handleSubmit</span> = e =&gt; {
+    e.<span class="fn">preventDefault</span>();
+    <span class="fn">alert</span>(JSON.<span class="fn">stringify</span>(state));
+};
+
+<span class="cmt">// Form UI</span>
+<span class="tag-html">&lt;form</span> <span class="attr">onSubmit</span>={handleSubmit}&gt;
+    <span class="tag-html">&lt;input</span> <span class="attr">name</span>=<span class="str">"email"</span> <span class="attr">type</span>=<span class="str">"email"</span> <span class="attr">required</span>
+           <span class="attr">value</span>={state.email} <span class="attr">onChange</span>={handleChange} /&gt;
+    <span class="tag-html">&lt;input</span> <span class="attr">name</span>=<span class="str">"password"</span> <span class="attr">type</span>=<span class="str">"password"</span> <span class="attr">required</span>
+           <span class="attr">value</span>={state.password} <span class="attr">onChange</span>={handleChange} /&gt;
+    <span class="tag-html">&lt;input</span> <span class="attr">type</span>=<span class="str">"submit"</span> /&gt;
+<span class="tag-html">&lt;/form&gt;</span></pre>
+      </div>
+    </section>
+
+    <section id="react-vdom">
+      <div class="section-header">
+        <div class="section-number" style="background:#61dafb; color:#0a1a2f;">7</div>
+        <h2>Props vs. State — Uni-directional Data Flow</h2>
+      </div>
+      <div class="card" style="border-color:#61dafb;">
+        <h3>Props vs. State Comparison</h3>
+        <table>
+          <tr><th></th><th>Props</th><th>State</th></tr>
+          <tr><td><strong>Source</strong></td><td>Passed from parent to child</td><td>Managed internally by the component</td></tr>
+          <tr><td><strong>Mutability</strong></td><td>Read-only — child cannot modify</td><td>Private &amp; modifiable via setter functions only</td></tr>
+          <tr><td><strong>Access</strong></td><td>Available as function argument</td><td>Cannot be accessed or modified outside the component</td></tr>
+          <tr><td><strong>Re-render</strong></td><td>Changes trigger re-render</td><td>Changes trigger re-render</td></tr>
+        </table>
+      </div>
+    </section>
+
+    <section id="react-comm">
+      <div class="section-header">
+        <div class="section-number" style="background:#61dafb; color:#0a1a2f;">8</div>
+        <h2>Components Communication</h2>
+      </div>
+      <div class="card" style="border-color:#61dafb; background: linear-gradient(135deg, #141626, #091a2a);">
+        <h3>Parent-Child Communication</h3>
+        <ul>
+          <li>Components are meant to be used together — most commonly in <strong>parent-child relationships</strong></li>
+          <li><strong>Parent → Child</strong>: Parent passes data <strong>down to the child via props</strong></li>
+          <li><strong>Child → Parent</strong>: Child notifies its parent of a state change via <strong>callbacks</strong> (parent must pass a callback function as a prop)</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Callback Example — Child Notifying Parent</h3>
+        <pre><span class="cmt">// Parent: passes onChange callback to child</span>
+<span class="kw">function</span> <span class="fn">Main</span>() {
+  <span class="kw">return</span> <span class="tag-html">&lt;Counter</span>
+    <span class="attr">startValue</span>={3}
+    <span class="attr">onChange</span>={count =&gt;
+      console.<span class="fn">log</span>(`Count from child: ${count}`)
+    }
+  <span class="tag-html">/&gt;</span>
+}
+
+<span class="cmt">// Child: calls props.onChange to notify parent</span>
+<span class="kw">function</span> <span class="fn">Counter</span>(props) {
+    <span class="kw">const</span> [count, setCount] = <span class="fn">useState</span>(props.startValue);
+
+    <span class="kw">const</span> <span class="var">increment</span> = () =&gt; {
+        <span class="kw">const</span> <span class="var">updatedCount</span> = count + <span class="num">1</span>;
+        <span class="fn">setCount</span>(updatedCount);
+        props.<span class="fn">onChange</span>(updatedCount); <span class="cmt">// notify parent</span>
+    };
+
+    <span class="kw">return</span> <span class="tag-html">&lt;div&gt;</span>
+        Count: {count}
+        <span class="tag-html">&lt;button</span> <span class="attr">type</span>=<span class="str">"button"</span> <span class="attr">onClick</span>={increment}&gt;+<span class="tag-html">&lt;/button&gt;</span>
+    <span class="tag-html">&lt;/div&gt;</span>
+}</pre>
+      </div>
+      <div class="card tip">
+        <h3>React Dev Tools</h3>
+        <p>Install the <strong>React Developer Tools</strong> browser extension to inspect component trees, props, and state in the browser DevTools. Available for Chrome and Firefox.</p>
+      </div>
+    </section>
+
+    <section id="react-hooks">
+      <div class="section-header">
+        <div class="section-number" style="background:#61dafb; color:#0a1a2f;">9</div>
+        <h2>Common Hooks</h2>
+      </div>
+      <div class="card" style="border-color:#61dafb; background: linear-gradient(135deg, #141626, #091a2a);">
+        <h3>What are Hooks?</h3>
+        <p>A <strong>Hook</strong> is a special function that lets you <strong>hook into React features</strong> such as state and lifecycle methods.</p>
+        <table>
+          <tr><th>Hook</th><th>Purpose</th></tr>
+          <tr><td><code>useState</code></td><td>Manage state inside a component</td></tr>
+          <tr><td><code>useEffect</code></td><td>Perform side effects &amp; hook into component lifecycle</td></tr>
+          <tr><td><code>useRef</code></td><td>Access DOM elements directly or persist mutable values</td></tr>
+        </table>
+      </div>
+
+      <div class="card">
+        <h3>useEffect Hook</h3>
+        <ul>
+          <li>For doing stuff when a component <strong>mounts / unmounts / updates</strong></li>
+          <li>Ideal for <strong>fetching data when the component is mounted</strong></li>
+          <li>Takes two arguments: a <strong>callback function</strong> and an optional <strong>dependency array</strong></li>
+        </ul>
+        <table>
+          <tr><th>2nd Argument</th><th>Behavior</th></tr>
+          <tr><td>Not provided</td><td>useEffect runs on <strong>every re-render</strong></td></tr>
+          <tr><td><code>[]</code> (empty array)</td><td>Runs <strong>once</strong> when component first mounts</td></tr>
+          <tr><td><code>[query]</code> (with deps)</td><td>Runs whenever <code>query</code> changes</td></tr>
+        </table>
+      </div>
+      <div class="card">
+        <h3>useEffect Lifecycle</h3>
+        <ul>
+          <li><strong>A) After initial rendering</strong>: useEffect invokes the callback (side-effect). Cleanup is NOT invoked.</li>
+          <li><strong>B) On later renderings</strong>: Before next side-effect, useEffect invokes the <strong>cleanup from the previous run</strong>, then runs the current side-effect.</li>
+          <li><strong>C) After unmounting</strong>: useEffect invokes the cleanup function one final time.</li>
+        </ul>
+        <pre><span class="cmt">// Fetch data once when component mounts</span>
+<span class="fn">useEffect</span>(() =&gt; {
+    <span class="kw">async function</span> <span class="fn">fetchData</span>() {
+        <span class="kw">const</span> res = <span class="kw">await</span> <span class="fn">fetch</span>(<span class="str">"https://api.github.com/users"</span>);
+        <span class="fn">setUsers</span>(<span class="kw">await</span> res.<span class="fn">json</span>());
+    }
+    <span class="fn">fetchData</span>();
+}, []); <span class="cmt">// empty array = run once on mount</span>
+
+<span class="cmt">// Fetch when 'query' state variable changes</span>
+<span class="fn">useEffect</span>(() =&gt; {
+    <span class="kw">async function</span> <span class="fn">fetchData</span>() {
+        <span class="kw">const</span> url = <span class="str">`https://hn.algolia.com/api/v1/search?query=${query}`</span>;
+        <span class="kw">const</span> res  = <span class="kw">await</span> <span class="fn">fetch</span>(url);
+        <span class="kw">const</span> data = <span class="kw">await</span> res.<span class="fn">json</span>();
+        <span class="fn">setNews</span>(data.hits);
+    }
+    <span class="fn">fetchData</span>();
+}, [query]); <span class="cmt">// re-run whenever query changes</span></pre>
+      </div>
+
+      <div class="card">
+        <h3>useRef Hook</h3>
+        <ul>
+          <li>Creates <strong>persisted mutable values</strong> and accesses <strong>DOM elements directly</strong> (e.g., focusing an input)</li>
+          <li>The value of the reference is <strong>persisted between re-renderings</strong></li>
+          <li><strong>Updating a reference does NOT trigger a re-render</strong></li>
+          <li><code>useRef(initialValue)</code> returns a reference object with a <code>current</code> property</li>
+        </ul>
+        <div class="two-col" style="margin-top:10px;">
+          <div>
+            <pre><span class="cmt">// useRef for mutable values</span>
+<span class="kw">const</span> <span class="var">reference</span> = <span class="fn">useRef</span>(<span class="num">0</span>);
+reference.current; <span class="cmt">// access value</span>
+reference.current = <span class="num">5</span>; <span class="cmt">// update value</span>
+<span class="cmt">// ↑ does NOT trigger re-render!</span></pre>
+          </div>
+          <div>
+            <pre><span class="cmt">// useRef for DOM element access</span>
+<span class="kw">const</span> <span class="var">inputRef</span> = <span class="fn">useRef</span>();
+
+<span class="cmt">// Assign to element</span>
+<span class="tag-html">&lt;input</span> <span class="attr">ref</span>={inputRef} /&gt;
+
+<span class="cmt">// After mount: focus input</span>
+inputRef.current.<span class="fn">focus</span>();</pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="card warn">
+        <h3>useRef vs. useState Comparison</h3>
+        <table>
+          <tr><th></th><th>useState</th><th>useRef</th></tr>
+          <tr><td><strong>Triggers re-render?</strong></td><td>✅ Yes — on every state change</td><td>❌ No — value change is silent</td></tr>
+          <tr><td><strong>Persists across renders?</strong></td><td>✅ Yes</td><td>✅ Yes</td></tr>
+          <tr><td><strong>Best use</strong></td><td>UI data that should update the screen</td><td>DOM access, timers, non-visual data</td></tr>
+        </table>
+      </div>
+    </section>
+
+    <!-- REACT EXAMPLES -->
+    <div id="react-examples">
+      <div class="examples-header" style="background: linear-gradient(90deg, #0a3d5c 0%, #061d2e 100%);">
+        <h2>📌 React Examples from the Chapter</h2>
+        <p>Key code examples and output — organized for exam review</p>
+      </div>
+      <div class="example-item">
+        <h3><span class="ex-num">R-01</span> Basic Function Component with Props</h3>
+        <pre><span class="kw">function</span> <span class="fn">Welcome</span>(props) {
+    <span class="kw">return</span> (<span class="tag-html">&lt;h1&gt;</span>Welcome to {props.appName}<span class="tag-html">&lt;/h1&gt;</span>);
+}
+<span class="cmt">// &lt;Welcome appName="React Demo App" /&gt;</span></pre>
+        <div class="output-label">✓ Output</div>
+        <div class="output-box">Renders: &lt;h1&gt;Welcome to React Demo App&lt;/h1&gt;</div>
+      </div>
+      <div class="example-item">
+        <h3><span class="ex-num">R-02</span> useState — Counter Component</h3>
+        <pre><span class="kw">const</span> [count, setCount] = <span class="fn">useState</span>(<span class="num">3</span>);
+<span class="cmt">// Click + → setCount(count+1) → React re-renders
+// Click - → setCount(count-1) → React re-renders</span></pre>
+        <div class="output-label">✓ Answer</div>
+        <div class="output-box">count starts at 3 (from startValue prop). Every click re-renders the UI automatically.</div>
+      </div>
+      <div class="example-item">
+        <h3><span class="ex-num">R-03</span> List Rendering with Keys</h3>
+        <pre>{friends.<span class="fn">map</span>( (friend, i) =&gt;
+    <span class="tag-html">&lt;li</span> <span class="attr">key</span>={i}&gt;{friend}<span class="tag-html">&lt;/li&gt;</span>
+)}</pre>
+        <div class="output-label">✓ Answer</div>
+        <div class="output-box">Renders a &lt;li&gt; for each friend. key={i} helps React track list items efficiently. Without keys, React warns and performance suffers.</div>
+      </div>
+      <div class="example-item">
+        <h3><span class="ex-num">R-04</span> Form — handleChange with spread</h3>
+        <pre><span class="fn">setState</span>({ ...state, [name]: value });</pre>
+        <div class="output-label">✓ Explanation</div>
+        <div class="output-box">Spread (...state) copies all existing fields. [name]: value uses the input's name attribute as the key — updates only the changed field, keeps the rest intact.</div>
+      </div>
+      <div class="example-item">
+        <h3><span class="ex-num">R-05</span> useEffect — Fetch on Mount</h3>
+        <pre><span class="fn">useEffect</span>(() =&gt; {
+    <span class="kw">async function</span> <span class="fn">fetchData</span>() {
+        <span class="kw">const</span> res = <span class="kw">await</span> <span class="fn">fetch</span>(url);
+        <span class="fn">setUsers</span>(<span class="kw">await</span> res.<span class="fn">json</span>());
+    }
+    <span class="fn">fetchData</span>();
+}, []); <span class="cmt">// [] = run once only on mount</span></pre>
+        <div class="output-label">✓ Answer</div>
+        <div class="output-box">fetchData() runs once when the component first mounts. Empty [] dependency array = "run only once". setUsers(data) triggers re-render with the fetched data.</div>
+      </div>
+      <div class="example-item">
+        <h3><span class="ex-num">R-06</span> useRef — Focus Input on Mount</h3>
+        <pre><span class="kw">const</span> <span class="var">inputRef</span> = <span class="fn">useRef</span>();
+<span class="fn">useEffect</span>(() =&gt; { inputRef.current.<span class="fn">focus</span>(); }, []);
+<span class="cmt">// JSX: &lt;input ref={inputRef} /&gt;</span></pre>
+        <div class="output-label">✓ Answer</div>
+        <div class="output-box">After mount, useEffect runs: inputRef.current points to the real DOM input element. Calling .focus() gives it keyboard focus. Updating a ref does NOT trigger re-render.</div>
+      </div>
+    </div>
+  </div><!-- end chapter 7 React -->
 
 
 </div><!-- container -->

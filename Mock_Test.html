@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Mock Test – CMPS 350 Web Dev</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Sora:wght@300;400;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg:#0a0c18;--surface:#131525;--surface2:#1b1e35;--border:#252842;
+  --accent:#f7c948;--green:#3ecf8e;--red:#f87171;--blue:#38bdf8;
+  --purple:#a78bfa;--orange:#fb923c;--muted:#7b80a8;--text:#dde1f5;
+  --mono:'JetBrains Mono',monospace;--sans:'Sora',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);line-height:1.7;min-height:100vh;}
+
+/* NAV */
+.global-nav{position:sticky;top:0;z-index:9999;background:rgba(8,9,20,.96);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 24px;height:52px;gap:12px;}
+.nav-brand{font-family:var(--mono);font-size:12px;font-weight:700;letter-spacing:2px;color:var(--accent);text-transform:uppercase;white-space:nowrap;flex-shrink:0;}
+.nav-links{display:flex;gap:4px;align-items:center;}
+.nav-links a{font-family:var(--mono);font-size:10px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;padding:6px 14px;border-radius:6px;border:1px solid transparent;color:var(--muted);transition:all .18s;white-space:nowrap;}
+.nav-links a:hover{color:var(--text);border-color:var(--border);background:rgba(255,255,255,.05);}
+.nav-links a.nav-notes.active{color:#fb923c;border-color:#fb923c;background:rgba(251,146,60,.1);}
+.nav-links a.nav-vault.active{color:#60b8f0;border-color:#60b8f0;background:rgba(96,184,240,.1);}
+.nav-links a.nav-mcq.active{color:#3ecf8e;border-color:#3ecf8e;background:rgba(62,207,142,.1);}
+.nav-links a.nav-mock.active{color:var(--red);border-color:var(--red);background:rgba(248,113,113,.1);}
+@media(max-width:480px){.nav-brand{display:none;}.global-nav{justify-content:center;}.nav-links a{font-size:9px;padding:5px 8px;}}
+
+/* ── SCREEN MANAGER ── */
+.screen{display:none;}
+.screen.active{display:block;}
+
+/* ════════════════════════════
+   LOBBY SCREEN
+════════════════════════════ */
+#screen-lobby{max-width:760px;margin:0 auto;padding:40px 24px 80px;}
+.lobby-hero{text-align:center;padding:60px 0 40px;border-bottom:1px solid var(--border);margin-bottom:40px;}
+.lobby-badge{display:inline-block;background:var(--red);color:#fff;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:4px 14px;border-radius:20px;margin-bottom:20px;}
+.lobby-hero h1{font-size:clamp(2rem,5vw,3.2rem);font-weight:800;color:#fff;margin-bottom:10px;letter-spacing:-1px;}
+.lobby-hero h1 span{color:var(--red);}
+.lobby-hero p{color:var(--muted);font-size:14px;}
+
+.config-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:28px;}
+@media(max-width:560px){.config-grid{grid-template-columns:1fr;}}
+
+.config-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px 22px;}
+.config-card h3{font-family:var(--mono);font-size:10px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:12px;}
+.config-option{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:8px;border:2px solid var(--border);background:var(--surface2);cursor:pointer;transition:all .18s;margin-bottom:8px;font-size:13px;}
+.config-option:hover{border-color:var(--accent);color:var(--accent);}
+.config-option.selected{border-color:var(--accent);background:rgba(247,201,72,.08);color:var(--accent);}
+.config-option .opt-radio{width:16px;height:16px;border-radius:50%;border:2px solid currentColor;flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+.config-option.selected .opt-radio::after{content:'';width:8px;height:8px;border-radius:50%;background:var(--accent);}
+
+.topic-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.topic-chip{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:8px;border:2px solid var(--border);background:var(--surface2);cursor:pointer;transition:all .18s;font-size:12px;font-weight:600;}
+.topic-chip:hover{border-color:var(--blue);}
+.topic-chip.selected{border-color:var(--blue);background:rgba(56,189,248,.08);color:var(--blue);}
+.topic-chip .chip-check{width:14px;height:14px;border-radius:3px;border:2px solid currentColor;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:9px;}
+.topic-chip.selected .chip-check::after{content:'✓';color:var(--blue);}
+
+.start-btn{width:100%;padding:16px;background:var(--red);border:none;border-radius:12px;color:#fff;font-family:var(--sans);font-size:16px;font-weight:800;letter-spacing:.5px;cursor:pointer;transition:all .2s;margin-top:8px;}
+.start-btn:hover{background:#e55a5a;transform:translateY(-1px);box-shadow:0 8px 24px rgba(248,113,113,.3);}
+.start-btn:disabled{opacity:.4;cursor:not-allowed;transform:none;}
+
+.bank-stats{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:28px;}
+.bank-stat{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 20px;flex:1;min-width:120px;text-align:center;}
+.bank-stat .num{font-family:var(--mono);font-size:22px;font-weight:700;color:var(--accent);}
+.bank-stat .lbl{font-family:var(--mono);font-size:9px;letter-spacing:2px;color:var(--muted);margin-top:2px;}
+
+/* ════════════════════════════
+   TEST SCREEN
+════════════════════════════ */
+#screen-test{min-height:calc(100vh - 52px);display:flex;flex-direction:column;}
+
+.test-header{position:sticky;top:52px;z-index:100;background:rgba(10,12,24,.97);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:12px 24px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
+.test-title{font-family:var(--mono);font-size:11px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;flex-shrink:0;}
+.prog-wrap{flex:1;height:5px;background:var(--border);border-radius:3px;overflow:hidden;min-width:80px;}
+.prog-fill{height:100%;background:var(--green);border-radius:3px;transition:width .3s;}
+.prog-text{font-family:var(--mono);font-size:12px;color:var(--muted);white-space:nowrap;}
+
+/* TIMER */
+.timer-box{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:15px;font-weight:700;padding:6px 14px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);}
+.timer-box.warn{border-color:var(--orange);color:var(--orange);animation:pulse 1s infinite;}
+.timer-box.danger{border-color:var(--red);color:var(--red);animation:pulse .5s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.6;}}
+.timer-icon{font-size:14px;}
+
+.test-body{flex:1;max-width:820px;margin:0 auto;padding:32px 24px 80px;width:100%;}
+
+/* Q NAV */
+.q-nav-grid{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:24px;}
+.q-nav-btn{width:36px;height:36px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--muted);font-family:var(--mono);font-size:11px;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;font-weight:700;}
+.q-nav-btn:hover{border-color:var(--blue);color:var(--blue);}
+.q-nav-btn.current{border-color:var(--blue);background:rgba(56,189,248,.15);color:var(--blue);}
+.q-nav-btn.answered{border-color:var(--green);background:rgba(62,207,142,.1);color:var(--green);}
+.q-nav-btn.flagged{border-color:var(--orange);background:rgba(251,146,60,.1);color:var(--orange);}
+.q-nav-btn.answered.flagged{border-color:var(--orange);}
+
+/* QUESTION CARD */
+.q-display{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px;margin-bottom:16px;}
+.q-meta{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap;}
+.q-num-badge{font-family:var(--mono);font-size:11px;font-weight:800;padding:4px 12px;border-radius:20px;background:var(--surface2);color:var(--muted);}
+.q-topic-badge{font-family:var(--mono);font-size:10px;letter-spacing:1px;padding:3px 10px;border-radius:20px;border:1px solid var(--border);color:var(--muted);}
+.flag-btn{margin-left:auto;font-family:var(--mono);font-size:10px;letter-spacing:1px;padding:4px 12px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;transition:all .18s;}
+.flag-btn:hover,.flag-btn.flagged{border-color:var(--orange);color:var(--orange);}
+
+.q-text{font-size:15px;font-weight:600;color:#fff;line-height:1.65;margin-bottom:20px;}
+.q-text code{font-family:var(--mono);background:#080c18;padding:2px 7px;border-radius:4px;font-size:13px;color:#a5d6ff;}
+.q-code{background:#080c18;border:1px solid var(--border);border-radius:10px;padding:14px 16px;font-family:var(--mono);font-size:12px;line-height:1.8;color:#a5d6ff;white-space:pre;overflow-x:auto;margin:0 0 20px;}
+
+.opts-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+@media(max-width:560px){.opts-grid{grid-template-columns:1fr;}}
+
+.opt{background:var(--surface2);border:2px solid var(--border);border-radius:10px;padding:12px 16px;cursor:pointer;font-size:13.5px;color:var(--text);transition:all .18s;display:flex;align-items:flex-start;gap:10px;text-align:left;line-height:1.5;}
+.opt:hover:not(.selected):not(.locked){border-color:var(--blue);color:#fff;background:rgba(56,189,248,.06);}
+.opt.selected{border-color:var(--blue);background:rgba(56,189,248,.1);color:var(--blue);}
+.opt.locked{cursor:default;}
+.opt-label{font-family:var(--mono);font-weight:700;font-size:11px;opacity:.6;flex-shrink:0;margin-top:2px;}
+
+.test-actions{display:flex;gap:10px;flex-wrap:wrap;}
+.btn-prev,.btn-next,.btn-submit{font-family:var(--sans);font-size:13px;font-weight:700;padding:10px 22px;border-radius:10px;border:none;cursor:pointer;transition:all .18s;}
+.btn-prev{background:var(--surface2);border:1px solid var(--border);color:var(--text);}
+.btn-prev:hover{border-color:var(--blue);color:var(--blue);}
+.btn-next{background:var(--blue);color:#0a0c18;}
+.btn-next:hover{background:#60cbf8;}
+.btn-submit{background:var(--green);color:#0a1a0f;margin-left:auto;}
+.btn-submit:hover{background:#5aeaa8;}
+.btn-submit:disabled{opacity:.4;cursor:not-allowed;}
+
+/* ════════════════════════════
+   RESULTS SCREEN
+════════════════════════════ */
+#screen-results{max-width:820px;margin:0 auto;padding:40px 24px 80px;}
+
+.results-hero{text-align:center;padding:48px 0 40px;border-bottom:1px solid var(--border);margin-bottom:40px;}
+.grade-ring{width:140px;height:140px;border-radius:50%;border:6px solid var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;margin:0 auto 24px;position:relative;}
+.grade-ring .pct{font-family:var(--mono);font-size:30px;font-weight:700;}
+.grade-ring .grade-label{font-family:var(--mono);font-size:10px;letter-spacing:2px;color:var(--muted);}
+.results-hero h2{font-size:1.8rem;font-weight:800;color:#fff;margin-bottom:8px;}
+.results-hero p{color:var(--muted);font-size:14px;}
+
+.results-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:36px;}
+@media(max-width:560px){.results-stats{grid-template-columns:1fr 1fr;}}
+.r-stat{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;text-align:center;}
+.r-stat .num{font-family:var(--mono);font-size:22px;font-weight:700;line-height:1;}
+.r-stat .lbl{font-family:var(--mono);font-size:9px;letter-spacing:2px;color:var(--muted);margin-top:4px;}
+
+.review-section{margin-bottom:40px;}
+.review-title{font-family:var(--mono);font-size:10px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;padding:8px 14px;background:var(--surface);border:1px solid var(--border);border-radius:8px;margin-bottom:16px;display:inline-block;}
+
+.review-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:12px;}
+.review-card.r-correct{border-color:var(--green);}
+.review-card.r-wrong{border-color:var(--red);}
+.review-card.r-skipped{border-color:var(--orange);}
+.review-q-text{font-size:14px;font-weight:600;color:#fff;line-height:1.55;margin-bottom:10px;}
+.review-answer-row{display:flex;flex-direction:column;gap:6px;font-size:13px;}
+.review-answer-row .ra-label{font-family:var(--mono);font-size:10px;letter-spacing:1px;color:var(--muted);}
+.review-answer-row .ra-val{font-weight:600;}
+.ra-correct{color:var(--green);}
+.ra-wrong{color:var(--red);}
+.ra-skip{color:var(--orange);}
+.review-exp{margin-top:10px;padding:8px 12px;background:rgba(255,255,255,.03);border-radius:8px;font-size:12px;color:var(--muted);line-height:1.6;}
+
+.results-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:20px;}
+.ra-btn{font-family:var(--sans);font-size:13px;font-weight:700;padding:12px 24px;border-radius:10px;cursor:pointer;transition:all .18s;border:none;}
+.ra-btn.primary{background:var(--red);color:#fff;}
+.ra-btn.primary:hover{background:#e55a5a;}
+.ra-btn.secondary{background:var(--surface2);border:1px solid var(--border);color:var(--text);}
+.ra-btn.secondary:hover{border-color:var(--blue);color:var(--blue);}
+
+/* TIME UP OVERLAY */
+.time-overlay{position:fixed;inset:0;background:rgba(5,5,14,.92);backdrop-filter:blur(10px);z-index:9000;display:none;align-items:center;justify-content:center;flex-direction:column;text-align:center;gap:20px;}
+.time-overlay.show{display:flex;}
+.time-overlay h2{font-size:2.5rem;font-weight:800;color:var(--red);}
+.time-overlay p{color:var(--muted);font-size:14px;}
+.time-overlay .ra-btn{padding:14px 32px;font-size:15px;}
+
+/* Confirm overlay */
+.confirm-overlay{position:fixed;inset:0;background:rgba(5,5,14,.88);backdrop-filter:blur(8px);z-index:8900;display:none;align-items:center;justify-content:center;}
+.confirm-overlay.show{display:flex;}
+.confirm-box{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:32px;max-width:440px;width:90%;text-align:center;}
+.confirm-box h3{font-size:1.3rem;font-weight:800;color:#fff;margin-bottom:10px;}
+.confirm-box p{color:var(--muted);font-size:13px;margin-bottom:24px;line-height:1.6;}
+.confirm-box .confirm-btns{display:flex;gap:10px;justify-content:center;}
+.confirm-box .confirm-btns button{font-family:var(--sans);font-size:13px;font-weight:700;padding:10px 24px;border-radius:10px;cursor:pointer;border:none;transition:all .18s;}
+.confirm-yes{background:var(--green);color:#0a1a0f;}
+.confirm-no{background:var(--surface2);border:1px solid var(--border) !important;color:var(--text);}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;padding:10px 18px;border-radius:10px;font-family:var(--mono);font-size:12px;background:var(--surface2);border:1px solid var(--border);color:var(--text);z-index:9999;transform:translateY(80px);opacity:0;transition:all .3s;}
+.toast.show{transform:translateY(0);opacity:1;}
+
+.scroll-q{scroll-margin-top:120px;}
+</style>
+</head>
+<body>
+
+<nav class="global-nav">
+  <span class="nav-brand">CMPS 350 · Web Dev</span>
+  <div class="nav-links">
+    <a href="index.html" class="nav-notes">📚 Study Notes</a>
+    <a href="Keyword_Vault.html" class="nav-vault">⚡ Vault</a>
+    <a href="MCQ_Practice_Bank.html" class="nav-mcq">🧠 MCQ Bank</a>
+    <a href="Mock_Test.html" class="nav-mock active">🎯 Mock Test</a>
+  </div>
+</nav>
+
+<!-- ════════════ LOBBY ════════════ -->
+<div id="screen-lobby" class="screen active">
+  <div class="lobby-hero">
+    <div class="lobby-badge">📝 Exam Simulation</div>
+    <h1>Mock <span>Test</span></h1>
+    <p>Timed, randomised exam drawn from the full question bank · All chapters</p>
+  </div>
+
+  <div id="bank-stats-row" class="bank-stats">
+    <div class="bank-stat"><div class="num" id="bank-total">—</div><div class="lbl">TOTAL Q's</div></div>
+    <div class="bank-stat"><div class="num" id="bank-html">10</div><div class="lbl">HTML</div></div>
+    <div class="bank-stat"><div class="num" id="bank-css">10</div><div class="lbl">CSS</div></div>
+    <div class="bank-stat"><div class="num" id="bank-js">10</div><div class="lbl">JavaScript</div></div>
+    <div class="bank-stat"><div class="num" id="bank-oop">10</div><div class="lbl">OOP</div></div>
+    <div class="bank-stat"><div class="num" id="bank-dom">10</div><div class="lbl">Client JS</div></div>
+    <div class="bank-stat"><div class="num" id="bank-wa">10</div><div class="lbl">Web API</div></div>
+    <div class="bank-stat"><div class="num" id="bank-react">19</div><div class="lbl">React</div></div>
+  </div>
+
+  <div class="config-grid">
+    <div class="config-card">
+      <h3>⏱ Time Limit</h3>
+      <div class="config-option selected" data-group="time" data-val="15">
+        <span class="opt-radio"></span>15 minutes — Quick
+      </div>
+      <div class="config-option" data-group="time" data-val="30">
+        <span class="opt-radio"></span>30 minutes — Standard
+      </div>
+      <div class="config-option" data-group="time" data-val="60">
+        <span class="opt-radio"></span>60 minutes — Full Exam
+      </div>
+      <div class="config-option" data-group="time" data-val="0">
+        <span class="opt-radio"></span>No time limit — Practice
+      </div>
+    </div>
+
+    <div class="config-card">
+      <h3>📋 Question Count</h3>
+      <div class="config-option selected" data-group="count" data-val="10">
+        <span class="opt-radio"></span>10 questions — Quick fire
+      </div>
+      <div class="config-option" data-group="count" data-val="20">
+        <span class="opt-radio"></span>20 questions — Mid-length
+      </div>
+      <div class="config-option" data-group="count" data-val="30">
+        <span class="opt-radio"></span>30 questions — Standard
+      </div>
+      <div class="config-option" data-group="count" data-val="all">
+        <span class="opt-radio"></span>All questions — Full Bank
+      </div>
+    </div>
+  </div>
+
+  <div class="config-card" style="margin-bottom:16px;">
+    <h3>📚 Topics to Include</h3>
+    <div class="topic-grid" id="topic-grid">
+      <div class="topic-chip selected" data-topic="HTML">
+        <span class="chip-check"></span>🌐 HTML Fundamentals
+      </div>
+      <div class="topic-chip selected" data-topic="CSS">
+        <span class="chip-check"></span>🎨 CSS Fundamentals
+      </div>
+      <div class="topic-chip selected" data-topic="CSS Responsive">
+        <span class="chip-check"></span>📐 CSS Responsive
+      </div>
+      <div class="topic-chip selected" data-topic="JavaScript">
+        <span class="chip-check"></span>⚡ JavaScript
+      </div>
+      <div class="topic-chip selected" data-topic="OOP">
+        <span class="chip-check"></span>🏛️ OOP in JS
+      </div>
+      <div class="topic-chip selected" data-topic="Client-Side JS">
+        <span class="chip-check"></span>🌍 Client-Side JS
+      </div>
+      <div class="topic-chip selected" data-topic="Web API">
+        <span class="chip-check"></span>🔌 Web API
+      </div>
+      <div class="topic-chip selected" data-topic="React">
+        <span class="chip-check"></span>⚛️ React
+      </div>
+    </div>
+  </div>
+
+  <div id="lobby-preview" style="font-family:var(--mono);font-size:12px;color:var(--muted);margin-bottom:16px;padding:10px 16px;background:var(--surface);border:1px solid var(--border);border-radius:8px;"></div>
+
+  <button class="start-btn" id="start-btn" onclick="startTest()">🚀 Start Mock Test</button>
+</div>
+
+<!-- ════════════ TEST ════════════ -->
+<div id="screen-test" class="screen">
+  <div class="test-header">
+    <span class="test-title">MOCK TEST</span>
+    <div class="prog-wrap"><div class="prog-fill" id="test-prog"></div></div>
+    <span class="prog-text" id="test-prog-text">0 / 0</span>
+    <div class="timer-box" id="timer-box">
+      <span class="timer-icon">⏱</span>
+      <span id="timer-display">—</span>
+    </div>
+  </div>
+
+  <div class="test-body">
+    <div class="q-nav-grid" id="q-nav-grid"></div>
+
+    <div class="q-display scroll-q" id="q-display">
+      <!-- populated by JS -->
+    </div>
+
+    <div class="test-actions">
+      <button class="btn-prev" onclick="navigate(-1)">← Prev</button>
+      <button class="btn-next" onclick="navigate(1)" id="btn-next">Next →</button>
+      <button class="btn-submit" onclick="confirmSubmit()" id="btn-submit">Submit Test ✓</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════ RESULTS ════════════ -->
+<div id="screen-results" class="screen">
+  <div class="results-hero">
+    <div class="grade-ring" id="grade-ring">
+      <span class="pct" id="result-pct">—%</span>
+      <span class="grade-label" id="result-grade">—</span>
+    </div>
+    <h2 id="result-headline">Test Complete!</h2>
+    <p id="result-subline">Loading results…</p>
+  </div>
+
+  <div class="results-stats">
+    <div class="r-stat"><div class="num" style="color:var(--green)" id="r-correct">—</div><div class="lbl">CORRECT</div></div>
+    <div class="r-stat"><div class="num" style="color:var(--red)" id="r-wrong">—</div><div class="lbl">WRONG</div></div>
+    <div class="r-stat"><div class="num" style="color:var(--orange)" id="r-skipped">—</div><div class="lbl">SKIPPED</div></div>
+    <div class="r-stat"><div class="num" id="r-time">—</div><div class="lbl">TIME USED</div></div>
+  </div>
+
+  <div class="review-section">
+    <span class="review-title">📋 Full Review</span>
+    <div id="review-container"></div>
+  </div>
+
+  <div class="results-actions">
+    <button class="ra-btn primary" onclick="retakeTest()">🔄 Retake Test</button>
+    <button class="ra-btn secondary" onclick="showLobby()">⚙️ New Config</button>
+    <button class="ra-btn secondary" onclick="window.location.href='MCQ_Practice_Bank.html'">📚 Back to MCQ Bank</button>
+  </div>
+</div>
+
+<!-- Time up overlay -->
+<div class="time-overlay" id="time-overlay">
+  <div style="font-size:64px;">⏰</div>
+  <h2>Time's Up!</h2>
+  <p>Your answers have been recorded. Let's see how you did.</p>
+  <button class="ra-btn primary" onclick="finishTest(true)">See Results →</button>
+</div>
+
+<!-- Confirm submit -->
+<div class="confirm-overlay" id="confirm-overlay">
+  <div class="confirm-box">
+    <h3>Submit Test?</h3>
+    <p id="confirm-msg">You're about to submit. Any unanswered questions will be marked as skipped.</p>
+    <div class="confirm-btns">
+      <button class="confirm-yes" onclick="finishTest(false)">Yes, Submit</button>
+      <button class="confirm-no" onclick="closeConfirm()">Keep Going</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ════════════════════════════════════════════════
+//  FULL QUESTION BANK
+// ════════════════════════════════════════════════
+const BANK = [
+
+// ── HTML (10) ──
+{topic:'HTML',q:'Which tag defines the main content of a page and should appear only once?',opts:['&lt;body&gt;','&lt;main&gt;','&lt;section&gt;','&lt;article&gt;'],correct:1,exp:'&lt;main&gt; marks the primary content unique to that page. It should appear only once per page.'},
+{topic:'HTML',q:'In an HTML table, &lt;tfoot&gt; is written BEFORE &lt;tbody&gt; in source code. How does the browser render it?',opts:['At the top','At the bottom','In the middle','Wherever it appears in source'],correct:1,exp:'Despite appearing before &lt;tbody&gt; in source code, the browser renders &lt;tfoot&gt; at the bottom of the table.'},
+{topic:'HTML',q:'Which input type opens a numeric keypad on mobile for phone numbers?',opts:['type="number"','type="text"','type="tel"','type="range"'],correct:2,exp:'type="tel" opens a numeric keypad on mobile and is designed specifically for phone numbers.'},
+{topic:'HTML',q:'What is the difference between &lt;section&gt; and &lt;article&gt;?',opts:['&lt;section&gt; adds borders','&lt;article&gt; is self-contained; &lt;section&gt; is a thematic grouping','&lt;section&gt; is only inside &lt;main&gt;','They are interchangeable'],correct:1,exp:'&lt;article&gt; = self-contained content (makes sense when read alone). &lt;section&gt; = thematic grouping of content.'},
+{topic:'HTML',q:'Which attribute makes a form field mandatory before submission?',opts:['placeholder','required','autofocus','disabled'],correct:1,exp:'The required attribute triggers browser validation — the form cannot be submitted until this field has a value.'},
+{topic:'HTML',q:'Which element groups related form inputs together and can have a legend caption?',opts:['&lt;form&gt;','&lt;div&gt;','&lt;fieldset&gt;','&lt;section&gt;'],correct:2,exp:'&lt;fieldset&gt; groups related inputs and pairs with &lt;legend&gt; to provide a caption for the group.'},
+{topic:'HTML',q:'What does the alt attribute on &lt;img&gt; provide?',opts:['Alternative image styling','Descriptive text for accessibility and fallback','A tooltip shown on hover','A visible caption below'],correct:1,exp:'alt provides a text alternative for screen readers and displays when the image fails to load — essential for accessibility.'},
+{topic:'HTML',q:'Which input type allows multiple independent selections?',opts:['type="radio"','type="checkbox"','type="select"','type="text"'],correct:1,exp:'Checkboxes allow multiple independent selections. Radio buttons only allow one selection per named group.'},
+{topic:'HTML',q:'What is &lt;aside&gt; used for?',opts:['Navigation links','Page footer content','Sidebar/supplementary content tangentially related to main','Page header and logo'],correct:2,exp:'&lt;aside&gt; is for sidebar content that is tangentially related — it can be removed without reducing the main content\'s meaning.'},
+{topic:'HTML',q:'Which HTML element provides autocomplete suggestions for a text input?',opts:['&lt;optgroup&gt;','&lt;select&gt;','&lt;datalist&gt;','&lt;option&gt;'],correct:2,exp:'&lt;datalist&gt; linked to an input via the list= attribute provides a dropdown of autocomplete suggestions.'},
+
+// ── CSS (10) ──
+{topic:'CSS',q:'Which CSS selector has the highest specificity?',opts:['Element selector p{}','Class selector .btn{}','ID selector #logo{}','Inline style="..."'],correct:3,exp:'Specificity order: Inline (1000) > ID (100) > Class (10) > Element (1). Inline styles always win.'},
+{topic:'CSS',q:'What does the em unit in CSS refer to?',opts:['Font size of the root HTML element','Font size of the parent element','One pixel','Viewport width'],correct:1,exp:'em is relative to the font-size of the parent element. rem is relative to the root element.'},
+{topic:'CSS',q:'What is the correct order of CSS box model layers (inside to outside)?',opts:['Margin > Border > Padding > Content','Content > Padding > Border > Margin','Content > Border > Padding > Margin','Padding > Content > Border > Margin'],correct:1,exp:'From innermost to outermost: Content → Padding → Border → Margin.'},
+{topic:'CSS',q:'What does margin: 10px 20px set?',opts:['All sides 10px','Top & bottom 10px; left & right 20px','Top 20px, all others 10px','Four sides individually'],correct:1,exp:'2-value shorthand: first value = top & bottom, second value = left & right.'},
+{topic:'CSS',q:'Which CSS selector targets only direct children of a div?',opts:['div p {}','div > p {}','div + p {}','div ~ p {}'],correct:1,exp:'div > p targets only direct children, not deeply nested descendants.'},
+{topic:'CSS',q:'What does tr:nth-child(odd) select?',opts:['Only the first table row','Every even table row','Every odd table row (1, 3, 5…)','Every third column'],correct:2,exp:'nth-child(odd) selects rows 1, 3, 5… — commonly used for zebra striping.'},
+{topic:'CSS',q:'Which is the recommended way to include CSS for a multi-page website?',opts:['Inline styles on each element','&lt;style&gt; block in &lt;head&gt;','External .css file with &lt;link rel="stylesheet"&gt;','JavaScript to apply styles'],correct:2,exp:'External stylesheets are reusable across all pages and can be cached by the browser — the best practice.'},
+{topic:'CSS',q:'In CSS, what does "the cascade" mean?',opts:['CSS animations that flow downward','Later rules overwrite earlier ones; inline styles win','Child elements inherit from parent','ID selectors always override class selectors'],correct:1,exp:'The cascade means: when rules conflict, the later rule wins. Inline styles have highest priority in the cascade.'},
+{topic:'CSS',q:'Which CSS declaration inserts content BEFORE an element without modifying HTML?',opts:['content: "→"','p::after {}','p::before { content: "→"; }','p.prepend("→")'],correct:2,exp:'p::before is a pseudo-element that inserts generated content before the element using the content property.'},
+{topic:'CSS',q:'Which attribute selector targets links that start with "https"?',opts:['a[href="https"]','a[href^="https"]','a[href$="https"]','a[href*="https"]'],correct:1,exp:'The ^ operator (caret) matches attributes that START WITH the given value.'},
+
+// ── CSS RESPONSIVE (10) ──
+{topic:'CSS Responsive',q:'CSS Grid is _____ while Flexbox is _____.',opts:['1D; 2D','2D; 1D','Both 2D','Both 1D'],correct:1,exp:'Grid = 2D (rows + columns). Flexbox = 1D (row OR column). Use both together: Grid for layout, Flexbox inside cells.'},
+{topic:'CSS Responsive',q:'What does justify-content control in Flexbox?',opts:['Alignment along the cross-axis','Distribution along the main axis','Whether items go row or column','Whether items wrap to multiple lines'],correct:1,exp:'justify-content distributes items along the MAIN axis. align-items handles the cross axis.'},
+{topic:'CSS Responsive',q:'Which CSS function constrains a value with an absolute minimum and maximum?',opts:['minmax()','calc()','clamp()','max()'],correct:2,exp:'clamp(min, preferred, max) e.g. clamp(200px, 40%, 600px) — perfect for fluid responsive sizing.'},
+{topic:'CSS Responsive',q:'Which Grid property allows you to name layout areas?',opts:['grid-template-columns','grid-gap','grid-template-areas','grid-column'],correct:2,exp:'grid-template-areas lets you name regions using string-based ASCII art and assign items with grid-area.'},
+{topic:'CSS Responsive',q:'What does @media screen and (min-width: 768px) do?',opts:['Applies styles on screens narrower than 768px','Applies styles on screens 768px or wider','Applies on exactly 768px screens only','Applies on screens up to 768px maximum'],correct:1,exp:'min-width: 768px = styles apply when viewport is 768px or wider — the standard tablet breakpoint.'},
+{topic:'CSS Responsive',q:'In the "Pancake Stack" layout, what does grid-template-rows: auto 1fr auto achieve?',opts:['Header and footer fill all space','Header & footer auto-size; main fills remaining space','All three rows equal height','Only the middle row is shown'],correct:1,exp:'auto = header/footer shrink to their content size. 1fr = main fills all remaining space — the classic sticky footer.'},
+{topic:'CSS Responsive',q:'Which Flex item property controls how much an item grows to fill available space?',opts:['flex-shrink','flex-grow','flex-basis','order'],correct:1,exp:'flex-grow: 1 means the item will grow proportionally to fill available space. 0 = don\'t grow.'},
+{topic:'CSS Responsive',q:'What does grid-column: 1 / -1 mean?',opts:['Item is placed in only the first column','Spans from first to last column line (all columns)','Item spans only the last two columns','Item is hidden'],correct:1,exp:'1/-1 means from the first grid line to the last grid line — spanning all available columns.'},
+{topic:'CSS Responsive',q:'When should you use Flexbox over CSS Grid?',opts:['Full page layout with header, sidebar, footer','Component-level layouts like navbars and card rows','Complex 2D item placements','Layouts using named grid-template-areas'],correct:1,exp:'Flexbox excels at component-level 1D layouts. Grid excels at macro page-level 2D layouts. Use both together.'},
+{topic:'CSS Responsive',q:'Which approach is recommended for responsive design?',opts:['Desktop-first using max-width queries','Mobile-first using min-width queries','Fixed-width for all screen sizes','Media queries only for tablet screens'],correct:1,exp:'Mobile-first starts with single-column and adds complexity with min-width media queries as screens widen.'},
+
+// ── JAVASCRIPT (10) ──
+{topic:'JavaScript',q:'What is the output of typeof null in JavaScript?',opts:['"null"','"undefined"','"object"','"function"'],correct:2,exp:'typeof null returns "object" — this is a well-known historical JavaScript quirk, not a logical type.'},
+{topic:'JavaScript',q:'What does 0 == "" evaluate to?',opts:['true','false','TypeError','NaN'],correct:0,exp:'== (loose equality) performs type coercion. Both get converted to 0, so 0==0 is true. Use === to avoid surprises.'},
+{topic:'JavaScript',q:'Which of these values is NOT falsy in JavaScript?',opts:['0','""','"0"','null'],correct:2,exp:'"0" is a non-empty string and is therefore TRUTHY, even though the character zero looks like a falsy value.'},
+{topic:'JavaScript',q:'What is the output of [1,2,3].map(x=>x*2).reduce((s,x)=>s+x)?',opts:['6','12','36','TypeError'],correct:1,exp:'map([1,2,3]) → [2,4,6], then reduce: 2+4+6 = 12.'},
+{topic:'JavaScript',q:'What does the rest operator (...args) do in a function definition?',opts:['Spreads an array into individual arguments','Collects multiple arguments into an array','Destructures an object into variables','Merges two arrays'],correct:1,exp:'The rest operator in a function parameter collects all remaining arguments into a real array.'},
+{topic:'JavaScript',q:'Which array method returns a new array WITHOUT modifying the original?',opts:['push()','splice()','filter()','sort()'],correct:2,exp:'filter() always returns a new array of elements that pass the test — it never mutates the original.'},
+{topic:'JavaScript',q:'What is a closure in JavaScript?',opts:['A function that can only be called once','A function written with arrow syntax','An inner function that retains access to the outer function\'s scope','A function with no side effects'],correct:2,exp:'A closure is an inner function that retains access to its outer function\'s scope even after the outer function has returned.'},
+{topic:'JavaScript',q:'Which variable declaration should you use by default?',opts:['var','let','const','function'],correct:2,exp:'Start with const by default. Only switch to let when the value genuinely needs to be reassigned. Avoid var.'},
+{topic:'JavaScript',q:'What does .find(fn) return on an array?',opts:['All matching elements in a new array','The first element where the callback returns true','The index of the first matching element','A new transformed array'],correct:1,exp:'.find() returns the FIRST element where the callback returns true, or undefined if none is found.'},
+{topic:'JavaScript',q:'In a modern full-stack (React/Next.js), what is the role of JSON?',opts:['A programming language','A database technology','The common data format throughout the full stack','A front-end framework'],correct:2,exp:'JavaScript is the common language; JSON is the common data format used throughout the full stack.'},
+
+// ── OOP (10) ──
+{topic:'OOP',q:'What keyword must a child class use in its constructor to invoke the parent constructor?',opts:['parent()','super()','this()','base()'],correct:1,exp:'super() calls the parent class constructor. It must be called before accessing this in a child constructor.'},
+{topic:'OOP',q:'Private class fields in JavaScript are denoted by which prefix?',opts:['_','$','#','@'],correct:2,exp:'# makes a field truly private. Accessing it outside the class throws a SyntaxError at parse time.'},
+{topic:'OOP',q:'What does JSON.stringify() do with methods in an object?',opts:['Includes them as function strings','Throws a TypeError','Excludes them from the output','Converts them to null'],correct:2,exp:'JSON.stringify() only serializes data properties. Methods (functions) are silently excluded.'},
+{topic:'OOP',q:'At the very end of a prototype chain is…',opts:['Object.prototype','undefined','null','window'],correct:2,exp:'The prototype chain always terminates at null. Object.prototype.__proto__ === null.'},
+{topic:'OOP',q:'What does the static keyword mean in a JavaScript class?',opts:['The property cannot be changed','The property is only accessible inside the class','The property belongs to the class, not instances','The property cannot be inherited'],correct:2,exp:'Static members belong to the CLASS itself, not to individual instances. Access via ClassName.member.'},
+{topic:'OOP',q:'Which import syntax is correct for a named export?',opts:["import { add } from './lib.js'",'import add from "./lib.js"',"const add = require('./lib.js')",'include { add } from "./lib.js"'],correct:0,exp:'Named exports are imported with curly braces { } using the exact exported name.'},
+{topic:'OOP',q:'What does Object.setPrototypeOf(myCat, cat) do?',opts:['Copies all properties from cat to myCat','Makes cat the prototype of myCat (enables inheritance)','Merges cat into myCat as a flat object','Adds a property named "prototype" to myCat'],correct:1,exp:'Sets cat as the prototype of myCat, so myCat can access cat\'s properties through the prototype chain.'},
+{topic:'OOP',q:'How many default exports can a JavaScript module have?',opts:['Only one','Up to three','Unlimited','None — only named exports'],correct:0,exp:'A module can have only ONE default export. Named exports are unlimited.'},
+{topic:'OOP',q:'Which is a feature of Functional Programming?',opts:['Shared mutable state','Modifying input parameters','Pure functions with no side effects','Deep class hierarchies'],correct:2,exp:'Pure functions have no side effects and always produce the same output for the same input — a core FP principle.'},
+{topic:'OOP',q:'What does const movie2 = { ...movie1, episode: 8 } do?',opts:['Modifies movie1 by adding episode: 8','Creates a new object with all movie1 properties plus episode: 8','Appends movie1 array to movie2','Throws a TypeError'],correct:1,exp:'Spread (...movie1) copies all properties into a new object, then episode: 8 overrides or adds that property.'},
+
+// ── CLIENT-SIDE JS (10) ──
+{topic:'Client-Side JS',q:'What does document.querySelector(".myClass") return?',opts:['The first element with class "myClass"','All elements with class "myClass" as an array','An error — use getElementById for classes','A NodeList of matching elements'],correct:0,exp:'querySelector returns only the FIRST matching element. Use querySelectorAll for all matches.'},
+{topic:'Client-Side JS',q:'Which method prevents a form from reloading the page on submit?',opts:['event.stopPropagation()','event.preventDefault()','event.cancel()','return false'],correct:1,exp:'event.preventDefault() stops the browser\'s default behavior — for forms, that means preventing the page reload.'},
+{topic:'Client-Side JS',q:'What is the correct way to store an object in localStorage?',opts:["localStorage.setItem('k', myObj)","localStorage.setItem('k', JSON.stringify(myObj))","localStorage.store('k', myObj)","localStorage.save('k', myObj)"],correct:1,exp:'localStorage only stores strings. Serialize with JSON.stringify() before storing, JSON.parse() when reading.'},
+{topic:'Client-Side JS',q:'data-user-name="Ali" is accessed in JavaScript as…',opts:['el.dataset["user-name"]','el.dataset.userName','el.data.userName','el.getAttribute("userName")'],correct:1,exp:'Hyphens in data attribute names become camelCase in the dataset API: data-user-name → dataset.userName.'},
+{topic:'Client-Side JS',q:'What does response.json() return from the Fetch API?',opts:['A JSON string','A JavaScript object (synchronously)','A Promise that resolves to a JavaScript object','An array of JSON data'],correct:2,exp:'response.json() is asynchronous — it returns a Promise that resolves to the parsed JS object/array.'},
+{topic:'Client-Side JS',q:'What is the difference between innerHTML and innerText?',opts:['innerHTML returns text; innerText returns HTML','innerHTML parses HTML tags; innerText returns plain text','They are identical','innerHTML only works on &lt;div&gt;'],correct:1,exp:'innerHTML parses HTML markup (including tags). innerText returns only the visible plain text content.'},
+{topic:'Client-Side JS',q:'Which storage persists data even after the browser tab is closed?',opts:['localStorage.setItem()','sessionStorage.setItem()','cookieStorage.setItem()','memoryStorage.setItem()'],correct:0,exp:'localStorage persists data across sessions. sessionStorage is cleared when the tab or window closes.'},
+{topic:'Client-Side JS',q:'How do you add the CSS class "active" to an element using classList?',opts:['el.className = "active"','el.classList.push("active")','el.classList.add("active")','el.setAttribute("active")'],correct:2,exp:'classList.add() appends the class while keeping all existing classes on the element.'},
+{topic:'Client-Side JS',q:'When fetch()-ing with POST, which three things go in the options object?',opts:['url, method, body','method, headers, body','method, auth, body','type, headers, data'],correct:1,exp:'method (POST) + headers (Content-Type: application/json) + body (JSON.stringify(data)) always go together.'},
+{topic:'Client-Side JS',q:'What does el.classList.toggle("active") do?',opts:['Always adds the class "active"','Always removes the class "active"','Adds class if absent, removes it if present','Removes all other classes'],correct:2,exp:'toggle() adds the class if absent, removes it if present — perfect for on/off UI states like dark mode.'},
+
+// ── WEB API (10) ──
+{topic:'Web API',q:'What is a Web API?',opts:['A web page that returns HTML','A web service that accepts HTTP requests and returns JSON','A database that stores JSON files','A browser plugin for accessing data'],correct:1,exp:'A Web API accepts HTTP requests and returns structured data (JSON) — like a web page but for programs.'},
+{topic:'Web API',q:'In REST, what are the three main concepts?',opts:['HTML, CSS, JavaScript','Nouns (Resources), Verbs (HTTP Methods), Representations','Tables, Columns, Rows','Request, Response, Header'],correct:1,exp:'REST = Nouns (Resources via URIs) + Verbs (HTTP Methods) + Representations (JSON/XML).'},
+{topic:'Web API',q:'Which HTTP method should be used to CREATE a new resource (server decides URI)?',opts:['GET','POST','PUT','DELETE'],correct:1,exp:'POST is for creation when the server assigns the URI. It is not repeatable (not idempotent). PUT is for replacement.'},
+{topic:'Web API',q:'What HTTP status code indicates the resource was not found?',opts:['200','500','404','201'],correct:2,exp:'404 Not Found — the resource at the given URL does not exist on the server.'},
+{topic:'Web API',q:'In Next.js, how do you create an API endpoint at /api/books?',opts:['Create app/api/books/page.js','Create app/api/books/route.js','Create app/books/api.js','Create app/controller/books.js'],correct:1,exp:'route.js inside app/api/books/ creates a Web API endpoint accessible at /api/books.'},
+{topic:'Web API',q:'How do you create a dynamic route for /api/books/[id] in Next.js?',opts:['app/api/books/:id/route.js','app/api/books/[id]/route.js','app/api/books/{id}/route.js','app/api/books/*/route.js'],correct:1,exp:'Wrapping a folder name in [brackets] creates a dynamic route segment in Next.js App Router.'},
+{topic:'Web API',q:'How do you read a JSON request body in a Next.js route handler?',opts:['req.body','await request.json()','JSON.parse(request)','request.data()'],correct:1,exp:'In Next.js App Router, await request.json() reads and parses the JSON request body.'},
+{topic:'Web API',q:'Which status code range indicates a CLIENT error?',opts:['2xx','3xx','4xx','5xx'],correct:2,exp:'4xx = client errors (400 Bad Request, 401 Unauthorized, 403 Forbidden, 404 Not Found, 422 Unprocessable).'},
+{topic:'Web API',q:'What is a Single Page Application (SPA)?',opts:['A website that reloads fully on every action','A static web page with no JavaScript','A web app where content loads dynamically without full page reloads','A website with exactly one view/screen'],correct:2,exp:'A SPA fits on one HTML page. Resources load dynamically in response to user actions without page reloads.'},
+{topic:'Web API',q:'What does [...slug] in a Next.js folder name create?',opts:['A basic dynamic route matching one segment','A catch-all route matching any number of path segments','An optional route that matches only if segment exists','A static route segment'],correct:1,exp:'[...slug] is a catch-all route that matches any number of path segments after the base path.'},
+
+// ── REACT (19) ──
+{topic:'React',q:'React is an open-source JavaScript library for building User Interfaces. TRUE or FALSE: React is a framework.',opts:['True — React is a framework','False — React is a library','True — React works like Angular','False — React is a compiler'],correct:1,exp:'False — React is a library (not a framework), primarily for building client-side user interfaces. Next.js is a framework.'},
+{topic:'React',q:'JSX allows writing HTML-like markup inside JavaScript. What does JSX get compiled to?',opts:['HTML strings','CSS objects','JavaScript objects','TypeScript declarations'],correct:2,exp:'JSX (JavaScript XML) is transformed into JavaScript objects by tools like Babel. It\'s syntactic sugar.'},
+{topic:'React',q:'React component names must…',opts:['start with a lowercase letter','start with a capital letter','be exactly one word','end with Component'],correct:1,exp:'Component names MUST start with a capital letter. Lowercase names are treated as plain HTML elements.'},
+{topic:'React',q:'Props in a React component are…',opts:['mutable — the child can change them','read-only — the child cannot modify them','two-way — parent and child share state','optional — components can ignore them'],correct:1,exp:'Props are read-only (immutable). The receiving component can only read them, not modify them.'},
+{topic:'React',q:'How do you correctly update a state variable count from 0 to 1 in React?',opts:['count = 1','setCount(1)','count.update(1)','React.setState(count, 1)'],correct:1,exp:'Always use the setter function returned by useState. Direct assignment like count=1 does NOT trigger re-render.'},
+{topic:'React',q:'Both props changes and state changes trigger a re-render. TRUE or FALSE.',opts:['True','False'],correct:0,exp:'True — React automatically re-renders a component whenever either its props or its state change.'},
+{topic:'React',q:'The special "children" prop holds…',opts:['The first child component in the app','Content nested between the component\'s opening and closing tags','All child state variables','Sub-components created inside the component'],correct:1,exp:'children is a special auto-added React prop containing whatever is nested between the component\'s JSX tags.'},
+{topic:'React',q:'Why are keys important in list rendering?',opts:['They make list items look different','They help React track which items changed, improving performance','They are required for CSS styling','They prevent duplicate data'],correct:1,exp:'Keys allow React to do efficient reconciliation — only re-rendering changed items instead of rebuilding the whole list.'},
+{topic:'React',q:'useState() returns…',opts:['A single state value','An array: [stateValue, setterFunction]','An object with get() and set()','A Promise resolving to the state'],correct:1,exp:'Destructured as: const [value, setValue] = useState(initialValue).'},
+{topic:'React',q:'State variables are…',opts:['Public and accessible by any component','Private and fully controlled by their component','Shared across all components by default','Stored in the HTML file'],correct:1,exp:'State is private and fully controlled by the component that owns it. It can be passed down as props but not accessed externally.'},
+{topic:'React',q:'How does a child component communicate back to its parent?',opts:['By directly modifying parent state','By calling a callback function passed as a prop','By using global variables','By calling parent.setState()'],correct:1,exp:'Parent passes a callback as a prop. Child calls it to notify the parent of changes — uni-directional flow.'},
+{topic:'React',q:'The Virtual DOM…',opts:['Is the same as the browser DOM','Is a pure JavaScript lightweight DOM React uses for efficient updates','Slows down rendering','Is only used in React Native'],correct:1,exp:'Virtual DOM = pure JS representation. React diffs new vs old tree and applies only the minimum necessary real DOM changes.'},
+{topic:'React',q:'What does useEffect with an empty dependency array [] do?',opts:['Runs after every re-render','Runs only once — after the initial mount','Runs before the component mounts','Runs when any state changes'],correct:1,exp:'Empty array [] = "no dependencies" = run only once after initial mount. Perfect for data fetching on load.'},
+{topic:'React',q:'Updating a useRef value…',opts:['Triggers a component re-render','Resets the value to initial','Persists the value but does NOT trigger re-render','Throws an error'],correct:2,exp:'ref.current persists across renders but updating it never triggers a re-render — the key difference from useState.'},
+{topic:'React',q:'Which is the CORRECT way to render a list in React?',opts:['<for item in items>...</for>','items.forEach(i => <li>{i}</li>)','items.map((item,i) => <li key={i}>{item}</li>)','items.each(item => JSX(item))'],correct:2,exp:'.map() returns an array of JSX elements. Each must have a key prop for React\'s efficient reconciliation.'},
+{topic:'React',q:'Imperative UI (direct DOM manipulation) vs Declarative React: In React you should…',opts:['Use document.querySelector to update elements directly','Update state variables and let React handle the DOM','Manipulate innerHTML directly for performance','Use jQuery alongside React'],correct:1,exp:'React is declarative. You update state; React automatically updates the DOM. Direct manipulation fights React\'s model.'},
+{topic:'React',q:'useEffect(() => { setCount(count+1); }, [count]) — what happens?',opts:['Count increments to 1 then stops','Renders Count: 0 forever','Infinite loop / crash','Count increments exactly once'],correct:2,exp:'setCount changes count → effect runs again (count in deps changed) → infinite loop. Never put a setter for a dep inside its own effect.'},
+{topic:'React',q:'Forms in React use "controlled components" meaning…',opts:['Forms control their own styling','Form input values are tied to state via value= and onChange=','Forms submit automatically on change','Forms bypass React rendering'],correct:1,exp:'Controlled components: input value= is bound to state, onChange= updates state. React is the single source of truth.'},
+{topic:'React',q:'Which hook should you use to focus a DOM input element after mount?',opts:['useState','useEffect','useRef','useContext'],correct:2,exp:'useRef gives you direct DOM access. Assign to the element\'s ref= prop, then call inputRef.current.focus() in useEffect.'},
+
+];
+
+// ════════════════════════════════════════════════
+//  STATE
+// ════════════════════════════════════════════════
+let cfg = { time: 15, count: 10, topics: new Set(['HTML','CSS','CSS Responsive','JavaScript','OOP','Client-Side JS','Web API','React']) };
+let testQ = [];
+let answers = {}; // qIdx -> chosen option index
+let flagged = new Set();
+let currentQ = 0;
+let timerInterval = null;
+let secondsLeft = 0;
+let startTime = null;
+
+// ════════════════════════════════════════════════
+//  LOBBY
+// ════════════════════════════════════════════════
+document.getElementById('bank-total').textContent = BANK.length;
+
+document.querySelectorAll('.config-option').forEach(el => {
+  el.addEventListener('click', () => {
+    const group = el.dataset.group;
+    document.querySelectorAll(`[data-group="${group}"]`).forEach(o => o.classList.remove('selected'));
+    el.classList.add('selected');
+    if(group==='time') cfg.time = el.dataset.val==='0' ? 0 : parseInt(el.dataset.val);
+    if(group==='count') cfg.count = el.dataset.val;
+    updatePreview();
+  });
+});
+
+document.querySelectorAll('.topic-chip').forEach(el => {
+  el.addEventListener('click', () => {
+    el.classList.toggle('selected');
+    if(el.classList.contains('selected')) cfg.topics.add(el.dataset.topic);
+    else cfg.topics.delete(el.dataset.topic);
+    updatePreview();
+  });
+});
+
+function updatePreview() {
+  const pool = BANK.filter(q => cfg.topics.has(q.topic));
+  const n = cfg.count === 'all' ? pool.length : Math.min(parseInt(cfg.count), pool.length);
+  const t = cfg.time === 0 ? 'no limit' : `${cfg.time} min`;
+  document.getElementById('lobby-preview').textContent =
+    `→ ${n} questions drawn from ${pool.length} available · Time: ${t}`;
+  document.getElementById('start-btn').disabled = pool.length === 0 || cfg.topics.size === 0;
+}
+updatePreview();
+
+function startTest() {
+  const pool = BANK.filter(q => cfg.topics.has(q.topic));
+  const shuffled = [...pool].sort(() => Math.random() - .5);
+  const n = cfg.count === 'all' ? shuffled.length : Math.min(parseInt(cfg.count), shuffled.length);
+  testQ = shuffled.slice(0, n);
+  answers = {};
+  flagged = new Set();
+  currentQ = 0;
+  startTime = Date.now();
+
+  buildTestUI();
+  showScreen('test');
+  startTimer();
+}
+
+// ════════════════════════════════════════════════
+//  TIMER
+// ════════════════════════════════════════════════
+function startTimer() {
+  clearInterval(timerInterval);
+  if(cfg.time === 0) {
+    document.getElementById('timer-display').textContent = '∞';
+    document.getElementById('timer-box').style.display = 'flex';
+    return;
+  }
+  secondsLeft = cfg.time * 60;
+  updateTimerDisplay();
+  timerInterval = setInterval(() => {
+    secondsLeft--;
+    updateTimerDisplay();
+    if(secondsLeft <= 0) {
+      clearInterval(timerInterval);
+      timeUp();
+    }
+  }, 1000);
+}
+
+function updateTimerDisplay() {
+  const m = Math.floor(secondsLeft / 60);
+  const s = secondsLeft % 60;
+  document.getElementById('timer-display').textContent = `${m}:${s.toString().padStart(2,'0')}`;
+  const box = document.getElementById('timer-box');
+  box.classList.remove('warn','danger');
+  if(secondsLeft <= 60) box.classList.add('danger');
+  else if(secondsLeft <= 180) box.classList.add('warn');
+}
+
+function timeUp() {
+  document.getElementById('time-overlay').classList.add('show');
+}
+
+// ════════════════════════════════════════════════
+//  BUILD TEST UI
+// ════════════════════════════════════════════════
+function buildTestUI() {
+  buildQNav();
+  renderQ(0);
+}
+
+function buildQNav() {
+  const grid = document.getElementById('q-nav-grid');
+  grid.innerHTML = '';
+  testQ.forEach((_,i) => {
+    const btn = document.createElement('button');
+    btn.className = 'q-nav-btn';
+    btn.textContent = i+1;
+    btn.id = `qnav-${i}`;
+    btn.onclick = () => goTo(i);
+    grid.appendChild(btn);
+  });
+  updateQNav();
+}
+
+function updateQNav() {
+  testQ.forEach((_,i) => {
+    const btn = document.getElementById(`qnav-${i}`);
+    if(!btn) return;
+    btn.className = 'q-nav-btn';
+    if(i === currentQ) btn.classList.add('current');
+    if(answers[i] !== undefined) btn.classList.add('answered');
+    if(flagged.has(i)) btn.classList.add('flagged');
+  });
+  const answered = Object.keys(answers).length;
+  document.getElementById('test-prog').style.width = (answered/testQ.length*100)+'%';
+  document.getElementById('test-prog-text').textContent = `${answered} / ${testQ.length}`;
+}
+
+function renderQ(idx) {
+  const q = testQ[idx];
+  const isFlagged = flagged.has(idx);
+  const selected = answers[idx];
+
+  let optsHtml = q.opts.map((o,j) => `
+    <div class="opt${selected===j?' selected':''}" onclick="selectOpt(${j})">
+      <span class="opt-label">${['A','B','C','D'][j]}</span>
+      <span>${o}</span>
+    </div>`).join('');
+
+  document.getElementById('q-display').innerHTML = `
+    <div class="q-meta">
+      <span class="q-num-badge">Q${idx+1} / ${testQ.length}</span>
+      <span class="q-topic-badge">${q.topic}</span>
+      <button class="flag-btn${isFlagged?' flagged':''}" onclick="toggleFlag(${idx})" id="flag-btn-${idx}">
+        ${isFlagged ? '🚩 Flagged':'⚐ Flag'}
+      </button>
+    </div>
+    <div class="q-text">${q.q}</div>
+    <div class="opts-grid">${optsHtml}</div>`;
+
+  // Update nav state
+  document.getElementById('btn-next').textContent = idx === testQ.length-1 ? 'Last Q' : 'Next →';
+  updateQNav();
+  document.getElementById('q-display').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function selectOpt(j) {
+  answers[currentQ] = j;
+  renderQ(currentQ);
+}
+
+function toggleFlag(idx) {
+  if(flagged.has(idx)) flagged.delete(idx);
+  else flagged.add(idx);
+  renderQ(idx);
+  showToast(flagged.has(idx) ? '🚩 Question flagged' : 'Flag removed');
+}
+
+function navigate(dir) {
+  const next = currentQ + dir;
+  if(next < 0 || next >= testQ.length) return;
+  goTo(next);
+}
+
+function goTo(idx) {
+  currentQ = idx;
+  renderQ(idx);
+}
+
+function confirmSubmit() {
+  const unanswered = testQ.length - Object.keys(answers).length;
+  const flagCount = flagged.size;
+  let msg = `You're about to submit your test.`;
+  if(unanswered > 0) msg += ` ${unanswered} question(s) unanswered.`;
+  if(flagCount > 0) msg += ` ${flagCount} question(s) still flagged.`;
+  msg += ' Unanswered questions will be marked as skipped.';
+  document.getElementById('confirm-msg').textContent = msg;
+  document.getElementById('confirm-overlay').classList.add('show');
+}
+
+function closeConfirm() {
+  document.getElementById('confirm-overlay').classList.remove('show');
+}
+
+// ════════════════════════════════════════════════
+//  FINISH TEST
+// ════════════════════════════════════════════════
+function finishTest(fromTimeout) {
+  clearInterval(timerInterval);
+  document.getElementById('time-overlay').classList.remove('show');
+  document.getElementById('confirm-overlay').classList.remove('show');
+  buildResults(fromTimeout);
+  showScreen('results');
+}
+
+function buildResults(fromTimeout) {
+  let correct = 0, wrong = 0, skipped = 0;
+  const elapsed = Math.floor((Date.now() - startTime) / 1000);
+
+  testQ.forEach((q,i) => {
+    const chosen = answers[i];
+    if(chosen === undefined) skipped++;
+    else if(chosen === q.correct) correct++;
+    else wrong++;
+  });
+
+  const pct = Math.round(correct/testQ.length*100);
+  const grade = pct>=90?'A+':pct>=80?'A':pct>=70?'B':pct>=60?'C':pct>=50?'D':'F';
+  const gradeColor = pct>=70?'var(--green)':pct>=50?'var(--orange)':'var(--red)';
+
+  const ring = document.getElementById('grade-ring');
+  ring.style.borderColor = gradeColor;
+  document.getElementById('result-pct').style.color = gradeColor;
+  document.getElementById('result-pct').textContent = pct+'%';
+  document.getElementById('result-grade').textContent = grade;
+
+  const headlines = {A:'Outstanding! 🏆',B:'Well done! 🎉',C:'Good effort! 📚',D:'Keep studying! 💪',F:'Back to the books! 📖'};
+  document.getElementById('result-headline').textContent = headlines[grade[0]] || 'Test Complete!';
+  document.getElementById('result-subline').textContent =
+    fromTimeout ? 'Time ran out — here are your results.' :
+    `You completed the ${testQ.length}-question test.`;
+
+  document.getElementById('r-correct').textContent = correct;
+  document.getElementById('r-wrong').textContent = wrong;
+  document.getElementById('r-skipped').textContent = skipped;
+
+  const mm = Math.floor(elapsed/60);
+  const ss = elapsed%60;
+  document.getElementById('r-time').textContent = `${mm}:${ss.toString().padStart(2,'0')}`;
+
+  // Review cards
+  const container = document.getElementById('review-container');
+  container.innerHTML = '';
+  testQ.forEach((q,i) => {
+    const chosen = answers[i];
+    const isRight = chosen === q.correct;
+    const isSkip = chosen === undefined;
+    const cls = isSkip ? 'r-skipped' : isRight ? 'r-correct' : 'r-wrong';
+    const icon = isSkip ? '⬜' : isRight ? '✅' : '❌';
+
+    const yourAns = isSkip ? 'Skipped' : q.opts[chosen];
+    const correctAns = q.opts[q.correct];
+
+    container.innerHTML += `
+      <div class="review-card ${cls}">
+        <div class="q-meta" style="margin-bottom:10px;">
+          <span class="q-num-badge">Q${i+1}</span>
+          <span class="q-topic-badge">${q.topic}</span>
+          <span style="margin-left:auto;font-size:16px;">${icon}</span>
+        </div>
+        <div class="review-q-text">${q.q}</div>
+        <div class="review-answer-row">
+          ${!isRight && !isSkip ? `<div><span class="ra-label">YOUR ANSWER: </span><span class="ra-val ra-wrong">${yourAns}</span></div>` : ''}
+          <div><span class="ra-label">CORRECT: </span><span class="ra-val ra-correct">${correctAns}</span></div>
+          ${isSkip ? `<div><span class="ra-val ra-skip">— Not answered</span></div>` : ''}
+        </div>
+        <div class="review-exp">${q.exp}</div>
+      </div>`;
+  });
+}
+
+function retakeTest() {
+  showScreen('test');
+  answers = {};
+  flagged = new Set();
+  currentQ = 0;
+  testQ = [...testQ].sort(() => Math.random() - .5);
+  buildTestUI();
+  startTimer();
+}
+
+function showLobby() {
+  clearInterval(timerInterval);
+  showScreen('lobby');
+}
+
+// ════════════════════════════════════════════════
+//  UTILS
+// ════════════════════════════════════════════════
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-'+name).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function showToast(msg, dur=2000) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), dur);
+}
+</script>
+</body>
+</html>

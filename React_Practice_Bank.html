@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>React Practice Bank – CMPS 350</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg:#0a0c18; --surface:#131525; --surface2:#1b1e35; --border:#252842;
+  --react:#61dafb; --react-dim:rgba(97,218,251,.12); --react-glow:rgba(97,218,251,.25);
+  --accent:#f7c948; --green:#3ecf8e; --red:#f87171; --purple:#a78bfa;
+  --orange:#fb923c; --muted:#7b80a8; --text:#dde1f5;
+  --mono:'JetBrains Mono',monospace; --sans:'Syne',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);line-height:1.7;min-height:100vh;}
+
+/* ── NAV ── */
+.global-nav{position:sticky;top:0;z-index:9999;background:rgba(8,9,20,.96);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 24px;height:52px;gap:12px;}
+.nav-brand{font-family:var(--mono);font-size:12px;font-weight:700;letter-spacing:2px;color:var(--accent);text-transform:uppercase;white-space:nowrap;flex-shrink:0;}
+.nav-links{display:flex;gap:4px;align-items:center;}
+.nav-links a{font-family:var(--mono);font-size:10px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;padding:6px 14px;border-radius:6px;border:1px solid transparent;color:var(--muted);transition:all .18s;white-space:nowrap;}
+.nav-links a:hover{color:var(--text);border-color:var(--border);background:rgba(97,218,251,.07);}
+.nav-links a.nav-notes.active{color:#fb923c;border-color:#fb923c;background:rgba(251,146,60,.1);}
+.nav-links a.nav-vault.active{color:#60b8f0;border-color:#60b8f0;background:rgba(96,184,240,.1);}
+.nav-links a.nav-mcq.active{color:#3ecf8e;border-color:#3ecf8e;background:rgba(62,207,142,.1);}
+.nav-links a.nav-react.active{color:var(--react);border-color:var(--react);background:var(--react-dim);}
+@media(max-width:480px){.nav-brand{display:none;}.global-nav{justify-content:center;}.nav-links a{font-size:9px;padding:5px 8px;}}
+
+/* ── HERO ── */
+.hero{padding:44px 32px 36px;border-bottom:1px solid var(--border);position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 60% at 80% 20%,rgba(97,218,251,.08),transparent 70%),radial-gradient(ellipse 40% 40% at 10% 80%,rgba(167,139,250,.06),transparent 70%);pointer-events:none;}
+.hero-inner{max-width:1100px;margin:0 auto;display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap;}
+.hero-label{font-family:var(--mono);font-size:10px;letter-spacing:3px;color:var(--react);text-transform:uppercase;margin-bottom:10px;}
+.hero h1{font-size:clamp(22px,4vw,46px);font-weight:800;letter-spacing:-1px;line-height:1.05;}
+.hero h1 span{color:var(--react);}
+.hero-sub{margin-top:8px;color:var(--muted);font-size:13px;font-family:var(--mono);}
+.hero-stats{display:flex;gap:20px;flex-wrap:wrap;}
+.stat-pill .num{font-size:26px;font-weight:800;color:var(--react);font-family:var(--mono);line-height:1;}
+.stat-pill .lbl{font-family:var(--mono);font-size:9px;letter-spacing:2px;color:var(--muted);margin-top:2px;}
+
+/* ── TABS ── */
+.tab-bar{display:flex;gap:0;border-bottom:1px solid var(--border);background:var(--surface);overflow-x:auto;scrollbar-width:none;position:sticky;top:52px;z-index:100;}
+.tab-bar::-webkit-scrollbar{display:none;}
+.tab-btn{font-family:var(--mono);font-size:11px;letter-spacing:1px;padding:14px 22px;border:none;background:none;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:all .18s;}
+.tab-btn:hover{color:var(--text);}
+.tab-btn.active{color:var(--react);border-bottom-color:var(--react);}
+.tab-btn.quiz-tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+.tab-page{display:none;max-width:1100px;margin:0 auto;padding:32px 24px 80px;}
+.tab-page.active{display:block;}
+
+/* ── SECTION TITLES ── */
+.section-title{font-family:var(--mono);font-size:11px;letter-spacing:3px;color:var(--react);text-transform:uppercase;padding:8px 16px;background:var(--react-dim);border:1px solid rgba(97,218,251,.2);border-radius:8px;margin:32px 0 16px;display:inline-flex;align-items:center;gap:8px;}
+
+/* ── CARDS BASE ── */
+.q-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px 24px;margin-bottom:14px;transition:border-color .2s,box-shadow .2s;}
+.q-card.correct-card{border-color:var(--green);box-shadow:0 0 0 1px var(--green);}
+.q-card.wrong-card{border-color:var(--red);box-shadow:0 0 0 1px var(--red);}
+.q-label{font-family:var(--mono);font-size:10px;letter-spacing:2px;color:var(--muted);margin-bottom:8px;}
+.q-text{font-size:14px;font-weight:600;color:#fff;line-height:1.6;margin-bottom:14px;}
+.q-num{display:inline-flex;align-items:center;justify-content:center;background:var(--react);color:#0a0c18;font-size:10px;font-weight:800;width:24px;height:24px;border-radius:6px;margin-right:8px;flex-shrink:0;vertical-align:middle;}
+code{font-family:var(--mono);background:#0a0c18;padding:2px 7px;border-radius:4px;font-size:12px;color:#a5d6ff;}
+pre.code-block{background:#080c18;border:1px solid var(--border);border-radius:10px;padding:16px 18px;overflow-x:auto;font-family:var(--mono);font-size:12px;line-height:1.8;color:#a5d6ff;margin:10px 0 14px;white-space:pre;}
+
+/* ── T/F BUTTONS ── */
+.tf-row{display:flex;gap:10px;flex-wrap:wrap;}
+.tf-btn{font-family:var(--mono);font-size:12px;font-weight:700;padding:9px 28px;border-radius:8px;border:2px solid var(--border);background:var(--surface2);color:var(--text);cursor:pointer;transition:all .2s;letter-spacing:.5px;}
+.tf-btn:hover:not(.disabled){border-color:var(--react);color:var(--react);}
+.tf-btn.correct{border-color:var(--green);background:rgba(62,207,142,.12);color:var(--green);}
+.tf-btn.wrong{border-color:var(--red);background:rgba(248,113,113,.12);color:var(--red);}
+.tf-btn.disabled{cursor:default;}
+
+/* ── FILL IN THE BLANK ── */
+.fill-wrap{display:flex;gap:10px;align-items:stretch;flex-wrap:wrap;}
+.fill-input{flex:1;min-width:200px;background:var(--surface2);border:2px solid var(--border);border-radius:8px;padding:9px 14px;color:var(--text);font-family:var(--mono);font-size:12px;outline:none;transition:border-color .2s;}
+.fill-input:focus{border-color:var(--react);}
+.fill-input.correct-input{border-color:var(--green);background:rgba(62,207,142,.07);}
+.fill-input.wrong-input{border-color:var(--red);background:rgba(248,113,113,.07);}
+.fill-input.disabled-input{opacity:.7;cursor:not-allowed;}
+.check-btn{font-family:var(--mono);font-size:11px;font-weight:700;padding:9px 20px;background:rgba(97,218,251,.1);border:1px solid var(--react);border-radius:8px;color:var(--react);cursor:pointer;transition:all .2s;white-space:nowrap;}
+.check-btn:hover:not(:disabled){background:rgba(97,218,251,.2);}
+.check-btn:disabled{opacity:.5;cursor:not-allowed;}
+
+/* ── FEEDBACK ── */
+.feedback{margin-top:12px;padding:10px 14px;border-radius:8px;font-size:13px;display:none;line-height:1.6;}
+.feedback.show{display:block;}
+.feedback.ok{background:rgba(62,207,142,.08);border:1px solid rgba(62,207,142,.25);color:var(--green);}
+.feedback.bad{background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.25);color:var(--red);}
+
+/* ── PROGRESS ── */
+.progress-bar-wrap{flex:1;height:5px;background:var(--border);border-radius:3px;overflow:hidden;}
+.progress-bar-fill{height:100%;background:var(--green);border-radius:3px;transition:width .4s;}
+.prog-row{display:flex;align-items:center;gap:14px;padding:12px 18px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:24px;}
+.prog-label{font-family:var(--mono);font-size:11px;color:var(--muted);}
+.score-badge{font-family:var(--mono);font-size:12px;font-weight:800;color:var(--accent);background:var(--surface2);padding:4px 12px;border-radius:20px;}
+.reset-btn{font-family:var(--mono);font-size:10px;padding:5px 12px;background:none;border:1px solid var(--border);border-radius:6px;color:var(--muted);cursor:pointer;transition:all .15s;}
+.reset-btn:hover{border-color:var(--red);color:var(--red);}
+
+/* ── FLASHCARDS ── */
+.fc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px;margin-top:12px;}
+.flashcard{perspective:1200px;height:260px;cursor:pointer;}
+.flashcard-inner{position:relative;width:100%;height:100%;transition:transform .55s cubic-bezier(.4,0,.2,1);transform-style:preserve-3d;}
+.flashcard.flipped .flashcard-inner{transform:rotateY(180deg);}
+.fc-face{position:absolute;width:100%;height:100%;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:14px;padding:18px 20px;display:flex;flex-direction:column;justify-content:space-between;}
+.fc-front{background:var(--surface);border:2px solid var(--border);}
+.fc-front:hover{border-color:var(--react);}
+.fc-back{background:var(--surface2);border:2px solid var(--react);transform:rotateY(180deg);}
+.fc-tag{font-family:var(--mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);}
+.fc-q{font-size:13px;font-weight:600;color:#fff;line-height:1.5;flex:1;display:flex;align-items:center;margin:10px 0;}
+.fc-hint{font-family:var(--mono);font-size:10px;color:var(--muted);text-align:right;}
+.fc-back .fc-tag{color:var(--react);}
+.fc-code{font-family:var(--mono);font-size:11px;color:#a5d6ff;line-height:1.7;background:#080c18;padding:10px 12px;border-radius:8px;overflow:auto;flex:1;margin:8px 0;white-space:pre;}
+.fc-nav{display:flex;gap:8px;align-items:center;margin-top:12px;justify-content:center;}
+.fc-btn{background:var(--surface);border:1px solid var(--border);color:var(--text);padding:7px 16px;border-radius:8px;cursor:pointer;font-size:12px;font-family:var(--sans);font-weight:600;transition:all .15s;}
+.fc-btn:hover{border-color:var(--react);color:var(--react);}
+.fc-btn.primary{background:var(--react);border-color:var(--react);color:#0a0c18;}
+.fc-counter{font-family:var(--mono);font-size:12px;color:var(--muted);min-width:60px;text-align:center;}
+
+/* ── QUICK QUIZ ── */
+.quiz-q-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:24px;margin-bottom:18px;transition:border-color .2s;}
+.quiz-q-card.answered-correct{border-color:var(--green);background:linear-gradient(135deg,#131525,#0c2019);}
+.quiz-q-card.answered-wrong{border-color:var(--red);background:linear-gradient(135deg,#131525,#1e0c0c);}
+.quiz-opts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px;}
+.quiz-opt{background:var(--surface2);border:2px solid var(--border);border-radius:8px;padding:10px 14px;cursor:pointer;font-size:13px;color:var(--text);transition:all .2s;display:flex;align-items:flex-start;gap:8px;text-align:left;}
+.quiz-opt:hover:not(.qdis){border-color:var(--react);color:#fff;background:var(--react-dim);}
+.quiz-opt.qcorrect{border-color:var(--green);background:rgba(62,207,142,.12);color:var(--green);}
+.quiz-opt.qwrong{border-color:var(--red);background:rgba(248,113,113,.12);color:var(--red);}
+.quiz-opt.qdis{cursor:default;}
+.quiz-opt .qlabel{font-weight:800;font-size:11px;opacity:.65;flex-shrink:0;}
+.quiz-feedback{margin-top:12px;padding:10px 14px;border-radius:8px;font-size:13px;display:none;line-height:1.6;}
+.quiz-feedback.show{display:block;}
+.quiz-feedback.qok{background:rgba(62,207,142,.08);border:1px solid rgba(62,207,142,.25);color:var(--green);}
+.quiz-feedback.qbad{background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.25);color:var(--red);}
+.quiz-section-title{font-size:1rem;font-weight:800;color:var(--accent);text-transform:uppercase;letter-spacing:1.5px;padding:8px 16px;background:rgba(247,201,72,.07);border:1px solid rgba(247,201,72,.18);border-radius:8px;margin:28px 0 16px;}
+.regen-btn{font-family:var(--mono);font-size:11px;padding:8px 20px;background:rgba(247,201,72,.08);border:1px solid var(--accent);border-radius:8px;color:var(--accent);cursor:pointer;transition:all .2s;}
+.regen-btn:hover{background:rgba(247,201,72,.18);}
+@media(max-width:600px){.quiz-opts{grid-template-columns:1fr;}}
+@media(max-width:500px){.tab-page{padding:20px 14px 60px;}}
+</style>
+</head>
+<body>
+
+<nav class="global-nav">
+  <span class="nav-brand">CMPS 350 · Web Dev</span>
+  <div class="nav-links">
+    <a href="index.html" class="nav-notes">📚 Study Notes</a>
+    <a href="Keyword_Vault.html" class="nav-vault">⚡ Keyword Vault</a>
+    <a href="MCQ_Practice_Bank.html" class="nav-mcq">🧠 MCQ Bank</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="hero-inner">
+    <div>
+      <p class="hero-label">CMPS 350 · React Fundamentals</p>
+      <h1>React <span>Practice Bank</span></h1>
+      <p class="hero-sub">// true/false · fill-in-output · code flashcards · quick quiz</p>
+    </div>
+    <div class="hero-stats">
+      <div class="stat-pill"><div class="num">19</div><div class="lbl">T/F</div></div>
+      <div class="stat-pill"><div class="num">12</div><div class="lbl">OUTPUT</div></div>
+      <div class="stat-pill"><div class="num">7</div><div class="lbl">CODE</div></div>
+      <div class="stat-pill"><div class="num">∞</div><div class="lbl">QUIZ</div></div>
+    </div>
+  </div>
+</header>
+
+<!-- TABS -->
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="switchTab('tf')">✅ True / False</button>
+  <button class="tab-btn" onclick="switchTab('output')">🔍 Output Questions</button>
+  <button class="tab-btn" onclick="switchTab('code')">💻 Code Flashcards</button>
+  <button class="tab-btn quiz-tab" onclick="switchTab('quiz')">🎯 Quick Quiz</button>
+</div>
+
+<!-- ====================== T / F ====================== -->
+<div id="tab-tf" class="tab-page active">
+  <div class="prog-row">
+    <span class="prog-label">Progress</span>
+    <div class="progress-bar-wrap"><div class="progress-bar-fill" id="pb-tf"></div></div>
+    <span class="score-badge" id="sc-tf">0 / 19</span>
+    <button class="reset-btn" onclick="resetTF()">↺ Reset</button>
+  </div>
+
+  <div class="section-title">📋 True / False — React Fundamentals</div>
+
+  <div id="tf-container"></div>
+</div>
+
+<!-- ====================== OUTPUT ====================== -->
+<div id="tab-output" class="tab-page">
+  <div class="prog-row">
+    <span class="prog-label">Progress</span>
+    <div class="progress-bar-wrap"><div class="progress-bar-fill" id="pb-out"></div></div>
+    <span class="score-badge" id="sc-out">0 / 12</span>
+    <button class="reset-btn" onclick="resetOutput()">↺ Reset</button>
+  </div>
+
+  <div class="section-title">🔍 What is the Output? — Fill in the Blank</div>
+  <div id="output-container"></div>
+</div>
+
+<!-- ====================== FLASHCARDS ====================== -->
+<div id="tab-code" class="tab-page">
+  <div class="section-title">💻 Write the Code — Flashcards</div>
+  <p style="color:var(--muted);font-size:13px;margin-bottom:20px;">Click a card to see the solution. Use the arrows to navigate or shuffle.</p>
+  <div id="fc-grid-container"></div>
+  <div class="fc-nav" style="margin-top:20px;">
+    <button class="fc-btn" onclick="fcNav(-1)">← Prev</button>
+    <span class="fc-counter" id="fc-counter">1 / 7</span>
+    <button class="fc-btn" onclick="fcNav(1)">Next →</button>
+    <button class="fc-btn primary" onclick="fcFlip()">Flip Card</button>
+    <button class="fc-btn" onclick="fcShuffle()" style="border-color:var(--purple);color:var(--purple)">🔀 Shuffle</button>
+  </div>
+</div>
+
+<!-- ====================== QUICK QUIZ ====================== -->
+<div id="tab-quiz" class="tab-page">
+  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px;">
+    <div>
+      <h2 style="font-size:1.2rem;font-weight:800;color:#fff;">🎯 Quick Quiz</h2>
+      <p style="color:var(--muted);font-size:13px;margin-top:4px;">10 randomised questions drawn from all 38 practice questions</p>
+    </div>
+    <button class="regen-btn" onclick="buildQuiz()">🔀 New Quiz</button>
+  </div>
+  <div class="prog-row">
+    <span class="prog-label">Progress</span>
+    <div class="progress-bar-wrap"><div class="progress-bar-fill" id="pb-quiz"></div></div>
+    <span class="score-badge" id="sc-quiz">0 / 10</span>
+    <button class="reset-btn" onclick="resetQuiz()">↺ Reset</button>
+  </div>
+  <div id="quiz-container"></div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════
+//  DATA
+// ═══════════════════════════════════════════════
+
+// TRUE / FALSE DATA
+const TF_DATA = [
+  { id:'tf1',  s:'React is an open-source JavaScript <strong>framework</strong> for building server-side applications.', ans:false, exp:'False — React is a <strong>library</strong> (not a framework), primarily for building <strong>client-side</strong> user interfaces.' },
+  { id:'tf2',  s:'JSX is a syntax that allows you to write HTML-like markup inside JavaScript, which gets transformed into JavaScript objects.', ans:true,  exp:'True — JSX (JavaScript XML) is transformed into JavaScript objects by tools like Babel.' },
+  { id:'tf3',  s:'React component names can start with a lowercase letter.', ans:false, exp:'False — Component names <strong>must start with a capital letter</strong>. Lowercase names are treated as plain HTML elements.' },
+  { id:'tf4',  s:'Props in a React component are read-only and cannot be modified by the component that receives them.', ans:true,  exp:'True — Props are immutable. The receiving component can only read them, not modify them.' },
+  { id:'tf5',  s:'You can update a state variable directly by assigning a new value to it (e.g., <code>count = count + 1</code>) and React will re-render the UI.', ans:false, exp:'False — You must use the setter function from useState (e.g., <code>setCount(count + 1)</code>). Direct assignment does not trigger re-render.' },
+  { id:'tf6',  s:'Both props changes and state changes trigger a re-render of the component.', ans:true,  exp:'True — React re-renders automatically whenever props or state change.' },
+  { id:'tf7',  s:'The special "children" prop holds the content placed between a component\'s opening and closing tags.', ans:true,  exp:'True — React auto-adds the <code>children</code> prop with whatever is nested between the component tags.' },
+  { id:'tf8',  s:'Keys in a list help React identify which items have changed, been added, or removed, improving rendering performance.', ans:true,  exp:'True — Keys allow React to do efficient reconciliation — only re-rendering changed items instead of the whole list.' },
+  { id:'tf9',  s:'<code>useState()</code> returns an array containing a state variable and a function to update it.', ans:true,  exp:'True — Destructured as: <code>const [value, setValue] = useState(initial)</code>.' },
+  { id:'tf10', s:'State variables in React are public and can be accessed and modified by any component in the app.', ans:false, exp:'False — State is <strong>private</strong> and fully controlled by the component that owns it. It can be passed down as props, but not directly accessed or modified externally.' },
+  { id:'tf11', s:'A parent component can communicate data to a child component by passing props.', ans:true,  exp:'True — Props are the mechanism for parent-to-child data flow.' },
+  { id:'tf12', s:'A child component can directly modify the state of its parent component.', ans:false, exp:'False — A child communicates back to the parent via <strong>callbacks</strong> (functions passed as props), not by directly modifying parent state.' },
+  { id:'tf13', s:'The Virtual DOM is a pure JavaScript representation of the real DOM that React uses to calculate the minimum set of changes needed to update the UI.', ans:true,  exp:'True — React diffs the new virtual DOM against the old one and applies only the necessary real DOM mutations.' },
+  { id:'tf14', s:'<code>useState()</code> is a React hook used to run code after a component renders, and is suitable for tasks like fetching data or setting up timers.', ans:false, exp:'False — That description is <code>useEffect()</code>. <code>useState()</code> is for managing state variables.' },
+  { id:'tf15', s:'Passing an empty array <code>[]</code> as the second argument to <code>useEffect</code> causes the effect to run after <em>every</em> re-render.', ans:false, exp:'False — An empty array <code>[]</code> means the effect runs <strong>only once</strong>, after the initial mount. No second argument = runs after every render.' },
+  { id:'tf16', s:'<code>useRef()</code> can be used to directly access DOM elements without triggering a re-render.', ans:true,  exp:'True — Assign the ref to an element\'s <code>ref</code> attribute. <code>ref.current</code> gives the DOM node. Updating a ref never triggers re-render.' },
+  { id:'tf17', s:'Updating a <code>useRef</code> value triggers a component re-render just like updating a <code>useState</code> variable.', ans:false, exp:'False — Updating <code>ref.current</code> does <strong>not</strong> trigger re-render. That is the key difference from state.' },
+  { id:'tf18', s:'The following <code>useEffect</code> code creates an infinite loop: <code>useEffect(() =&gt; { setCount(count + 1); }, [count]);</code>', ans:true,  exp:'True — Every time <code>setCount</code> runs, <code>count</code> changes → the effect re-runs → <code>setCount</code> runs again → infinite loop.' },
+  { id:'tf19', s:'In React\'s declarative UI model, you should directly manipulate the DOM (e.g., <code>document.querySelector</code>) to update the UI when state changes.', ans:false, exp:'False — React is <strong>declarative</strong>. You update state and React handles the DOM automatically. Direct DOM manipulation fights against React\'s model.' },
+];
+
+// OUTPUT QUESTIONS DATA
+const OUTPUT_DATA = [
+  { id:'out20', num:20, label:'Initial render output',
+    code:`function RealMadridApp() {
+  const [loaded, setLoaded] = useState(false);
+  useEffect(() => { setLoaded(true); }, []);
+  return (<p>{loaded ? "Hala Madrid!" : "Loading squad..."}</p>);
+}`,
+    answers:['Hala Madrid!'],
+    hint:'Think: what renders first? Then useEffect fires…',
+    exp:'Initially renders "Loading squad..." (loaded=false). Then useEffect fires after mount, setLoaded(true) → re-render → <strong>"Hala Madrid!"</strong> is the final visible output.' },
+
+  { id:'out21', num:21, label:'Output after clicking Cheer!',
+    code:`function BarcaApp() {
+  const [msg, setMsg] = useState("...");
+  return (<div>
+    <p>{msg}</p>
+    <FanBtn onCheer={() => setMsg("Visca Barça!")} />
+  </div>);
+}
+function FanBtn({ onCheer }) {
+  return <button onClick={onCheer}>Cheer!</button>;
+}`,
+    answers:['Visca Barça!'],
+    hint:'FanBtn calls the callback passed as a prop…',
+    exp:'Clicking "Cheer!" calls <code>onCheer</code> → <code>setMsg("Visca Barça!")</code> → re-render → p shows <strong>"Visca Barça!"</strong>' },
+
+  { id:'out22', num:22, label:'How many times is "Arda Guler scored!" logged?',
+    code:`function ArdasStats({ goals }) {
+  useEffect(() => {
+    console.log("Arda Guler scored!");
+  }, [goals]);
+  return <p>Goals: {goals}</p>;
+}
+// Renders with goals=5, then re-renders with goals=6`,
+    answers:['2'],
+    hint:'useEffect with [goals] fires when goals changes…',
+    exp:'<strong>2 times</strong> — once on initial mount (goals=5), once when goals changes to 6. The [goals] dependency means: run after any render where goals changed.' },
+
+  { id:'out23', num:23, label:'How many times is "Painted!" logged after 2 button clicks?',
+    code:`function PaintApp() {
+  const [coats, setCoats] = useState(0);
+  useEffect(() => { console.log("Painted!"); });
+  return (
+    <button onClick={() => setCoats(c => c + 1)}>
+      Paint ({coats} coats)
+    </button>
+  );
+}`,
+    answers:['3'],
+    hint:'No dependency array means useEffect runs after every render. Count initial mount too…',
+    exp:'<strong>3 times</strong> — once on initial mount, once after 1st click (coats→1), once after 2nd click (coats→2). No dependency array = runs after every render.' },
+
+  { id:'out24', num:24, label:'What is the output?',
+    code:`function AvocadoCounter() {
+  const [count, setCount] = useState(0);
+  useEffect(() => {
+    setCount(count + 1);
+  }, [count]);
+  return <p>Count: {count}</p>;
+}`,
+    answers:['Infinite loop','infinite loop','Crashes','crashes'],
+    hint:'What happens when the effect updates count, which is in the dependency array?',
+    exp:'<strong>Infinite loop / crash</strong> — setCount changes count → count in deps triggers useEffect again → setCount again → forever. The browser tab will freeze.' },
+
+  { id:'out25', num:25, label:'What is displayed after clicking the button 5 times?',
+    code:`function MadridClicks() {
+  const clicksRef = useRef(0);
+  const handle = () => { clicksRef.current += 1; };
+  return (
+    <div>
+      <p>Clicks: {clicksRef.current}</p>
+      <button onClick={handle}>Click!</button>
+    </div>
+  );
+}`,
+    answers:['Clicks: 0','0'],
+    hint:'Updating a ref does NOT trigger a re-render…',
+    exp:'<strong>Clicks: 0</strong> — The ref updates internally (to 5) but since refs don\'t trigger re-renders, the JSX always shows the initial rendered value of 0.' },
+
+  { id:'out26', num:26, label:'What is the display after clicking Score! 3 times?',
+    code:`function Goals() {
+  const [goals, setGoals] = useState(0);
+  const score = () => setGoals(goals + 1);
+  return (
+    <div>
+      <p>Goals: {goals}</p>
+      <button onClick={score}>Score!</button>
+    </div>
+  );
+}`,
+    answers:['Goals: 3','3'],
+    hint:'useState properly triggers re-renders…',
+    exp:'<strong>Goals: 3</strong> — Each click calls setGoals, which triggers re-render. After 3 clicks: 0→1→2→3.' },
+
+  { id:'out27', num:27, label:'What is the output?',
+    code:`function RealMadridStar({ name, goals }) {
+  return <p>{name} scored {goals} goals!</p>;
+}
+// <RealMadridStar name="Arda Güler" goals={7} />`,
+    answers:['Arda Güler scored 7 goals!'],
+    hint:'Props destructuring — name and goals come directly from JSX attributes…',
+    exp:'<strong>Arda Güler scored 7 goals!</strong> — Props are destructured and interpolated directly in the JSX.' },
+
+  { id:'out28', num:28, label:'What is the output?',
+    code:`function MangoShop() {
+  const [stock, setStock] = useState(3);
+  return <p>Mangos in stock: {stock}</p>;
+}`,
+    answers:['Mangos in stock: 3','3'],
+    hint:'useState initializes with 3 and no event changes it…',
+    exp:'<strong>Mangos in stock: 3</strong> — useState(3) initializes stock to 3. No events change it, so it stays 3.' },
+
+  { id:'out29', num:29, label:'What is the output?',
+    code:`function BarcelonaChant() {
+  const team = "Barça";
+  const chant = "Ole";
+  return <p>{chant} {chant} {team}!</p>;
+}`,
+    answers:['Ole Ole Barça!'],
+    hint:'Simple JSX interpolation of JS variables…',
+    exp:'<strong>Ole Ole Barça!</strong> — {chant} is "Ole", repeated twice, then {team} is "Barça".' },
+
+  { id:'out30', num:30, label:'Output for: <PaintBucket>Crimson Red</PaintBucket>',
+    code:`function PaintBucket({ children }) {
+  return <div>Color: {children}</div>;
+}`,
+    answers:['Color: Crimson Red'],
+    hint:'children = content between opening and closing tags…',
+    exp:'<strong>Color: Crimson Red</strong> — "Crimson Red" is passed as the children prop and rendered inside the div.' },
+
+  { id:'out31', num:31, label:'Output for: <PaintLabel color="Teal" brand="Pantone" />',
+    code:`function PaintLabel({ color, brand }) {
+  return <p>{brand}: {color}</p>;
+}`,
+    answers:['Pantone: Teal'],
+    hint:'Props destructured in function params — note the order in the JSX string…',
+    exp:'<strong>Pantone: Teal</strong> — brand="Pantone" and color="Teal". Template: {brand}: {color}.' },
+];
+
+// FLASHCARD CODE DATA
+const FC_DATA = [
+  {
+    q:'Build a CamelCard component.\n• Props: name (string), humps (number), isThirsty (boolean)\n• Render: name in <h2>, Humps: X in <p>, water status in <p>',
+    a:`function CamelCard({ name, humps, isThirsty }) {
+  return (
+    <div>
+      <h2>{name}</h2>
+      <p>Humps: {humps}</p>
+      {isThirsty
+        ? <p>Needs water!</p>
+        : <p>Hydrated!</p>
+      }
+    </div>
+  );
+}
+export default CamelCard;`
+  },
+  {
+    q:'Build a FlowerGarden component.\n• Accepts: flowers (array of strings)\n• If empty → <p>No flowers yet!</p>\n• Otherwise → <ul> with <li key={index}> per flower',
+    a:`function FlowerGarden({ flowers }) {
+  if (flowers.length === 0) {
+    return <p>No flowers yet!</p>;
+  }
+  return (
+    <ul>
+      {flowers.map((flower, i) => (
+        <li key={i}>{flower}</li>
+      ))}
+    </ul>
+  );
+}`
+  },
+  {
+    q:'Build a RainForecast component.\n• Accepts: forecast [{day, chance}]\n• Render a <ul> with <li key={day}>\n• Format: "Day: X% chance of rain"\n• Append ☔ if chance > 70',
+    a:`function RainForecast({ forecast }) {
+  return (
+    <ul>
+      {forecast.map(({ day, chance }) => (
+        <li key={day}>
+          {day}: {chance}% chance of rain
+          {chance > 70 ? " ☔" : ""}
+        </li>
+      ))}
+    </ul>
+  );
+}`
+  },
+  {
+    q:'Which SpeedTracker is correct?\n• Starts at 0 km/h\n• Accelerate: +10\n• Brake: -10 (never below 0)\nChoose implementation A, B, C, or D.',
+    a:`// ✅ CORRECT: Implementation A
+function SpeedTracker() {
+  const [speed, setSpeed] = useState(0);
+  return (
+    <div>
+      <p>Speed: {speed} km/h</p>
+      <button onClick={() =>
+        setSpeed(s => s + 10)}>
+        Accelerate
+      </button>
+      <button onClick={() =>
+        setSpeed(s => Math.max(0, s - 10))}>
+        Brake
+      </button>
+    </div>
+  );
+}
+// Uses functional updates + Math.max(0, ...)
+// B: Missing Math.max (can go negative)
+// C: Uses let — no re-render!
+// D: Calls setSpeed in render body — infinite loop`
+  },
+  {
+    q:'Which OceanCreatures is correct?\n• Fetch from API once on mount\n• Display list of creatures\nChoose the correct implementation.',
+    a:`// ✅ CORRECT: Implementation D
+function OceanCreatures() {
+  const [list, setList] = useState([]);
+  useEffect(() => {
+    fetch("https://api.ocean.com/creatures")
+      .then(r => r.json())
+      .then(data => setList(data));
+  }, []); // [] = run once on mount
+  return (
+    <ul>
+      {list.map((c, i) => (
+        <li key={i}>{c}</li>
+      ))}
+    </ul>
+  );
+}
+// A: [list] in deps → infinite loop
+// B: useState(Promise) — wrong
+// C: fetch outside useEffect → every render`
+  },
+  {
+    q:'Fix CloudCounter — gets stuck at 1.\nGoal: count clouds, 1 per second.\n\nfunction CloudCounter() {\n  const [clouds, setClouds] = useState(0);\n  useEffect(() => {\n    const id = setInterval(() => {\n      setClouds(clouds + 1); // BUG!\n    }, 1000);\n    return () => clearInterval(id);\n  }, []);\n  return <p>Clouds: {clouds}</p>;\n}',
+    a:`// FIX: Use functional update form
+function CloudCounter() {
+  const [clouds, setClouds] = useState(0);
+  useEffect(() => {
+    const id = setInterval(() => {
+      setClouds(c => c + 1); // ✅ functional update
+    }, 1000);
+    return () => clearInterval(id);
+  }, []); // [] is correct — no stale closure
+  return <p>Clouds spotted: {clouds}</p>;
+}
+// Bug: clouds + 1 captures the stale closure value (0)
+// Fix: c => c + 1 always uses the latest state`
+  },
+  {
+    q:'Which VolcanoMonitor tracks eruption count WITHOUT causing re-renders?\n• Increment count on button click\n• Log current count\n• No re-renders allowed',
+    a:`// ✅ CORRECT: Implementation C
+function VolcanoMonitor() {
+  const eruptRef = useRef(0);
+  const handleEruption = () => {
+    eruptRef.current += 1;
+    console.log("Eruptions: "
+      + eruptRef.current);
+  };
+  return (
+    <button onClick={handleEruption}>
+      Eruption!
+    </button>
+  );
+}
+// A: increments on every RENDER (not click)
+// B: let count resets every render (not persistent)
+// D: useState → triggers re-render (violates requirement)`
+  },
+];
+
+// ═══════════════════════════════════════════════
+//  TAB SWITCHING
+// ═══════════════════════════════════════════════
+function switchTab(name) {
+  document.querySelectorAll('.tab-page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  document.querySelectorAll('.tab-btn').forEach(b=>{
+    if(b.getAttribute('onclick')&&b.getAttribute('onclick').includes(`'${name}'`)) b.classList.add('active');
+  });
+}
+
+// ═══════════════════════════════════════════════
+//  T/F SECTION
+// ═══════════════════════════════════════════════
+const tfAnswered = {};
+function buildTF() {
+  const container = document.getElementById('tf-container');
+  TF_DATA.forEach((item,i)=>{
+    const card = document.createElement('div');
+    card.className='q-card';
+    card.id=item.id;
+    card.innerHTML=`
+      <div class="q-label">QUESTION ${i+1} OF 19</div>
+      <div class="q-text"><span class="q-num">${i+1}</span>${item.s}</div>
+      <div class="tf-row">
+        <button class="tf-btn" data-val="true" onclick="answerTF('${item.id}',true,${item.ans},'${escJs(item.exp)}')">TRUE</button>
+        <button class="tf-btn" data-val="false" onclick="answerTF('${item.id}',false,${item.ans},'${escJs(item.exp)}')">FALSE</button>
+      </div>
+      <div class="feedback" id="${item.id}-fb"></div>`;
+    container.appendChild(card);
+  });
+}
+
+function answerTF(id, chosen, correct, exp) {
+  if(tfAnswered[id]) return;
+  tfAnswered[id]=true;
+  const card = document.getElementById(id);
+  const fb = document.getElementById(id+'-fb');
+  const btns = card.querySelectorAll('.tf-btn');
+  btns.forEach(b=>b.classList.add('disabled'));
+  const isRight = (chosen===correct);
+  btns.forEach(b=>{
+    if(b.dataset.val===String(correct)) b.classList.add('correct');
+    else b.classList.add('wrong');
+  });
+  fb.innerHTML=(isRight?'✅ Correct! ':'❌ Incorrect. ')+exp;
+  fb.className='feedback show '+(isRight?'ok':'bad');
+  if(!isRight) card.classList.add('wrong-card'); else card.classList.add('correct-card');
+  updateTFProgress();
+}
+
+function updateTFProgress() {
+  const done=Object.keys(tfAnswered).filter(k=>k.startsWith('tf')).length;
+  document.getElementById('pb-tf').style.width=(done/19*100)+'%';
+  document.getElementById('sc-tf').textContent=done+' / 19';
+}
+
+function resetTF() {
+  Object.keys(tfAnswered).forEach(k=>{if(k.startsWith('tf'))delete tfAnswered[k];});
+  document.getElementById('tf-container').innerHTML='';
+  buildTF();
+  updateTFProgress();
+}
+
+// ═══════════════════════════════════════════════
+//  OUTPUT SECTION
+// ═══════════════════════════════════════════════
+const outAnswered = {};
+function buildOutput() {
+  const container = document.getElementById('output-container');
+  OUTPUT_DATA.forEach((item,i)=>{
+    const card = document.createElement('div');
+    card.className='q-card';
+    card.id=item.id;
+    card.innerHTML=`
+      <div class="q-label">QUESTION ${item.num} · ${item.label.toUpperCase()}</div>
+      <div class="q-text"><span class="q-num">${item.num}</span>${item.label}</div>
+      <pre class="code-block">${escHtml(item.code)}</pre>
+      <p style="font-size:12px;color:var(--muted);font-family:var(--mono);margin-bottom:8px;">💡 Hint: ${item.hint}</p>
+      <div class="fill-wrap">
+        <input type="text" class="fill-input" id="${item.id}-inp" placeholder="Type your answer…" onkeydown="if(event.key==='Enter')checkOutput('${item.id}')"/>
+        <button class="check-btn" id="${item.id}-btn" onclick="checkOutput('${item.id}')">Check ✓</button>
+      </div>
+      <div class="feedback" id="${item.id}-fb"></div>`;
+    container.appendChild(card);
+  });
+}
+
+function checkOutput(id) {
+  if(outAnswered[id]) return;
+  const item = OUTPUT_DATA.find(x=>x.id===id);
+  const inp = document.getElementById(id+'-inp');
+  const btn = document.getElementById(id+'-btn');
+  const fb = document.getElementById(id+'-fb');
+  const val = inp.value.trim();
+  if(!val) return;
+  const correct = item.answers.some(a=>val.toLowerCase().replace(/['"<>]/g,'')===a.toLowerCase().replace(/['"<>]/g,''));
+  outAnswered[id]=true;
+  inp.classList.add(correct?'correct-input':'wrong-input');
+  inp.classList.add('disabled-input');
+  inp.disabled=true;
+  btn.disabled=true;
+  const card = document.getElementById(id);
+  card.classList.add(correct?'correct-card':'wrong-card');
+  fb.innerHTML=(correct?'✅ Correct! ':'❌ Incorrect. Expected: <strong>'+item.answers[0]+'</strong><br>')+item.exp;
+  fb.className='feedback show '+(correct?'ok':'bad');
+  updateOutProgress();
+}
+
+function updateOutProgress() {
+  const done=Object.keys(outAnswered).length;
+  document.getElementById('pb-out').style.width=(done/12*100)+'%';
+  document.getElementById('sc-out').textContent=done+' / 12';
+}
+
+function resetOutput() {
+  Object.keys(outAnswered).forEach(k=>delete outAnswered[k]);
+  document.getElementById('output-container').innerHTML='';
+  buildOutput();
+}
+
+// ═══════════════════════════════════════════════
+//  FLASHCARDS
+// ═══════════════════════════════════════════════
+let fcState = { current:0, flipped:false, order:[...Array(FC_DATA.length).keys()] };
+
+function renderFC() {
+  const idx = fcState.order[fcState.current];
+  const card = FC_DATA[idx];
+  document.getElementById('fc-counter').textContent=(fcState.current+1)+' / '+FC_DATA.length;
+  document.getElementById('fc-grid-container').innerHTML=`
+    <div class="fc-grid">
+      <div class="flashcard ${fcState.flipped?'flipped':''}" id="fc-main" onclick="fcFlip()" style="height:300px;">
+        <div class="flashcard-inner">
+          <div class="fc-face fc-front">
+            <div class="fc-tag">💻 Write the Code — Question ${fcState.current+1}</div>
+            <div class="fc-q" style="white-space:pre-wrap;font-family:var(--mono);font-size:12px;">${escHtml(card.q)}</div>
+            <div class="fc-hint">Click to reveal solution →</div>
+          </div>
+          <div class="fc-face fc-back">
+            <div class="fc-tag">✅ Solution</div>
+            <pre class="fc-code">${escHtml(card.a)}</pre>
+          </div>
+        </div>
+      </div>
+    </div>`;
+}
+
+function fcFlip() {
+  fcState.flipped=!fcState.flipped;
+  const el=document.getElementById('fc-main');
+  if(el) el.classList.toggle('flipped');
+}
+
+function fcNav(dir) {
+  fcState.current=(fcState.current+dir+FC_DATA.length)%FC_DATA.length;
+  fcState.flipped=false;
+  renderFC();
+}
+
+function fcShuffle() {
+  for(let i=fcState.order.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [fcState.order[i],fcState.order[j]]=[fcState.order[j],fcState.order[i]];
+  }
+  fcState.current=0; fcState.flipped=false;
+  renderFC();
+}
+
+// ═══════════════════════════════════════════════
+//  QUICK QUIZ
+// ═══════════════════════════════════════════════
+
+// All possible quiz questions pulled from TF + Output data
+const ALL_QUIZ_Q = [
+  // T/F as MCQ
+  ...TF_DATA.map((item,i)=>({
+    type:'tf', q:`<span class="q-num">${i+1}</span> TRUE or FALSE: ${item.s}`,
+    opts:['True','False'], correct:item.ans?0:1, exp:item.exp
+  })),
+  // Output questions as MCQ (pick 8)
+  { type:'out', q:'<span class="q-num">20</span> What is the <strong>final visible</strong> output of RealMadridApp (after mount)?',
+    opts:['Loading squad...','Hala Madrid!','undefined','Error'], correct:1, exp:'useEffect fires after mount → setLoaded(true) → re-render → "Hala Madrid!" is shown.' },
+  { type:'out', q:'<span class="q-num">22</span> How many times is "Arda Guler scored!" logged when goals goes from 5 → 6?',
+    opts:['1','2','3','0'], correct:1, exp:'Once on mount (goals=5), once when goals changes to 6. useEffect [goals] = run on mount + on change.' },
+  { type:'out', q:'<span class="q-num">23</span> No dependency array in useEffect. Component has 2 button clicks. How many times is the effect logged?',
+    opts:['1','2','3','4'], correct:2, exp:'3 times — initial mount + 1 per click = 3 total. No dependency array = runs after every render.' },
+  { type:'out', q:'<span class="q-num">24</span> useEffect(() => { setCount(count + 1); }, [count]) — what happens?',
+    opts:['Count increments to 1 then stops','Renders Count: 0','Infinite loop / crash','Count increments exactly once'], correct:2, exp:'setCount changes count → effect runs again → infinite loop. Never put a setter for a dep inside its own effect without a condition.' },
+  { type:'out', q:'<span class="q-num">25</span> After clicking 5 times, what does the UI show? (clicksRef.current += 1 in handler, no state)',
+    opts:['Clicks: 5','Clicks: 0','Clicks: 1','Error'], correct:1, exp:'Refs don\'t trigger re-renders. The UI stays at its initial render value: Clicks: 0.' },
+  { type:'out', q:'<span class="q-num">27</span> Output of: <RealMadridStar name="Arda Güler" goals={7} />',
+    opts:['Arda Güler scored 7 goals!','goals scored name!','7 goals Arda Güler','name scored goals goals!'], correct:0, exp:'Props destructure name and goals. Template: {name} scored {goals} goals!' },
+  { type:'out', q:'<span class="q-num">29</span> Output of BarcelonaChant: team="Barça", chant="Ole" → <p>{chant} {chant} {team}!</p>',
+    opts:['chant chant team!','Ole Ole Barça!','Barça Ole Ole!','OleOleBarça!'], correct:1, exp:'JSX interpolates variables: "Ole" + " " + "Ole" + " " + "Barça" + "!"' },
+  { type:'out', q:'<span class="q-num">30</span> Output of: <PaintBucket>Crimson Red</PaintBucket>',
+    opts:['Crimson Red','Color: Crimson Red','Color: children','PaintBucket: Crimson Red'], correct:1, exp:'"Crimson Red" is the children prop. Template: "Color: " + {children}.' },
+  // Concept MCQ
+  { type:'concept', q:'What is the correct way to update a state variable <code>count</code> from 0 to 1 in React?',
+    opts:['count = 1','setCount(1)','count.update(1)','React.setState(count, 1)'], correct:1, exp:'Always use the setter function returned by useState. Direct assignment does not trigger re-render.' },
+  { type:'concept', q:'Which useEffect dependency array makes it run <strong>only once</strong> when the component mounts?',
+    opts:['No second argument','[undefined]','[]','[true]'], correct:2, exp:'Empty array [] = "no dependencies" = only run after initial mount.' },
+  { type:'concept', q:'What does props.children refer to in a React component?',
+    opts:['The first child component in the app','Content nested between the component\'s opening and closing tags','All child state variables','Sub-components created inside the component'], correct:1, exp:'children is a special auto-added prop holding whatever is between the component\'s JSX tags.' },
+  { type:'concept', q:'How does a child component communicate back to its parent in React?',
+    opts:['By directly modifying parent state','By calling a callback function passed as a prop','By using global variables','By calling parent.setState()'], correct:1, exp:'Parent passes a callback as a prop. Child calls it to notify the parent of changes.' },
+  { type:'concept', q:'Which is the CORRECT way to render a list in React?',
+    opts:['<for item in items><li>{item}</li></for>','items.forEach(i => <li>{i}</li>)','items.map((item,i) => <li key={i}>{item}</li>)','items.each(item => JSX(item))'], correct:2, exp:'.map() returns an array of JSX elements. Each must have a key prop for React\'s reconciliation.' },
+  { type:'concept', q:'What happens when you update a useRef value?',
+    opts:['The component re-renders','The value is reset to initial','The value persists but no re-render occurs','React throws an error'], correct:2, exp:'ref.current persists across renders but updating it never triggers a re-render — unlike useState.' },
+];
+
+const quizAnswered = {};
+let currentQuizQ = [];
+
+function pickQuiz() {
+  const pool = [...ALL_QUIZ_Q];
+  for(let i=pool.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[pool[i],pool[j]]=[pool[j],pool[i]];}
+  return pool.slice(0,10);
+}
+
+function buildQuiz() {
+  Object.keys(quizAnswered).forEach(k=>delete quizAnswered[k]);
+  currentQuizQ = pickQuiz();
+  const container = document.getElementById('quiz-container');
+  container.innerHTML='';
+  document.getElementById('pb-quiz').style.width='0%';
+  document.getElementById('sc-quiz').textContent='0 / 10';
+  currentQuizQ.forEach((q,i)=>{
+    const id='qq'+i;
+    const opts = q.opts.map((o,j)=>`
+      <div class="quiz-opt" onclick="answerQuiz('${id}',${j},'${escJs(q.exp)}')">
+        <span class="qlabel">${['A','B','C','D'][j]}</span>${escHtml(o)}
+      </div>`).join('');
+    const typeLabel = {tf:'True/False',out:'Output',concept:'Concept'}[q.type]||'';
+    container.innerHTML+=`
+      <div class="quiz-q-card" id="${id}">
+        <div style="font-family:var(--mono);font-size:10px;letter-spacing:2px;color:var(--muted);margin-bottom:6px;">${typeLabel.toUpperCase()}</div>
+        <div class="q-text" style="margin-bottom:0;">${q.q}</div>
+        <div class="quiz-opts">${opts}</div>
+        <div class="quiz-feedback" id="${id}-fb"></div>
+      </div>`;
+  });
+}
+
+function answerQuiz(id, chosen, exp) {
+  if(quizAnswered[id]) return;
+  quizAnswered[id]=true;
+  const qi = parseInt(id.replace('qq',''));
+  const q = currentQuizQ[qi];
+  const card = document.getElementById(id);
+  const fb = document.getElementById(id+'-fb');
+  const opts = card.querySelectorAll('.quiz-opt');
+  opts.forEach(o=>o.classList.add('qdis'));
+  const isRight = chosen===q.correct;
+  opts[q.correct].classList.add('qcorrect');
+  if(!isRight) opts[chosen].classList.add('qwrong');
+  card.classList.add(isRight?'answered-correct':'answered-wrong');
+  fb.innerHTML=(isRight?'✅ Correct! ':'❌ Incorrect. ')+exp;
+  fb.className='quiz-feedback show '+(isRight?'qok':'qbad');
+  const done=Object.keys(quizAnswered).length;
+  document.getElementById('pb-quiz').style.width=(done/10*100)+'%';
+  document.getElementById('sc-quiz').textContent=done+' / 10';
+}
+
+function resetQuiz() {
+  buildQuiz();
+}
+
+// ═══════════════════════════════════════════════
+//  UTILS
+// ═══════════════════════════════════════════════
+function escHtml(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function escJs(s){return(s||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'&quot;').replace(/\n/g,'\\n');}
+
+// ═══════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════
+buildTF();
+buildOutput();
+renderFC();
+buildQuiz();
+</script>
+</body>
+</html>

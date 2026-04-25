@@ -539,11 +539,16 @@
     <span class="toc-group-label" style="color:#f87171">⑥ Web API</span>
     <a href="#wa-overview"><span class="dot"></span>Overview</a>
     <a href="#wa-http"><span class="dot"></span>HTTP &amp; URLs</a>
+    <a href="#wa-url-encoding"><span class="dot"></span>URL Encoding</a>
+    <a href="#wa-media-types"><span class="dot"></span>Media Types</a>
     <a href="#wa-rest"><span class="dot"></span>REST Principles</a>
     <a href="#wa-verbs"><span class="dot"></span>HTTP Verbs &amp; CRUD</a>
     <a href="#wa-status"><span class="dot"></span>Status Codes</a>
+    <a href="#wa-redirect"><span class="dot"></span>Redirection</a>
     <a href="#wa-nextjs"><span class="dot"></span>Next.js Routes</a>
     <a href="#wa-dynamic"><span class="dot"></span>Dynamic Routes</a>
+    <a href="#wa-catchall"><span class="dot"></span>Catch-all Routes</a>
+    <a href="#wa-headers"><span class="dot"></span>Headers &amp; Redirect</a>
     <a href="#wa-request"><span class="dot"></span>Request &amp; Response</a>
   </div>
 
@@ -1828,6 +1833,58 @@ Query     : ?key=value — optional parameters after ?</pre>
       </div>
     </section>
 
+    <section id="wa-url-encoding">
+      <div class="section-header">
+        <div class="section-number" style="background:var(--accent4)">2b</div>
+        <h2>URL Encoding</h2>
+      </div>
+      <div class="card" style="border-color:var(--accent4)">
+        <h3>Encoding Rules</h3>
+        <p>According to RFC 1738, only alphanumeric characters <code>[0-9a-zA-Z]</code> and a few special characters (<code>$-_.+!*'()</code>) are allowed unencoded in a URL. All other characters must be percent-encoded.</p>
+        <pre><span class="cmt">// Space and special chars must be encoded</span>
+https://google.com/search?q=qatar%20university
+<span class="cmt">// Common encodings:</span>
+<span class="cmt">// Space = %20  |  # = %23  |  & = %26</span>
+<span class="cmt">// = = %3D      |  + = %2B  |  / = %2F</span></pre>
+      </div>
+      <div class="card tip">
+        <h3>Why Encoding Matters</h3>
+        <p>Without encoding, characters like <code>&amp;</code> or <code>=</code> in query values would break the URL parser. The browser often handles encoding automatically, but it's important to understand when building API URLs manually.</p>
+      </div>
+    </section>
+
+    <section id="wa-media-types">
+      <div class="section-header">
+        <div class="section-number" style="background:var(--accent4)">2c</div>
+        <h2>Internet Media Types (MIME)</h2>
+      </div>
+      <div class="card">
+        <h3>Content-Type Header</h3>
+        <p>The <code>Content-Type</code> header describes the media type of the body in an HTTP message. Servers and clients use it to know how to parse the body.</p>
+        <table>
+          <tr><th>Media Type</th><th>Description</th></tr>
+          <tr><td><code>text/html</code></td><td>HTML web pages</td></tr>
+          <tr><td><code>text/plain</code></td><td>Plain text</td></tr>
+          <tr><td><code>application/json</code></td><td>JSON data — used by Web APIs</td></tr>
+          <tr><td><code>application/xml</code></td><td>XML data</td></tr>
+          <tr><td><code>image/jpeg</code></td><td>JPEG image</td></tr>
+          <tr><td><code>image/png</code></td><td>PNG image</td></tr>
+          <tr><td><code>multipart/form-data</code></td><td>File uploads via HTML forms</td></tr>
+          <tr><td><code>application/x-www-form-urlencoded</code></td><td>Standard HTML form submission</td></tr>
+        </table>
+      </div>
+      <div class="card info">
+        <h3>In Next.js Route Handlers</h3>
+        <pre><span class="kw">export async function</span> <span class="fn">GET</span>(request) {
+  <span class="kw">return</span> <span class="kw">new</span> <span class="fn">Response</span>(JSON.<span class="fn">stringify</span>(data), {
+    headers: {
+      <span class="str">'Content-Type'</span>: <span class="str">'application/json'</span>
+    }
+  });
+}</pre>
+      </div>
+    </section>
+
     <section id="wa-rest">
       <div class="section-header">
         <div class="section-number" style="background:var(--accent4)">3</div>
@@ -1895,6 +1952,28 @@ Query     : ?key=value — optional parameters after ?</pre>
       </div>
     </section>
 
+    <section id="wa-redirect">
+      <div class="section-header">
+        <div class="section-number" style="background:var(--accent4)">5b</div>
+        <h2>Browser Redirection (3xx)</h2>
+      </div>
+      <div class="card">
+        <h3>How HTTP Redirection Works</h3>
+        <p>When a resource has moved, the server responds with a <strong>3xx status code</strong> and a <code>Location</code> header pointing to the new URL. The browser automatically follows the redirect.</p>
+        <table>
+          <tr><th>Code</th><th>Name</th><th>Use Case</th></tr>
+          <tr><td><code>301</code></td><td>Moved Permanently</td><td>Resource has a new permanent URL — browsers and search engines update their links</td></tr>
+          <tr><td><code>302</code></td><td>Found (Temporary Redirect)</td><td>Resource is temporarily at a different URL</td></tr>
+          <tr><td><code>307</code></td><td>Temporary Redirect</td><td>Like 302, but guarantees the HTTP method is preserved</td></tr>
+          <tr><td><code>308</code></td><td>Permanent Redirect</td><td>Like 301, but preserves the HTTP method</td></tr>
+        </table>
+      </div>
+      <div class="card tip">
+        <h3>Redirect Flow</h3>
+        <p>Client sends <code>GET /old-url</code> → Server responds <code>302 Found</code> with <code>Location: /new-url</code> → Client automatically sends <code>GET /new-url</code> → Server responds <code>200 OK</code> with the resource.</p>
+      </div>
+    </section>
+
     <section id="wa-nextjs">
       <div class="section-header">
         <div class="section-number" style="background:var(--accent4)">6</div>
@@ -1905,8 +1984,10 @@ Query     : ?key=value — optional parameters after ?</pre>
         <ul>
           <li><strong>Next.js</strong> = React-based full-stack framework for server-rendered pages AND Web APIs</li>
           <li>Uses a <strong>file-system based App Router</strong> — folder structure = URL routes</li>
+          <li>Folders inside the <code>app/</code> directory define routes; a route is a path of nested folders from root to a leaf</li>
+          <li>Files create Web pages (<code>page.js</code>) or Web API endpoints (<code>route.js</code>)</li>
           <li>Create a project: <code>npx create-next-app@latest .</code></li>
-          <li>Run dev server: <code>npm run dev</code></li>
+          <li>Run dev server: <code>npm run dev</code> · Build: <code>npm run build</code> · Production: <code>npm run start</code></li>
         </ul>
       </div>
       <div class="two-col">
@@ -1977,6 +2058,79 @@ Query     : ?key=value — optional parameters after ?</pre>
     .<span class="fn">get</span>(<span class="str">'sortBy'</span>); <span class="cmt">// "price"</span>
 }</pre>
         </div>
+      </div>
+    </section>
+
+    <section id="wa-catchall">
+      <div class="section-header">
+        <div class="section-number" style="background:var(--accent4)">7b</div>
+        <h2>Optional Catch-all Segments</h2>
+      </div>
+      <div class="card">
+        <h3>Catch-all vs Optional Catch-all</h3>
+        <table>
+          <tr><th>Syntax</th><th>Matches</th><th>Also matches base path?</th></tr>
+          <tr><td><code>[...slug]</code></td><td><code>/shop/clothes</code>, <code>/shop/clothes/tops</code></td><td>❌ No — base <code>/shop</code> is not matched</td></tr>
+          <tr><td><code>[[...slug]]</code></td><td><code>/shop/clothes</code>, <code>/shop/clothes/tops</code></td><td>✅ Yes — <code>/shop</code> also matches</td></tr>
+        </table>
+      </div>
+      <div class="card highlight-blue">
+        <h3>Example</h3>
+        <pre><span class="cmt">// app/api/shop/[[...slug]]/route.js</span>
+<span class="cmt">// Matches: /api/shop, /api/shop/clothes,</span>
+<span class="cmt">//          /api/shop/clothes/tops, etc.</span>
+
+<span class="kw">export async function</span> <span class="fn">GET</span>(request, { params }) {
+  <span class="kw">const</span> <span class="var">slug</span> = params.slug ?? []; <span class="cmt">// [] for base path</span>
+  <span class="cmt">// /shop/clothes/tops → slug = ["clothes","tops"]</span>
+  <span class="kw">return</span> <span class="fn">Response</span>.<span class="fn">json</span>({ slug });
+}</pre>
+      </div>
+    </section>
+
+    <section id="wa-headers">
+      <div class="section-header">
+        <div class="section-number" style="background:var(--accent4)">7c</div>
+        <h2>Headers &amp; Server-Side Redirect</h2>
+      </div>
+      <div class="two-col">
+        <div class="card">
+          <h3>Reading &amp; Setting Headers</h3>
+          <p>Use the <code>headers</code> library from <code>next/headers</code> to read incoming request headers, and pass custom headers in the <code>Response</code> object.</p>
+          <pre><span class="kw">import</span> { headers } <span class="kw">from</span> <span class="str">'next/headers'</span>;
+
+<span class="kw">export async function</span> <span class="fn">GET</span>() {
+  <span class="kw">const</span> <span class="var">hList</span> = <span class="fn">headers</span>();
+  <span class="kw">const</span> <span class="var">auth</span> = hList.<span class="fn">get</span>(<span class="str">'Authorization'</span>);
+
+  <span class="kw">return</span> <span class="kw">new</span> <span class="fn">Response</span>(<span class="str">'OK'</span>, {
+    headers: {
+      <span class="str">'X-Custom-Header'</span>: <span class="str">'value'</span>,
+      <span class="str">'Content-Type'</span>: <span class="str">'application/json'</span>
+    }
+  });
+}</pre>
+        </div>
+        <div class="card">
+          <h3>Server-Side Redirect</h3>
+          <p>Use the <code>redirect()</code> function from Next.js to send a redirect response from inside a route handler.</p>
+          <pre><span class="kw">import</span> { redirect } <span class="kw">from</span> <span class="str">'next/navigation'</span>;
+
+<span class="kw">export async function</span> <span class="fn">GET</span>(request) {
+  <span class="kw">const</span> { searchParams } =
+    <span class="kw">new</span> <span class="fn">URL</span>(request.url);
+  <span class="kw">const</span> <span class="var">token</span> = searchParams.<span class="fn">get</span>(<span class="str">'token'</span>);
+
+  <span class="kw">if</span> (!token) {
+    <span class="fn">redirect</span>(<span class="str">'/login'</span>); <span class="cmt">// 307 by default</span>
+  }
+  <span class="kw">return</span> <span class="fn">Response</span>.<span class="fn">json</span>({ ok: <span class="kw">true</span> });
+}</pre>
+        </div>
+      </div>
+      <div class="card warn">
+        <h3>⚠️ redirect() vs new Response()</h3>
+        <p><code>redirect('/path')</code> is a Next.js helper that throws internally — do <strong>not</strong> wrap it in try/catch. For manual redirects, use <code>new Response(null, { status: 302, headers: { Location: '/path' } })</code> instead.</p>
       </div>
     </section>
 
